@@ -1,7 +1,7 @@
 # RoboCasa foundation status
 
 **Last updated:** 2026-08-31
-**Current phase:** foundation branch transition; Phase 0 not yet started
+**Current phase:** Phase 0 dependency and provenance audit ready to start
 **Implementation verdict:** **GO for ordered foundation execution from the designated handoff base**
 
 ## Completed
@@ -12,9 +12,10 @@
   remotely after `git fetch origin`.
 - On 2026-08-31, the user superseded that obsolete requirement and designated
   `codex/robocasa-foundation-handoff` as the exact base for foundation work.
-- The implementation branch must be created as
-  `codex/robocasa-certified-branchpoints-foundation` from the updated handoff
-  branch after the clean-worktree and fast-forward checks pass.
+- Created `codex/robocasa-certified-branchpoints-foundation` on Quest from the
+  updated handoff commit `d0890f4` after the clean-worktree and fast-forward
+  checks passed. Published the same commit to `origin` and configured the Quest
+  branch to track it.
 - Provisioned and smoke-tested the independent Quest RoboCasa365 core
   environment. Exact pins, commands, paths, asset status, and limitations are
   recorded in `ENVIRONMENT_HANDOFF.md`.
@@ -24,8 +25,22 @@
 ## Gate decision
 
 - Foundation base gate: cleared by the user's explicit designation of
-  `codex/robocasa-foundation-handoff`. Branch creation and Phase 0 remain to be
-  executed and recorded.
+  `codex/robocasa-foundation-handoff`.
+- Foundation branch gate: passed at commit `d0890f4`; local and Quest
+  `codex/robocasa-certified-branchpoints-foundation` branches track the matching
+  branch on `origin`.
+
+## Branch transition record
+
+- Quest ran `git fetch origin`, confirmed a clean worktree, fast-forwarded
+  `codex/robocasa-foundation-handoff` from `b1757e6` to `d0890f4`, and created
+  `codex/robocasa-certified-branchpoints-foundation`.
+- The first `git push -u origin` from Quest failed because the HTTPS checkout
+  has no non-interactive GitHub credentials. No commit or worktree content was
+  lost or changed by this failure.
+- The branch was then published from the authorized local checkout with
+  `git push origin d0890f4:refs/heads/codex/robocasa-certified-branchpoints-foundation`.
+  Quest fetched that ref, verified identical HEADs, and set it as upstream.
 
 ## Gates not yet started
 
@@ -45,8 +60,6 @@ range is unavailable from both tested package indexes. This is documented in
 
 1. Read `AGENTS.md`, `QUEST_WORKFLOW.md`, the environment handoff, and the
    execution plan.
-2. On Quest, verify that the worktree is clean, fetch `origin`, fast-forward
-   `codex/robocasa-foundation-handoff`, and create
-   `codex/robocasa-certified-branchpoints-foundation` from that exact commit.
-3. Begin Phase 0 in the prescribed order. Preserve these handoff documents and
+2. Begin Phase 0 on Quest in the prescribed order from commit `d0890f4`.
+3. Preserve these handoff documents and
    update this status file at each passing phase gate.
