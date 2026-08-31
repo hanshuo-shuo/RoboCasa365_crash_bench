@@ -10,7 +10,7 @@
 - Consolidated the linear environment-handoff and branch-transition commits
   into `main` without rewriting history.
 - On 2026-08-31, the user designated `main` as the only project branch. The two
-  temporary `codex/robocasa-*` branches are obsolete and are being removed
+  temporary `codex/robocasa-*` branches were removed
   locally, on Quest, and from `origin`.
 - Provisioned and smoke-tested the independent Quest RoboCasa365 core
   environment. Exact pins, commands, paths, asset status, and limitations are
