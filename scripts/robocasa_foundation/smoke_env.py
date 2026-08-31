@@ -35,9 +35,29 @@ def clean_value(value: Any) -> Any:
     return repr(value)
 
 
-def construct(task: str, seed: int, render: bool) -> tuple[dict[str, Any], Any]:
+def neutral_action(space: Any) -> Any:
     import gymnasium as gym
     import numpy as np
+
+    if isinstance(space, gym.spaces.Dict):
+        return {key: neutral_action(subspace) for key, subspace in space.spaces.items()}
+    if isinstance(space, gym.spaces.Box):
+        return np.zeros(space.shape, dtype=space.dtype)
+    if isinstance(space, gym.spaces.Discrete):
+        return 0
+    raise TypeError(f"unsupported action space: {space!r}")
+
+
+def space_schema(space: Any) -> Any:
+    import gymnasium as gym
+
+    if isinstance(space, gym.spaces.Dict):
+        return {key: space_schema(subspace) for key, subspace in space.spaces.items()}
+    return {"type": type(space).__name__, "shape": list(space.shape)}
+
+
+def construct(task: str, seed: int, render: bool) -> tuple[dict[str, Any], Any]:
+    import gymnasium as gym
     import robocasa  # noqa: F401
 
     kwargs: dict[str, Any] = {"split": "pretrain", "seed": seed}
@@ -73,8 +93,7 @@ def construct(task: str, seed: int, render: bool) -> tuple[dict[str, Any], Any]:
         ),
         key=lambda item: item["logical_name"],
     )
-    zero = np.zeros(env.action_space.shape, dtype=env.action_space.dtype)
-    env.step(zero)
+    env.step(neutral_action(env.action_space))
     frame = None
     if render:
         image_keys = sorted(key for key in observation if key.endswith("_image"))
@@ -89,7 +108,7 @@ def construct(task: str, seed: int, render: bool) -> tuple[dict[str, Any], Any]:
         "objects": objects,
         "fixtures": fixtures,
         "success_at_reset": bool(base._check_success()),
-        "action_shape": list(env.action_space.shape),
+        "action_space": space_schema(env.action_space),
     }
     env.close()
     return record, frame

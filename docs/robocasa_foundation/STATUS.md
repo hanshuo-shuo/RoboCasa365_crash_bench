@@ -74,6 +74,11 @@ range is unavailable from both tested package indexes. This is documented in
   official wrapper's fixed `has_offscreen_renderer` keyword. The duplicate was
   removed; the replacement job explicitly loads CUDA and records GPU/driver
   provenance before EGL initialization.
+- CPU `5239654` and render `5239661` both initialized their explicit GL
+  backends and constructed `CloseDrawer`, then failed because the smoke script
+  treated RoboCasa's Gym `Dict` action space as a flat array. The replacement
+  recursively emits neutral `Dict`, `Box`, and `Discrete` actions and records
+  the full action-space schema.
 
 ## Next action
 
