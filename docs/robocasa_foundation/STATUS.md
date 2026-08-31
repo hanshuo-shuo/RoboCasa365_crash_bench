@@ -66,6 +66,14 @@ range is unavailable from both tested package indexes. This is documented in
   `git/2.47.0-gcc-12.4.0`.
 - Pending render job `5239429` was cancelled before allocation because it used
   the same provenance preflight and would have failed for the same reason.
+- CPU smoke job `5239490` passed dependency provenance, then failed while
+  initializing inherited EGL on CPU node `qnode0158`. The replacement job
+  explicitly selects Quest's Mesa module and `MUJOCO_GL=osmesa`.
+- Render smoke job `5239503` received one A100 GPU on `qgpu0406` with
+  `CUDA_VISIBLE_DEVICES=0`, then failed because the smoke script duplicated the
+  official wrapper's fixed `has_offscreen_renderer` keyword. The duplicate was
+  removed; the replacement job explicitly loads CUDA and records GPU/driver
+  provenance before EGL initialization.
 
 ## Next action
 

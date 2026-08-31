@@ -43,8 +43,6 @@ def construct(task: str, seed: int, render: bool) -> tuple[dict[str, Any], Any]:
     kwargs: dict[str, Any] = {"split": "pretrain", "seed": seed}
     if render:
         kwargs.update(
-            camera_obs=True,
-            has_offscreen_renderer=True,
             camera_names=["robot0_agentview_center"],
             camera_widths=512,
             camera_heights=512,
