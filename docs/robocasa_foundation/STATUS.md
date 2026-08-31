@@ -94,6 +94,16 @@ range is unavailable from both tested package indexes. This is documented in
   4:11). It produced three hashed PNGs and a `valid=true` fixed-seed identity
   manifest. Together with CPU job `5239773`, this closes F1.
 
+## F2 job record
+
+- Candidate task screen `5240564` passed 21/21 constructions with no failures.
+- Source-demo audit `5241104` passed five one-object FoodCleanup episodes and
+  produced an episode-0 GIF/contact sheet.
+- First fresh-replay submission `5241173` failed before environment creation
+  because both the sbatch wrapper and Python no-overwrite gate created the same
+  report directory. The wrapper now creates only the run root; no replay result
+  was claimed from the failed job.
+
 ## Next action
 
 1. Rank natural composite tasks whose unchanged success predicate contains

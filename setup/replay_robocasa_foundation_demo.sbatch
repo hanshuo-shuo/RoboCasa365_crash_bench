@@ -21,7 +21,7 @@ export PYTHONPATH=/projects/p33100/siosio/tools/pyarrow-21.0.0
 cd "$PROJECT_ROOT"
 test -z "$(git status --short)"
 test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
-mkdir -p "$RUN_ROOT/report"
+mkdir -p "$RUN_ROOT"
 printf 'commit=%s\njob_id=%s\nnode=%s\npyarrow=21.0.0\n' \
   "$(git rev-parse HEAD)" "$SLURM_JOB_ID" "${SLURMD_NODENAME:-unknown}" \
   > "$RUN_ROOT/job_provenance.txt"
@@ -31,4 +31,3 @@ printf 'commit=%s\njob_id=%s\nnode=%s\npyarrow=21.0.0\n' \
   --episode 0 \
   --repeats 10 \
   --output "$RUN_ROOT/report/replay_report.json"
-
