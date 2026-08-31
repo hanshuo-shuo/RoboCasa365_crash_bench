@@ -65,6 +65,18 @@ def main() -> int:
     def controller():
         return env.robots[0].composite_controller.part_controllers["right"]
 
+    def gripper_model():
+        gripper = env.robots[0].gripper
+        if isinstance(gripper, dict):
+            return gripper.get("right", next(iter(gripper.values())))
+        return gripper
+
+    def fingerpad_midpoint():
+        gripper = gripper_model()
+        names = gripper.important_geoms["left_fingerpad"] + gripper.important_geoms["right_fingerpad"]
+        positions = [np.asarray(env.sim.data.get_geom_xpos(name), dtype=float) for name in names]
+        return np.mean(positions, axis=0), names
+
     def neutral():
         action = np.zeros(12, dtype=float)
         action[6] = -1.0
@@ -151,6 +163,28 @@ def main() -> int:
         approach = hazard_object_pos + outward * 0.07 + np.array([0.0, 0.0, 0.015])
         approach_record = move_eef_world("approach_outside_object", approach)
         capture(True)
+        pad_before, pad_names = fingerpad_midpoint()
+        align_correction = hazard_object_pos - pad_before
+        align_target = np.asarray(controller().ref_pos).copy() + align_correction
+        align_record = move_eef_world(
+            "align_fingerpad_midpoint_to_object",
+            align_target,
+            max_steps=180,
+            tolerance=0.02,
+        )
+        pad_after, _ = fingerpad_midpoint()
+        primitive_records.append(
+            {
+                "primitive": "AlignFingerpads",
+                "fingerpad_geoms": pad_names,
+                "midpoint_before": pad_before.tolist(),
+                "midpoint_after": pad_after.tolist(),
+                "object_center": hazard_object_pos.tolist(),
+                "final_midpoint_error_m": float(np.linalg.norm(pad_after - hazard_object_pos)),
+                "privileged_geometry": True,
+            }
+        )
+        capture(True)
         for _ in range(30):
             close_action = neutral()
             close_action[6] = 1.0
@@ -164,6 +198,7 @@ def main() -> int:
                 "privileged_geometry": False,
             }
         )
+        grasped_after_close = bool(env._check_grasp(gripper_model(), target))
         push_target = np.asarray(controller().ref_pos).copy() + inward * 0.06
         push_record = move_eef_world(
             "move_grasped_object_inward",
@@ -216,8 +251,15 @@ def main() -> int:
             "cabinet_closed": bool(env.cab.is_closed(env=env)),
         }
         crash = max_consecutive >= int(config["contact_persistence_frames"])
-        if approach_record["timeout"] or push_record["timeout"] or retract_record["timeout"]:
+        if (
+            approach_record["timeout"]
+            or align_record["timeout"]
+            or push_record["timeout"]
+            or retract_record["timeout"]
+        ):
             failures.append("one or more physical motion primitives timed out")
+        if not grasped_after_close:
+            failures.append("fingerpad contact test did not verify a grasp")
         if inward_displacement <= 0.015:
             failures.append(f"physical push moved object inward only {inward_displacement:.6f} m")
         if not contained_after_push:
@@ -238,6 +280,7 @@ def main() -> int:
             "hazard_object_pos": hazard_object_pos.tolist(),
             "post_push_object_pos": post_push_object_pos.tolist(),
             "inward_displacement_m": inward_displacement,
+            "grasped_after_close": grasped_after_close,
             "contained_after_push": contained_after_push,
             "task_success": task_success,
             "terminal_components": terminal_components,
@@ -255,6 +298,7 @@ def main() -> int:
         )
         print(json.dumps({
             "inward_displacement_m": inward_displacement,
+            "grasped_after_close": grasped_after_close,
             "contained_after_push": contained_after_push,
             "task_success": task_success,
             "persistent_door_object_contact": crash,

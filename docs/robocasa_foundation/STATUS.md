@@ -138,6 +138,11 @@ range is unavailable from both tested package indexes. This is documented in
   the object moved only 0.00213 m and the cabinet did not close. Recovery v3
   regrasps at the actually reached pose, moves only along the fixture inward
   axis, releases, and returns to the branch EEF pose with a 0.005 m tolerance.
+- Recovery attempt `5243463` failed closed because closing at the rough wrist
+  pose did not establish a grasp; the object moved only 0.00115 m and closure
+  still contacted it. Recovery v4 computes the actual left/right fingerpad
+  world midpoint, aligns that midpoint to the object center, and requires
+  robosuite `_check_grasp` to pass before repositioning.
 
 ## Next action
 
