@@ -95,7 +95,13 @@ def main() -> int:
         capture(force_frame)
 
     def move_eef_world(
-        label, target_world, max_steps=120, tolerance=0.05, gripper_command=-1.0
+        label,
+        target_world,
+        max_steps=120,
+        tolerance=0.05,
+        gripper_command=-1.0,
+        target_world_ori=None,
+        orientation_tolerance=0.03,
     ):
         start = np.asarray(controller().ref_pos).copy()
         errors = []
@@ -105,11 +111,20 @@ def main() -> int:
             target_origin = ctrl.world_to_origin_frame(np.asarray(target_world))
             delta = target_origin - current_origin
             error = float(np.linalg.norm(delta))
-            errors.append(error)
-            if error <= tolerance:
+            orientation_error = 0.0
+            axis_angle = np.zeros(3, dtype=float)
+            if target_world_ori is not None:
+                current_ori_origin = np.asarray(ctrl.origin_ori).T @ np.asarray(ctrl.ref_ori_mat)
+                target_ori_origin = np.asarray(ctrl.origin_ori).T @ np.asarray(target_world_ori)
+                error_matrix = target_ori_origin @ current_ori_origin.T
+                axis_angle = T.quat2axisangle(T.mat2quat(error_matrix))
+                orientation_error = float(np.linalg.norm(axis_angle))
+            errors.append({"position_m": error, "orientation_rad": orientation_error})
+            if error <= tolerance and orientation_error <= orientation_tolerance:
                 break
             action = neutral()
             action[:3] = np.clip(delta / 0.05, -1.0, 1.0)
+            action[3:6] = np.clip(axis_angle / 0.5, -1.0, 1.0)
             action[6] = gripper_command
             step(action)
         final = np.asarray(controller().ref_pos).copy()
@@ -121,7 +136,12 @@ def main() -> int:
             "final_world": final.tolist(),
             "steps": len(errors),
             "final_error_m": float(np.linalg.norm(final - target_world)),
-            "timeout": not errors or errors[-1] > tolerance,
+            "final_orientation_error_rad": None
+            if target_world_ori is None
+            else errors[-1]["orientation_rad"],
+            "timeout": not errors
+            or errors[-1]["position_m"] > tolerance
+            or errors[-1]["orientation_rad"] > orientation_tolerance,
             "privileged_geometry": True,
         }
         primitive_records.append(record)
@@ -211,6 +231,7 @@ def main() -> int:
         capture(True)
         hazard_object_pos = np.asarray(env.sim.data.get_body_xpos(target.root_body)).copy()
         branch_eef_pos = np.asarray(controller().ref_pos).copy()
+        branch_eef_ori = np.asarray(controller().ref_ori_mat).copy()
         branch_base_pos, branch_base_ori = base_controller().get_base_pose()
         branch_base_pos = np.asarray(branch_base_pos).copy()
         branch_base_ori = np.asarray(branch_base_ori).copy()
@@ -315,7 +336,12 @@ def main() -> int:
         )
         base_record = move_base_to_pose(branch_base_pos, branch_base_ori, branch_torso)
         retract_record = move_eef_world(
-            "return_to_branch_eef", branch_eef_pos, max_steps=300, tolerance=0.005
+            "return_to_branch_eef_pose",
+            branch_eef_pos,
+            max_steps=300,
+            tolerance=0.005,
+            target_world_ori=branch_eef_ori,
+            orientation_tolerance=0.03,
         )
         capture(True)
 

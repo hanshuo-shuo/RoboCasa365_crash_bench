@@ -153,6 +153,10 @@ range is unavailable from both tested package indexes. This is documented in
   mobile-base/torso context displaced and the cabinet stayed open. Recovery v6
   physically drives base x/y/yaw and torso back to their saved branch values,
   then refines EEF position before the nominal closure suffix.
+- Recovery attempt `5244726` verified that base/torso were already within
+  1.26 mm / 0.00229 rad / 0.00045 of branch values, but cabinet openness only
+  reached 0.901. Recovery v7 restores the full branch EEF pose, including OSC
+  base-frame axis-angle orientation, instead of position alone.
 
 ## Next action
 
