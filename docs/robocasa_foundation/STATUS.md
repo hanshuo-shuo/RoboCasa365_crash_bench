@@ -1,8 +1,8 @@
 # RoboCasa foundation status
 
 **Last updated:** 2026-08-31
-**Current phase:** Phase 0 dependency and provenance audit ready to start
-**Implementation verdict:** **GO for ordered foundation execution on `main`**
+**Current phase:** F1 reproducible environment verification
+**Implementation verdict:** **F0 gate passed; F1 ready**
 
 ## Completed
 
@@ -17,6 +17,26 @@
   recorded in `ENVIRONMENT_HANDOFF.md`.
 - Confirmed the remote private project checkout was clean. No synchronization
   between the local and remote project checkouts was performed.
+- On user authorization, moved the local untracked `.DS_Store` to the
+  recoverable backup `/tmp/RoboCasa365_crash_bench.DS_Store.20260831`.
+- Fast-forward checked local `main`; it was already equal to `origin/main` at
+  `7d395e56d883ad64c17dacf537f7ebf3205424a3`.
+- Reconfirmed the Quest checkout is clean on `main` and has the same commit.
+- Defined the foundation scientific boundary and frozen-evidence rule in
+  `FOUNDATION_CHARTER.md`.
+- Created the F0 dependency-audit skeleton without modifying the handed-off
+  Quest environment.
+- Passed the F0 documentation gate with `git diff --check`; baseline test count
+  is zero because no test suite existed before the foundation implementation.
+
+## F0 baseline
+
+- Baseline command: `rg --files`
+- Tracked source/test scripts present before F0: none; the repository contained
+  seven Markdown handoff/planning files and one path-template shell file.
+- Baseline zero-GPU test count: **0** (no test suite existed).
+- Pre-existing test failures: **none observable because no tests existed**.
+- No frozen result content was present or modified.
 
 ## Repository decision
 
@@ -38,10 +58,9 @@ LeRobot-dependent dataset utility is absent because its pinned old `rerun-sdk`
 range is unavailable from both tested package indexes. This is documented in
 `ENVIRONMENT_HANDOFF.md`; it is not a waiver for data-conversion work.
 
-## Next action for a new agent
+## Next action
 
-1. Read `AGENTS.md`, `QUEST_WORKFLOW.md`, the environment handoff, and the
-   execution plan.
-2. Begin Phase 0 on Quest in the prescribed order from updated `main`.
-3. Preserve these handoff documents and
-   update this status file at each passing phase gate.
+1. Verify live dependency revisions, licenses, fixed-seed task identity, and
+   CPU construction on Quest.
+2. Add checked-in CPU and EGL render smoke scripts, then submit only from a
+   clean pushed commit.
