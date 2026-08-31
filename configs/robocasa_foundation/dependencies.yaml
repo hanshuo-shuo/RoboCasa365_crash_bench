@@ -37,4 +37,10 @@ known_exceptions:
     status: unavailable
     scope: dataset conversion utilities only
     reason: compatible rerun-sdk range was unavailable from tested indexes
+dataset_tools:
+  pyarrow:
+    version: '21.0.0'
+    license: Apache-2.0
+    installation: isolated_target_directory
+    purpose: read selected official action parquet files without installing lerobot
 
