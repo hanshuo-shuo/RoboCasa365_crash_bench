@@ -124,6 +124,15 @@ range is unavailable from both tested package indexes. This is documented in
 - F4 restart job `5242278` passed all three nominal suffix modes 10/10 with
   identity 10/10. The canonical action-prefix state is safe, incomplete, and
   supported; recorded frame 370 differs by 7.16 mm and is noncanonical.
+- F5 frozen-grid job `5242790` selected the smallest qualifying outward
+  displacement, 0.10 m. The safe twin completed without door/object contact;
+  the bad suffix first contacted at 2.35 simulated seconds and contact persisted
+  for at least three frames.
+- Recovery attempt `5243065` failed closed: its 0.14 m deep EEF target was
+  outside the reachable workspace, the physical push moved the object inward
+  only 0.00386 m, and original task success was false. The emitted 736 actions
+  and failed GIF were retained; recovery v2 uses the 0.01 m causal boundary
+  measured by the frozen grid instead of an arbitrary deep push.
 
 ## Next action
 
