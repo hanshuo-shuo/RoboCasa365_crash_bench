@@ -116,17 +116,25 @@ Privileged geometry and scripted skills are allowed only for authoring and certi
 
 ## 4.1 Branch procedure
 
-First verify that the local worktree is clean and that the base branch exists.
+The user designated `codex/robocasa-foundation-handoff` as the exact foundation
+base on 2026-08-31, superseding the earlier request to wait for
+`codex/iclr27-exact-state-intervention-routing`. First verify that the worktree
+is clean and that the designated base branch exists on `origin`.
 
 ```bash
 git status --short
 git fetch origin
-git checkout codex/iclr27-exact-state-intervention-routing
+git checkout codex/robocasa-foundation-handoff
 git pull --ff-only
 git checkout -b codex/robocasa-certified-branchpoints-foundation
 ```
 
 If the local worktree is dirty, the branch is missing, or history has diverged, stop and document the exact condition. Do not reset, force-pull, stash unknown user work, or recreate history.
+
+Do not use `main` or reconstruct the abandoned
+`codex/iclr27-exact-state-intervention-routing` branch. The handoff branch is
+the auditable starting point because it contains the Quest environment and
+workflow records that govern the foundation work.
 
 ## 4.2 Preserve old work
 

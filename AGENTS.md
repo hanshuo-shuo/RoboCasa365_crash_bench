@@ -18,13 +18,14 @@ Read these files before changing code, using Quest, or submitting a job:
 
 ## Branch gate
 
-On 2026-08-31, `git fetch origin` showed that
-`codex/iclr27-exact-state-intervention-routing` does not exist on `origin`.
-The foundation execution plan says to stop and document that condition rather
-than inventing the requested base. This documentation-only branch,
-`codex/robocasa-foundation-handoff`, starts from the clean `main` branch and is
-not permission to begin the scientific implementation. Once the requested base
-branch is published, create the planned foundation branch from that exact base.
+On 2026-08-31, the user explicitly designated
+`codex/robocasa-foundation-handoff` as the exact foundation base, superseding
+the earlier missing-base requirement for
+`codex/iclr27-exact-state-intervention-routing`. After confirming a clean
+worktree and fetching `origin`, create
+`codex/robocasa-certified-branchpoints-foundation` from the updated handoff
+branch. Do not recreate the abandoned base, start from `main`, overwrite an
+existing foundation branch, or conceal divergence.
 
 ## Quest rules
 
