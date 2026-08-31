@@ -160,8 +160,25 @@ def main() -> int:
         if disallowed_contacts():
             failures.append("hazard start already has door-object contact")
 
-        approach = hazard_object_pos + outward * 0.07 + np.array([0.0, 0.0, 0.015])
-        approach_record = move_eef_world("approach_outside_object", approach)
+        anchor_frame = int(config["recovery_anchor_frame"])
+        reverse_count = 0
+        for recorded in reversed(nominal_actions[anchor_frame:branch_frame]):
+            reverse_action = np.asarray(recorded).copy()
+            reverse_action[:6] *= -1.0
+            reverse_action[6] = -1.0
+            reverse_action[7:11] *= -1.0
+            step(reverse_action)
+            reverse_count += 1
+        primitive_records.append(
+            {
+                "primitive": "ReplayRecordedActions",
+                "label": "reverse_post_release_retreat",
+                "source_frames": [anchor_frame, branch_frame],
+                "steps": reverse_count,
+                "reversed_delta_fields": ["eef_pose", "base_motion"],
+                "privileged_geometry": False,
+            }
+        )
         capture(True)
         pad_before, pad_names = fingerpad_midpoint()
         align_correction = hazard_object_pos - pad_before
@@ -223,6 +240,21 @@ def main() -> int:
         post_push_object_pos = np.asarray(env.sim.data.get_body_xpos(target.root_body)).copy()
         inward_displacement = float(np.dot(post_push_object_pos - hazard_object_pos, inward))
         contained_after_push = bool(OU.obj_inside_of(env, "food0", env.cab))
+        retreat_count = 0
+        for recorded in nominal_actions[anchor_frame:branch_frame]:
+            retreat_action = np.asarray(recorded).copy()
+            retreat_action[6] = -1.0
+            step(retreat_action)
+            retreat_count += 1
+        primitive_records.append(
+            {
+                "primitive": "ReplayRecordedActions",
+                "label": "forward_post_release_retreat",
+                "source_frames": [anchor_frame, branch_frame],
+                "steps": retreat_count,
+                "privileged_geometry": False,
+            }
+        )
         retract_record = move_eef_world(
             "return_to_branch_eef", branch_eef_pos, max_steps=300, tolerance=0.005
         )
@@ -252,8 +284,7 @@ def main() -> int:
         }
         crash = max_consecutive >= int(config["contact_persistence_frames"])
         if (
-            approach_record["timeout"]
-            or align_record["timeout"]
+            align_record["timeout"]
             or push_record["timeout"]
             or retract_record["timeout"]
         ):

@@ -143,6 +143,11 @@ range is unavailable from both tested package indexes. This is documented in
   still contacted it. Recovery v4 computes the actual left/right fingerpad
   world midpoint, aligns that midpoint to the object center, and requires
   robosuite `_check_grasp` to pass before repositioning.
+- Recovery attempt `5243768` showed an 0.0859 m fingerpad/object error at the
+  already-retreated branch posture, outside arm reach. Recovery v5 uses the
+  natural demonstration's physical frame-241-to-370 retreat segment: reverse
+  its EEF/base deltas to return to the placement posture, regrasp/reposition,
+  then execute the retreat forward before closure.
 
 ## Next action
 

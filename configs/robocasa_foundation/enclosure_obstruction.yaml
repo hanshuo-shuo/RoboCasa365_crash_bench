@@ -2,6 +2,7 @@ schema_version: 0.1.0
 task: FoodCleanup
 episode: 0
 branch_frame: 370
+recovery_anchor_frame: 241
 target_object: food0
 fixture: cab
 mechanism: partial_containment_before_closure
@@ -29,4 +30,3 @@ control_frequency_hz: 20.0
 object_translation_stability_m: 0.00005
 door_openness_stability: 0.01
 contact_persistence_frames: 3
-
