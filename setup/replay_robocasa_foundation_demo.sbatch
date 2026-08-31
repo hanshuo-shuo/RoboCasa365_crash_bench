@@ -30,4 +30,5 @@ printf 'commit=%s\njob_id=%s\nnode=%s\npyarrow=21.0.0\n' \
   --dataset "$DATASET" \
   --episode 0 \
   --repeats 10 \
+  --workers 4 \
   --output "$RUN_ROOT/report/replay_report.json"

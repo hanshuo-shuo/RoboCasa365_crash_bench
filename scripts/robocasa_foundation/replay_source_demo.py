@@ -66,11 +66,65 @@ def create_env(dataset: Path):
     return robosuite.make(**kwargs)
 
 
+def run_repeat(payload: tuple[object, ...]) -> dict[str, object]:
+    import numpy as np
+
+    repeat, dataset, states, actions, model_xml, ep_meta, expected_language, expected_objects = payload
+    env = None
+    try:
+        env = create_env(dataset)
+        reset_to(env, states[0], model_xml, ep_meta)
+        actual_language = env.get_ep_meta().get("lang")
+        actual_objects = sorted(env.objects)
+        start_success = bool(env._check_success())
+        max_state_l2 = 0.0
+        first_nonexact_step = None
+        for step, action in enumerate(actions):
+            env.step(action)
+            if step < len(states) - 1:
+                actual = np.asarray(env.sim.get_state().flatten())
+                expected = states[step + 1]
+                if actual.shape != expected.shape:
+                    raise RuntimeError(
+                        f"state shape changed at step {step}: {actual.shape} != {expected.shape}"
+                    )
+                error = float(np.linalg.norm(actual - expected))
+                max_state_l2 = max(max_state_l2, error)
+                if error != 0.0 and first_nonexact_step is None:
+                    first_nonexact_step = step
+        return {
+            "repeat": repeat,
+            "execution_error": None,
+            "start_success": start_success,
+            "task_success": bool(env._check_success()),
+            "language_match": actual_language == expected_language,
+            "object_names_match": actual_objects == expected_objects,
+            "actual_language": actual_language,
+            "actual_objects": actual_objects,
+            "expected_objects": expected_objects,
+            "first_nonexact_state_step": first_nonexact_step,
+            "max_state_l2": max_state_l2,
+        }
+    except Exception as exc:
+        return {
+            "repeat": repeat,
+            "execution_error": f"{type(exc).__name__}: {exc}",
+            "start_success": False,
+            "task_success": False,
+            "language_match": False,
+            "object_names_match": False,
+        }
+    finally:
+        if env is not None:
+            env.close()
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset", type=Path, required=True)
     parser.add_argument("--episode", type=int, required=True)
     parser.add_argument("--repeats", type=int, default=10)
+    parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     import numpy as np
@@ -91,46 +145,31 @@ def main() -> int:
     expected_objects = sorted(
         cfg["name"] for cfg in ep_meta.get("object_cfgs", []) if "name" in cfg
     )
-    repeats: list[dict[str, object]] = []
-    for repeat in range(args.repeats):
-        env = create_env(args.dataset)
-        try:
-            reset_to(env, states[0], model_xml, ep_meta)
-            actual_language = env.get_ep_meta().get("lang")
-            actual_objects = sorted(env.objects)
-            start_success = bool(env._check_success())
-            max_state_l2 = 0.0
-            first_nonexact_step = None
-            for step, action in enumerate(actions):
-                env.step(action)
-                if step < len(states) - 1:
-                    actual = np.asarray(env.sim.get_state().flatten())
-                    expected = states[step + 1]
-                    if actual.shape != expected.shape:
-                        raise RuntimeError(
-                            f"state shape changed at step {step}: {actual.shape} != {expected.shape}"
-                        )
-                    error = float(np.linalg.norm(actual - expected))
-                    max_state_l2 = max(max_state_l2, error)
-                    if error != 0.0 and first_nonexact_step is None:
-                        first_nonexact_step = step
-            task_success = bool(env._check_success())
-            repeats.append(
-                {
-                    "repeat": repeat,
-                    "start_success": start_success,
-                    "task_success": task_success,
-                    "language_match": actual_language == expected_language,
-                    "object_names_match": actual_objects == expected_objects,
-                    "actual_language": actual_language,
-                    "actual_objects": actual_objects,
-                    "expected_objects": expected_objects,
-                    "first_nonexact_state_step": first_nonexact_step,
-                    "max_state_l2": max_state_l2,
-                }
-            )
-        finally:
-            env.close()
+    payloads = [
+        (
+            repeat,
+            args.dataset,
+            states,
+            actions,
+            model_xml,
+            ep_meta,
+            expected_language,
+            expected_objects,
+        )
+        for repeat in range(args.repeats)
+    ]
+    if args.workers == 1:
+        repeats = [run_repeat(payload) for payload in payloads]
+    else:
+        import concurrent.futures
+        import multiprocessing
+
+        with concurrent.futures.ProcessPoolExecutor(
+            max_workers=args.workers,
+            mp_context=multiprocessing.get_context("spawn"),
+        ) as executor:
+            repeats = list(executor.map(run_repeat, payloads))
+    repeats.sort(key=lambda item: int(item["repeat"]))
 
     success_count = sum(bool(item["task_success"]) for item in repeats)
     identity_count = sum(
@@ -138,6 +177,9 @@ def main() -> int:
     )
     start_incomplete_count = sum(not bool(item["start_success"]) for item in repeats)
     failures: list[str] = []
+    execution_errors = [item for item in repeats if item.get("execution_error")]
+    if execution_errors:
+        failures.append(f"{len(execution_errors)} repeat(s) raised execution errors")
     if success_count < 9:
         failures.append(f"nominal action replay success {success_count}/{args.repeats} < 9/10")
     if identity_count != args.repeats:
@@ -149,6 +191,7 @@ def main() -> int:
         "dataset": str(args.dataset.resolve()),
         "episode": args.episode,
         "action_count": len(actions),
+        "workers": args.workers,
         "success_count": success_count,
         "identity_count": identity_count,
         "start_incomplete_count": start_incomplete_count,

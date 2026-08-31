@@ -103,6 +103,10 @@ range is unavailable from both tested package indexes. This is documented in
   because both the sbatch wrapper and Python no-overwrite gate created the same
   report directory. The wrapper now creates only the run root; no replay result
   was claimed from the failed job.
+- Serial retry `5241204` was healthy but used only one of four allocated CPUs
+  and was cancelled after 6:31 to avoid approaching the one-hour limit. The
+  replacement uses four independent spawn workers; every repeat still creates
+  and closes its own environment.
 
 ## Next action
 
