@@ -76,7 +76,9 @@ def main() -> int:
         low_level_actions.append(np.asarray(action).copy())
         capture(force_frame)
 
-    def move_eef_world(label, target_world, max_steps=120, tolerance=0.05):
+    def move_eef_world(
+        label, target_world, max_steps=120, tolerance=0.05, gripper_command=-1.0
+    ):
         start = np.asarray(controller().ref_pos).copy()
         errors = []
         for _ in range(max_steps):
@@ -90,6 +92,7 @@ def main() -> int:
                 break
             action = neutral()
             action[:3] = np.clip(delta / 0.05, -1.0, 1.0)
+            action[6] = gripper_command
             step(action)
         final = np.asarray(controller().ref_pos).copy()
         record = {
@@ -146,18 +149,47 @@ def main() -> int:
             failures.append("hazard start already has door-object contact")
 
         approach = hazard_object_pos + outward * 0.07 + np.array([0.0, 0.0, 0.015])
-        push_target = hazard_object_pos + outward * 0.01 + np.array([0.0, 0.0, 0.015])
         approach_record = move_eef_world("approach_outside_object", approach)
         capture(True)
-        push_record = move_eef_world("push_object_inward", push_target, max_steps=160)
+        for _ in range(30):
+            close_action = neutral()
+            close_action[6] = 1.0
+            step(close_action)
+        primitive_records.append(
+            {
+                "primitive": "SetGripper",
+                "label": "close_for_regrasp",
+                "steps": 30,
+                "command": 1.0,
+                "privileged_geometry": False,
+            }
+        )
+        push_target = np.asarray(controller().ref_pos).copy() + inward * 0.06
+        push_record = move_eef_world(
+            "move_grasped_object_inward",
+            push_target,
+            max_steps=160,
+            gripper_command=1.0,
+        )
         capture(True)
+        for _ in range(20):
+            step(neutral())
+        primitive_records.append(
+            {
+                "primitive": "SetGripper",
+                "label": "release_after_reposition",
+                "steps": 20,
+                "command": -1.0,
+                "privileged_geometry": False,
+            }
+        )
         for _ in range(10):
             step(neutral())
         post_push_object_pos = np.asarray(env.sim.data.get_body_xpos(target.root_body)).copy()
         inward_displacement = float(np.dot(post_push_object_pos - hazard_object_pos, inward))
         contained_after_push = bool(OU.obj_inside_of(env, "food0", env.cab))
         retract_record = move_eef_world(
-            "return_to_branch_eef", branch_eef_pos, max_steps=180, tolerance=0.02
+            "return_to_branch_eef", branch_eef_pos, max_steps=300, tolerance=0.005
         )
         capture(True)
 

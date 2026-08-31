@@ -133,6 +133,11 @@ range is unavailable from both tested package indexes. This is documented in
   only 0.00386 m, and original task success was false. The emitted 736 actions
   and failed GIF were retained; recovery v2 uses the 0.01 m causal boundary
   measured by the frozen grid instead of an arbitrary deep push.
+- Recovery attempt `5243313` also failed closed. It approached successfully,
+  but its diagonal target retained a 0.049 m unreachable world-y component;
+  the object moved only 0.00213 m and the cabinet did not close. Recovery v3
+  regrasps at the actually reached pose, moves only along the fixture inward
+  axis, releases, and returns to the branch EEF pose with a 0.005 m tolerance.
 
 ## Next action
 
