@@ -1,0 +1,40 @@
+schema_version: 0.1.0
+recorded: '2026-08-31'
+python: '3.11.16'
+dependencies:
+  robocasa:
+    version: '1.0.1'
+    commit: a07e365c958c4216cd6bbd5f30b47f09a65c6f00
+    license: MIT
+    source: https://github.com/robocasa/robocasa
+  robosuite:
+    version: '1.5.2'
+    commit: 5ce6643f3092639d08f7b0f90ed1c6a84f50552c
+    license: MIT
+    source: https://github.com/ARISE-Initiative/robosuite
+  mujoco:
+    version: '3.3.1'
+    license: Apache-2.0
+  numpy:
+    version: '2.2.5'
+    license: BSD-3-Clause
+  numba:
+    version: '0.61.2'
+    license: BSD-2-Clause
+  scipy:
+    version: '1.15.3'
+    license: BSD-3-Clause
+  gymnasium:
+    version: '0.29.1'
+    license: MIT
+assets_and_datasets:
+  robocasa:
+    license: CC-BY-4.0
+    source_note: RoboCasa README at the pinned commit
+known_exceptions:
+  - component: lerobot
+    required_version: '0.3.3'
+    status: unavailable
+    scope: dataset conversion utilities only
+    reason: compatible rerun-sdk range was unavailable from tested indexes
+

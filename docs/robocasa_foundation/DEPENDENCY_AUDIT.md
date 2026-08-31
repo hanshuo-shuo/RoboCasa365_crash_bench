@@ -1,6 +1,6 @@
 # RoboCasa foundation dependency audit
 
-**Status:** F0 skeleton; license/source audit pending in F1  
+**Status:** live F1 dependency and license audit complete; Slurm smoke pending
 **Recorded:** 2026-08-31
 
 ## Verified environment handed off before F0
@@ -15,9 +15,31 @@
 | Numba | 0.61.2 | installed package | foundation prefix |
 | SciPy | 1.15.3 | installed package | foundation prefix |
 
-These values are inherited evidence, not yet the completed F1 audit. F1 must
-verify the live revisions, package metadata, licenses, asset provenance, and
-machine-readable manifest without changing either editable checkout.
+Live read-only verification on Quest confirmed all listed versions and Git
+revisions. RoboCasa contains exactly the handed-off untracked asset marker
+`robocasa/models/assets/README.md`; robosuite is clean. The audit script treats
+only that exact RoboCasa path as allowed and fails on any other dirty path.
+
+## License and provenance findings
+
+| Material | License | Evidence |
+| --- | --- | --- |
+| RoboCasa code | MIT | pinned checkout `LICENSE`, SHA-256 `5da18670b3f00c59847b1ded9c28dee59940d963b1e03b528b0108d9c5a09885` |
+| robosuite code | MIT | pinned checkout `LICENSE`, SHA-256 `177978cbece0a4c454c2aaec5b3f145b39270814874c43109da9e829c39d9cba` |
+| MuJoCo | Apache-2.0 | installed package metadata and upstream component notice |
+| RoboCasa assets and datasets | CC-BY-4.0 | pinned RoboCasa `README.md`, lines 122–125 |
+
+The pinned RoboCasa object documentation attributes object sources to
+Objaverse 1.0, Lightwheel AI, and Luma.ai generation. Any selected
+demonstration must retain its exact source episode identifier and hash; no
+demonstration has been selected or downloaded in F1.
+
+The machine-readable record is
+`configs/robocasa_foundation/dependencies.yaml`. The checked-in installer is
+login-node-only, refuses unexpected existing checkout state, pins both Git
+revisions and simulator versions, uses only ignored configured paths, and
+requires an explicit `ROBOCASA_DOWNLOAD_ASSETS=1` opt-in. It is not rerun on
+the already verified handed-off environment.
 
 ## Known exception to preserve
 
@@ -29,13 +51,29 @@ incompatible package installation is authorized.
 
 ## F1 audit checklist
 
-- [ ] Live Git revisions and dirty-state evidence for RoboCasa and robosuite.
-- [ ] Installed versions for Python, RoboCasa, robosuite, MuJoCo, NumPy, Numba,
+- [x] Live Git revisions and dirty-state evidence for RoboCasa and robosuite.
+- [x] Installed versions for Python, RoboCasa, robosuite, MuJoCo, NumPy, Numba,
       SciPy, Gymnasium, and controller dependencies.
-- [ ] License identifiers and source paths for code, assets, and any selected
+- [x] License identifiers and source paths for code and assets; the selected
       demonstration subset.
-- [ ] Machine-readable dependency manifest.
+- [x] Machine-readable dependency manifest.
 - [ ] Fixed-seed identity checks for three requested smoke tasks.
-- [ ] CPU smoke and checked-in Quest Slurm scripts.
+- [x] Checked-in CPU and Quest EGL Slurm scripts.
+- [ ] CPU construction/identity smoke job.
 - [ ] Offscreen EGL render smoke in a GPU allocation.
 
+## Exact live-audit commands
+
+The read-only checks used the established control socket and explicit prefix:
+
+```bash
+ssh -S /tmp/quest.sock quest.northwestern.edu \
+  'git -C /projects/p33100/siosio/third_party/robocasa365 rev-parse HEAD; \
+   git -C /projects/p33100/siosio/third_party/robocasa365 status --short; \
+   git -C /projects/p33100/siosio/third_party/robosuite rev-parse HEAD; \
+   git -C /projects/p33100/siosio/third_party/robosuite status --short'
+```
+
+An attempted interactive three-task construction on the login node did not
+produce a complete manifest and is not passing evidence. The checked-in Slurm
+jobs are the only accepted F1 task/render evidence.
