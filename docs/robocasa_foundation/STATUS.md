@@ -1,8 +1,8 @@
 # RoboCasa foundation status
 
 **Last updated:** 2026-08-31
-**Current phase:** F4 RoboCasa adapter and exact-restart audit
-**Implementation verdict:** **F0–F3 gates passed; F4 in progress**
+**Current phase:** F5 author first certified branch points
+**Implementation verdict:** **F0–F4 gates passed; F5 in progress**
 
 ## Completed
 
@@ -118,10 +118,16 @@ range is unavailable from both tested package indexes. This is documented in
   commit `83c2e4c`. It covers strict schema/I/O/hashes/no-overwrite,
   fail-closed certification, outcome partition, toy witnesses, CLI validation,
   and the temporal enclosure-contact predicate state machine.
+- F4 transition job `5242098` selected canonical prefix frame 370 immediately
+  before cabinet closure begins at frame 371 and generated a recorded-state
+  transition GIF/contact sheet.
+- F4 restart job `5242278` passed all three nominal suffix modes 10/10 with
+  identity 10/10. The canonical action-prefix state is safe, incomplete, and
+  supported; recorded frame 370 differs by 7.16 mm and is noncanonical.
 
 ## Next action
 
-1. Locate the stable released-object frame immediately before cabinet closure
-   in episode 0 using recorded state playback and privileged task geometry.
-2. Compare prefix replay, same-instance snapshot, and new-instance snapshot;
-   freeze semantic tolerances and canonical restart limitations.
+1. Freeze the fixture-local displacement grid and semantic closure/object crash
+   predicate before searching.
+2. Author the smallest stable protrusion that makes the same nominal closure
+   suffix collide, then construct a physical task-completing recovery.
