@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#SBATCH --job-name=rc-demo-audit
+#SBATCH --account=p33100
+#SBATCH --partition=short
+#SBATCH --time=00:30:00
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+
+set -euo pipefail
+
+module load git/2.47.0-gcc-12.4.0
+
+PROJECT_ROOT=/gpfs/home/shv7753/RoboCasa365_crash_bench
+PYTHON=/projects/p33100/siosio/envs/robocasa-foundation/bin/python
+DATASET=/projects/p33100/siosio/robocasa_datasets/v1.0/pretrain/composite/FoodCleanup/20250725/lerobot
+RUN_ROOT=/projects/p33100/siosio/robocasa_foundation_runs/f2_demo_audit_${SLURM_JOB_ID}
+
+export PYTHONPATH=/projects/p33100/siosio/tools/pyarrow-21.0.0
+cd "$PROJECT_ROOT"
+test -z "$(git status --short)"
+test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+mkdir -p "$RUN_ROOT"
+printf 'commit=%s\njob_id=%s\nnode=%s\npyarrow=21.0.0\n' \
+  "$(git rev-parse HEAD)" "$SLURM_JOB_ID" "${SLURMD_NODENAME:-unknown}" \
+  > "$RUN_ROOT/job_provenance.txt"
+
+"$PYTHON" scripts/robocasa_foundation/inspect_demo.py \
+  --dataset "$DATASET" \
+  --episodes 0 2 4 6 7 \
+  --output-root "$RUN_ROOT/audit"
+
