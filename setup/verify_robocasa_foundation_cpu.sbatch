@@ -8,6 +8,8 @@
 
 set -euo pipefail
 
+module load git/2.47.0-gcc-12.4.0
+
 PROJECT_ROOT=/gpfs/home/shv7753/RoboCasa365_crash_bench
 PYTHON=/projects/p33100/siosio/envs/robocasa-foundation/bin/python
 ROBOCASA_ROOT=/projects/p33100/siosio/third_party/robocasa365
@@ -31,4 +33,3 @@ printf 'commit=%s\njob_id=%s\nnode=%s\n' \
   --robosuite-root "$ROBOSUITE_ROOT" \
   --output-root "$RUN_ROOT/smoke" \
   --seed 0
-

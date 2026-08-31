@@ -58,6 +58,15 @@ LeRobot-dependent dataset utility is absent because its pinned old `rerun-sdk`
 range is unavailable from both tested package indexes. This is documented in
 `ENVIRONMENT_HANDOFF.md`; it is not a waiver for data-conversion work.
 
+## F1 job record
+
+- CPU smoke job `5239421` failed closed after 2 seconds on node `qnode0111`
+  because Git was absent from the compute-node default `PATH`; no simulator
+  claim was made. The job scripts now explicitly load Quest module
+  `git/2.47.0-gcc-12.4.0`.
+- Pending render job `5239429` was cancelled before allocation because it used
+  the same provenance preflight and would have failed for the same reason.
+
 ## Next action
 
 1. Verify live dependency revisions, licenses, fixed-seed task identity, and
