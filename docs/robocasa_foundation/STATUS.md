@@ -1,8 +1,8 @@
 # RoboCasa foundation status
 
 **Last updated:** 2026-08-31
-**Current phase:** F3 core schema, hashing, and toy certification
-**Implementation verdict:** **F0–F2 gates passed; F3 in progress**
+**Current phase:** F4 RoboCasa adapter and exact-restart audit
+**Implementation verdict:** **F0–F3 gates passed; F4 in progress**
 
 ## Completed
 
@@ -114,9 +114,14 @@ range is unavailable from both tested package indexes. This is documented in
   must audit this rather than claiming bit-exact replay.
 - F2 selected `FoodCleanup` episode 0 as the canonical natural source and
   retained `PlaceVeggiesInDrawer` as fallback.
+- F3 simulator-free suite passed 20/20 tests on Quest in 3.44 seconds at
+  commit `83c2e4c`. It covers strict schema/I/O/hashes/no-overwrite,
+  fail-closed certification, outcome partition, toy witnesses, CLI validation,
+  and the temporal enclosure-contact predicate state machine.
 
 ## Next action
 
-1. Implement the versioned manifest, content hashes, deterministic JSON, typed
-   witness outcomes, and fail-closed certification.
-2. Pass all simulator-free schema/toy/no-overwrite tests before F4.
+1. Locate the stable released-object frame immediately before cabinet closure
+   in episode 0 using recorded state playback and privileged task geometry.
+2. Compare prefix replay, same-instance snapshot, and new-instance snapshot;
+   freeze semantic tolerances and canonical restart limitations.
