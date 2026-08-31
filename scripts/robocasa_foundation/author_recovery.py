@@ -65,6 +65,12 @@ def main() -> int:
     def controller():
         return env.robots[0].composite_controller.part_controllers["right"]
 
+    def base_controller():
+        return env.robots[0].composite_controller.part_controllers["base"]
+
+    def torso_controller():
+        return env.robots[0].composite_controller.part_controllers["torso"]
+
     def gripper_model():
         gripper = env.robots[0].gripper
         if isinstance(gripper, dict):
@@ -121,6 +127,54 @@ def main() -> int:
         primitive_records.append(record)
         return record
 
+    def move_base_to_pose(target_pos, target_ori, target_torso, max_steps=240):
+        start_pos, _ = base_controller().get_base_pose()
+        errors = []
+        for _ in range(max_steps):
+            current_pos, current_ori = base_controller().get_base_pose()
+            world_delta = np.asarray(target_pos) - np.asarray(current_pos)
+            local_delta = np.asarray(current_ori).T @ world_delta
+            current_yaw = float(T.mat2euler(current_ori)[2])
+            target_yaw = float(T.mat2euler(target_ori)[2])
+            yaw_error = float((target_yaw - current_yaw + np.pi) % (2 * np.pi) - np.pi)
+            torso_now = np.asarray(torso_controller().joint_pos).reshape(-1)
+            torso_error = np.asarray(target_torso).reshape(-1) - torso_now
+            error = {
+                "translation_m": float(np.linalg.norm(world_delta[:2])),
+                "yaw_rad": abs(yaw_error),
+                "torso": float(np.linalg.norm(torso_error)),
+            }
+            errors.append(error)
+            if error["translation_m"] <= 0.005 and error["yaw_rad"] <= 0.01 and error["torso"] <= 0.005:
+                break
+            action = neutral()
+            action[7] = np.clip(local_delta[0] * 5.0, -1.0, 1.0)
+            action[8] = np.clip(local_delta[1] * 5.0, -1.0, 1.0)
+            action[9] = np.clip(yaw_error * 2.0, -1.0, 1.0)
+            action[10] = np.clip(torso_error[0] * 5.0, -1.0, 1.0)
+            action[11] = 1.0
+            step(action)
+        final_pos, final_ori = base_controller().get_base_pose()
+        record = {
+            "primitive": "MoveMobileBaseToPose",
+            "start_pos": np.asarray(start_pos).tolist(),
+            "target_pos": np.asarray(target_pos).tolist(),
+            "final_pos": np.asarray(final_pos).tolist(),
+            "target_yaw": float(T.mat2euler(target_ori)[2]),
+            "final_yaw": float(T.mat2euler(final_ori)[2]),
+            "target_torso": np.asarray(target_torso).reshape(-1).tolist(),
+            "final_torso": np.asarray(torso_controller().joint_pos).reshape(-1).tolist(),
+            "steps": len(errors),
+            "final_error": errors[-1] if errors else None,
+            "timeout": not errors
+            or errors[-1]["translation_m"] > 0.005
+            or errors[-1]["yaw_rad"] > 0.01
+            or errors[-1]["torso"] > 0.005,
+            "privileged_geometry": True,
+        }
+        primitive_records.append(record)
+        return record
+
     def disallowed_contacts():
         contacts = []
         force = np.zeros(6, dtype=float)
@@ -157,6 +211,10 @@ def main() -> int:
         capture(True)
         hazard_object_pos = np.asarray(env.sim.data.get_body_xpos(target.root_body)).copy()
         branch_eef_pos = np.asarray(controller().ref_pos).copy()
+        branch_base_pos, branch_base_ori = base_controller().get_base_pose()
+        branch_base_pos = np.asarray(branch_base_pos).copy()
+        branch_base_ori = np.asarray(branch_base_ori).copy()
+        branch_torso = np.asarray(torso_controller().joint_pos).copy()
         if disallowed_contacts():
             failures.append("hazard start already has door-object contact")
 
@@ -255,6 +313,7 @@ def main() -> int:
                 "privileged_geometry": False,
             }
         )
+        base_record = move_base_to_pose(branch_base_pos, branch_base_ori, branch_torso)
         retract_record = move_eef_world(
             "return_to_branch_eef", branch_eef_pos, max_steps=300, tolerance=0.005
         )
@@ -281,11 +340,15 @@ def main() -> int:
             "inside": bool(OU.obj_inside_of(env, "food0", env.cab)),
             "gripper_far": bool(OU.gripper_obj_far(env, "food0")),
             "cabinet_closed": bool(env.cab.is_closed(env=env)),
+            "door_openness": float(
+                max(env.cab.get_joint_state(env, env.cab.door_joint_names).values())
+            ),
         }
         crash = max_consecutive >= int(config["contact_persistence_frames"])
         if (
             align_record["timeout"]
             or push_record["timeout"]
+            or base_record["timeout"]
             or retract_record["timeout"]
         ):
             failures.append("one or more physical motion primitives timed out")

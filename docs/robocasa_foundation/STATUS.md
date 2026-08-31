@@ -148,6 +148,11 @@ range is unavailable from both tested package indexes. This is documented in
   natural demonstration's physical frame-241-to-370 retreat segment: reverse
   its EEF/base deltas to return to the placement posture, regrasp/reposition,
   then execute the retreat forward before closure.
+- Recovery attempt `5244132` achieved a verified grasp and moved the object
+  inward 0.03146 m without door contact, but the forward retreat left the
+  mobile-base/torso context displaced and the cabinet stayed open. Recovery v6
+  physically drives base x/y/yaw and torso back to their saved branch values,
+  then refines EEF position before the nominal closure suffix.
 
 ## Next action
 
