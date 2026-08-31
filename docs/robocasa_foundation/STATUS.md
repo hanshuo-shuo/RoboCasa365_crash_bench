@@ -85,6 +85,11 @@ range is unavailable from both tested package indexes. This is documented in
   was cancelled. A checked-in OSMesa job will perform the required Quest
   offscreen-render smoke on `short`; GPU EGL compatibility remains a separate
   pending verification and is not claimed as passed.
+- OSMesa job `5240280` initialized rendering and completed a camera-backed
+  reset/neutral step, then failed while extracting a PNG because the script
+  searched raw `*_image` keys after the official wrapper had mapped them to
+  `video.*`. The replacement uses the wrapper's documented `env.render()`
+  cache and validates that it is an RGB array.
 
 ## Next action
 

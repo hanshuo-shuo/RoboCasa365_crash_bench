@@ -96,10 +96,9 @@ def construct(task: str, seed: int, render: bool) -> tuple[dict[str, Any], Any]:
     env.step(neutral_action(env.action_space))
     frame = None
     if render:
-        image_keys = sorted(key for key in observation if key.endswith("_image"))
-        if not image_keys:
-            raise RuntimeError(f"{task}: no image observation keys")
-        frame = observation[image_keys[0]]
+        frame = env.render()
+        if frame is None or getattr(frame, "ndim", 0) != 3:
+            raise RuntimeError(f"{task}: wrapper render cache is not an RGB array")
     record = {
         "task": task,
         "seed": seed,
