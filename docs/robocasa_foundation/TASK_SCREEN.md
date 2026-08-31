@@ -1,7 +1,7 @@
 # Existing-task and demonstration screen
 
 **Phase:** F2  
-**Status:** task-construction screen passed; demonstration replay gate pending
+**Status:** passed; canonical task and source episode selected
 
 ## Method
 
@@ -23,9 +23,9 @@ Raw output remains outside Git at:
 /projects/p33100/siosio/robocasa_foundation_runs/f2_screen_5240564/
 ```
 
-## Provisional selection
+## Canonical selection
 
-`FoodCleanup` is the provisional canonical task. Its unchanged success check
+`FoodCleanup` is the canonical task. Its unchanged success check
 is the conjunction of:
 
 - every declared `food*` object is inside the selected cabinet;
@@ -40,14 +40,43 @@ shorter than all other screened candidates. One-object episodes make the
 matched-twin whitelist unambiguous and avoid assigning causal credit across
 two placed objects.
 
-This selection remains provisional until one to five official demonstrations
-are inspected and the unmodified safe episode passes fresh replay at least
-9/10. Only one official human-demonstration task package may be downloaded for
-this gate.
+Only its official pretrain human-demonstration task package was downloaded.
+The 193,372,160-byte archive SHA-256 is
+`fffacacae125bf603997a86bf4320a369c2bbefdeb8dc84925f55ecc03cb53b7`.
+It contains 101 episodes and 303 videos. The extracted content and its 715 file
+hashes are recorded outside Git under:
+
+```text
+/projects/p33100/siosio/robocasa_datasets/v1.0/pretrain/composite/FoodCleanup/20250725/
+```
+
+Quest job `5241104` audited five single-object episodes (`0,2,4,6,7`). Every
+episode had equal state/action/parquet lengths, 12-dimensional actions,
+terminal reward 1, terminal done true, valid compressed XML, and aligned
+language metadata. It also generated the source-demo GIF and contact sheet.
+
+Episode 0 is the selected canonical source:
+
+- instruction: “Pick the sweet potato from the counter and place it in the
+  cabinet. Then close the cabinet.”
+- layout/style: 37/25;
+- 721 states and 721 actions;
+- states SHA-256:
+  `235c1dd5146c1948c585412b758f5378427543033b2a45b0c3ef2a3d0c02db5a`;
+- compressed model XML SHA-256:
+  `8ef7429c8d4787e8f2a1729688d602f1b93b0e4161acfe3783b481c109c1c2b2`.
+
+Fresh open-loop reconstruction job `5241364` created ten independent
+environments and replayed all 721 actions. Original task success was 10/10,
+language/object identity was 10/10, and task-incomplete-at-start was 10/10.
+The per-step simulator state was not bit exact: divergence starts at step 0 and
+the repeat-stable maximum flattened-state L2 error is approximately 1.997.
+F4 must therefore measure semantic state/predicate/outcome tolerances and may
+not claim bit-exact action replay.
 
 ## Fallback
 
-`PlaceVeggiesInDrawer` is the declared fallback. It passed all three seeds and
+`PlaceVeggiesInDrawer` remains the declared fallback. It passed all three seeds and
 has especially direct place-then-close-drawer language, but every instance has
 two target vegetables and a more complex fridge-drawer fixture. It is not used
 unless `FoodCleanup` fails demonstration availability, identity, or replay.
@@ -63,4 +92,3 @@ unless `FoodCleanup` fails demonstration availability, identity, or replay.
 - `FoodCleanup` can sample one to three objects. Multi-object episodes are not
   silently treated as canonical one-object episodes; demonstration exclusions
   and their reasons must be recorded.
-

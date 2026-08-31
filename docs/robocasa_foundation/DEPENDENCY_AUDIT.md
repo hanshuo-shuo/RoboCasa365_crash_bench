@@ -64,6 +64,11 @@ incompatible package installation is authorized.
 - [ ] GPU EGL compatibility rerun; earlier jobs initialized EGL but failed later
       smoke-script gates, so no GPU render pass is claimed.
 
+The isolated dataset reader was installed at
+`/projects/p33100/siosio/tools/pyarrow-21.0.0` from the pinned PyPI wheel. It is
+not installed in the simulator prefix. Import verification returned version
+21.0.0. The reader is used only for the selected action parquet files.
+
 ## Passing F1 artifacts
 
 CPU identity output:

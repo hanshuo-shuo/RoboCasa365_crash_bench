@@ -1,8 +1,8 @@
 # RoboCasa foundation status
 
 **Last updated:** 2026-08-31
-**Current phase:** F2 existing-task and demonstration screen
-**Implementation verdict:** **F0 and F1 gates passed; F2 in progress**
+**Current phase:** F3 core schema, hashing, and toy certification
+**Implementation verdict:** **F0–F2 gates passed; F3 in progress**
 
 ## Completed
 
@@ -107,10 +107,16 @@ range is unavailable from both tested package indexes. This is documented in
   and was cancelled after 6:31 to avoid approaching the one-hour limit. The
   replacement uses four independent spawn workers; every repeat still creates
   and closes its own environment.
+- Parallel fresh replay `5241364` passed on `qnode0158` at commit `ad1411a`
+  (exit 0, 3:54): original task success 10/10, language/object identity 10/10,
+  task incomplete at start 10/10. State trajectories diverged numerically from
+  recorded states starting at step 0 with repeat-stable maximum L2 1.997; F4
+  must audit this rather than claiming bit-exact replay.
+- F2 selected `FoodCleanup` episode 0 as the canonical natural source and
+  retained `PlaceVeggiesInDrawer` as fallback.
 
 ## Next action
 
-1. Rank natural composite tasks whose unchanged success predicate contains
-   both placement inside an enclosure and later closure.
-2. Select and download only one permitted official human-demonstration task
-   subset on the Quest login node, then audit 1–5 successful episodes.
+1. Implement the versioned manifest, content hashes, deterministic JSON, typed
+   witness outcomes, and fail-closed certification.
+2. Pass all simulator-free schema/toy/no-overwrite tests before F4.
