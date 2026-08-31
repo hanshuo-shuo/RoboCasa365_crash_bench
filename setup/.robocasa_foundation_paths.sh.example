@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Copy to setup/.robocasa_foundation_paths.sh and edit locally. Never commit it.
+
+ROBOCASA_FOUNDATION_ENV=/projects/p33100/siosio/envs/robocasa-foundation
+ROBOCASA_ROOT=/projects/p33100/siosio/third_party/robocasa365
+ROBOSUITE_ROOT=/projects/p33100/siosio/third_party/robosuite
+ROBOCASA_ASSET_DIR=/projects/p33100/siosio/third_party/robocasa365/robocasa/models/assets
+ROBOCASA_DATA_ROOT=/projects/p33100/siosio/robocasa_datasets
+PIP_CACHE_DIR=/projects/p33100/siosio/pip_cache
+CONDA_PKGS_DIRS=/projects/p33100/siosio/conda_pkgs

@@ -1,0 +1,5 @@
+# Machine-specific Quest configuration. Keep the tracked example only.
+setup/.robocasa_foundation_paths.sh
+
+# Large generated branch-point artifacts must never enter Git.
+results/robocasa_foundation/
