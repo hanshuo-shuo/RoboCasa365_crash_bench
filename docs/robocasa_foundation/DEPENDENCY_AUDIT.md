@@ -1,6 +1,6 @@
 # RoboCasa foundation dependency audit
 
-**Status:** live F1 dependency and license audit complete; Slurm smoke pending
+**Status:** F1 dependency, identity, CPU, and offscreen-render gates passed
 **Recorded:** 2026-08-31
 
 ## Verified environment handed off before F0
@@ -54,13 +54,35 @@ incompatible package installation is authorized.
 - [x] Live Git revisions and dirty-state evidence for RoboCasa and robosuite.
 - [x] Installed versions for Python, RoboCasa, robosuite, MuJoCo, NumPy, Numba,
       SciPy, Gymnasium, and controller dependencies.
-- [x] License identifiers and source paths for code and assets; the selected
-      demonstration subset.
+- [x] License identifiers and source paths for code and assets.
+- [ ] Selected demonstration subset license/hash (belongs to F2 selection).
 - [x] Machine-readable dependency manifest.
-- [ ] Fixed-seed identity checks for three requested smoke tasks.
+- [x] Fixed-seed identity checks for three requested smoke tasks.
 - [x] Checked-in CPU and Quest EGL Slurm scripts.
-- [ ] CPU construction/identity smoke job.
-- [ ] Offscreen EGL render smoke in a GPU allocation.
+- [x] CPU construction/identity smoke job `5239773`.
+- [x] Quest offscreen OSMesa render smoke job `5240369`.
+- [ ] GPU EGL compatibility rerun; earlier jobs initialized EGL but failed later
+      smoke-script gates, so no GPU render pass is claimed.
+
+## Passing F1 artifacts
+
+CPU identity output:
+`/projects/p33100/siosio/robocasa_foundation_runs/f1_cpu_5239773/`
+
+OSMesa render output:
+`/projects/p33100/siosio/robocasa_foundation_runs/f1_osmesa_5240369/`
+
+Both jobs used seed 0. The CPU job completed on `qnode0137` in 4:11. The
+OSMesa job completed on `qnode0113` in 4:11 at project commit
+`a1212ccdf33a8bb7962730f06c06c3f7ed5e3c33`. Its manifest reports
+`valid=true`, fixed-seed identity matches for all three tasks, and these image
+hashes:
+
+| Frame | SHA-256 |
+| --- | --- |
+| `CloseDrawer.png` | `17accb58374e2a068a15af1a934b49b46bcc8ac002be3cf8c8f60b56c36ee64a` |
+| `PickPlaceCounterToDrawer.png` | `0d29bd75644d9da81fc73c99cfb3d300c9ee9c6476bacf8a8b36fcfd279887f3` |
+| `PlaceVeggiesInDrawer.png` | `15a0256e871871ce87909cfdd08368eb72fe2786ed9ad81a8d0e378909ac5dd0` |
 
 ## Exact live-audit commands
 

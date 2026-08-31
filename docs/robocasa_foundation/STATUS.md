@@ -1,8 +1,8 @@
 # RoboCasa foundation status
 
 **Last updated:** 2026-08-31
-**Current phase:** F1 reproducible environment verification
-**Implementation verdict:** **F0 gate passed; F1 ready**
+**Current phase:** F2 existing-task and demonstration screen
+**Implementation verdict:** **F0 and F1 gates passed; F2 in progress**
 
 ## Completed
 
@@ -90,10 +90,13 @@ range is unavailable from both tested package indexes. This is documented in
   searched raw `*_image` keys after the official wrapper had mapped them to
   `video.*`. The replacement uses the wrapper's documented `env.render()`
   cache and validates that it is an RGB array.
+- OSMesa job `5240369` passed on `qnode0113` at commit `a1212cc` (exit 0,
+  4:11). It produced three hashed PNGs and a `valid=true` fixed-seed identity
+  manifest. Together with CPU job `5239773`, this closes F1.
 
 ## Next action
 
-1. Verify live dependency revisions, licenses, fixed-seed task identity, and
-   CPU construction on Quest.
-2. Add checked-in CPU and EGL render smoke scripts, then submit only from a
-   clean pushed commit.
+1. Rank natural composite tasks whose unchanged success predicate contains
+   both placement inside an enclosure and later closure.
+2. Select and download only one permitted official human-demonstration task
+   subset on the Quest login node, then audit 1–5 successful episodes.
