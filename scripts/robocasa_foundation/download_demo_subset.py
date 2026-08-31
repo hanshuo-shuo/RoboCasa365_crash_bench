@@ -29,7 +29,8 @@ def main() -> int:
     if os.environ.get("SLURM_JOB_ID"):
         parser.error("dataset download is forbidden inside a Slurm job")
     root = args.data_root.resolve()
-    if not str(root).startswith("/projects/p33100/siosio/"):
+    allowed_roots = ("/projects/p33100/siosio/", "/gpfs/projects/p33100/siosio/")
+    if not str(root).startswith(allowed_roots):
         parser.error("data root must be under /projects/p33100/siosio/")
 
     import robocasa
@@ -115,4 +116,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
