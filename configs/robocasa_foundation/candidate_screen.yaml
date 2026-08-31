@@ -1,0 +1,46 @@
+schema_version: 0.1.0
+seeds: [0, 1, 2]
+candidates:
+  - task: PlaceVeggiesInDrawer
+    fixture_family: fridge_drawer
+    target_object: vegetable1
+    horizon: 1950
+    human_demo_registry: v1.0/pretrain/composite/PlaceVeggiesInDrawer/20250826
+    predicate_source: robocasa/environments/kitchen/composite/loading_fridge/place_veggies_in_drawer.py
+  - task: SortingCleanup
+    fixture_family: cabinet
+    target_object: bowl
+    horizon: 3000
+    human_demo_registry: v1.0/pretrain/composite/SortingCleanup/20250723
+    predicate_source: robocasa/environments/kitchen/composite/washing_dishes/sorting_cleanup.py
+  - task: FoodCleanup
+    fixture_family: cabinet
+    target_object: food0
+    horizon: 2250
+    human_demo_registry: v1.0/pretrain/composite/FoodCleanup/20250725
+    predicate_source: robocasa/environments/kitchen/composite/clearing_table/food_cleanup.py
+  - task: RestockBowls
+    fixture_family: cabinet_double_door
+    target_object: obj1
+    horizon: 2550
+    human_demo_registry: v1.0/pretrain/composite/RestockBowls/20250725
+    predicate_source: robocasa/environments/kitchen/composite/restocking_supplies/restock_bowls.py
+  - task: ReturnWashingSupplies
+    fixture_family: cabinet
+    target_object: supply1
+    horizon: 5100
+    human_demo_registry: v1.0/pretrain/composite/ReturnWashingSupplies/20250717
+    predicate_source: robocasa/environments/kitchen/composite/washing_dishes/return_washing_supplies.py
+  - task: HeatMug
+    fixture_family: microwave
+    target_object: obj
+    horizon: 1350
+    human_demo_registry: v1.0/pretrain/composite/HeatMug/20250725
+    predicate_source: robocasa/environments/kitchen/composite/reheating_food/heat_mug.py
+  - task: FreezeIceTray
+    fixture_family: freezer
+    target_object: ice_tray
+    horizon: 1800
+    human_demo_registry: v1.0/pretrain/composite/FreezeIceTray/20250807
+    predicate_source: robocasa/environments/kitchen/composite/managing_freezer_space/freeze_ice_tray.py
+

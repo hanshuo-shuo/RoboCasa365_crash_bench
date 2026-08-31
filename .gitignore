@@ -3,3 +3,7 @@ setup/.robocasa_foundation_paths.sh
 
 # Large generated branch-point artifacts must never enter Git.
 results/robocasa_foundation/
+
+# Local Python validation artifacts.
+__pycache__/
+*.py[cod]
