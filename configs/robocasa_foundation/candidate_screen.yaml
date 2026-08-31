@@ -16,13 +16,13 @@ candidates:
   - task: FoodCleanup
     fixture_family: cabinet
     target_object: food0
-    horizon: 2250
+    horizon: 1200
     human_demo_registry: v1.0/pretrain/composite/FoodCleanup/20250725
     predicate_source: robocasa/environments/kitchen/composite/clearing_table/food_cleanup.py
   - task: RestockBowls
     fixture_family: cabinet_double_door
     target_object: obj1
-    horizon: 2550
+    horizon: 3600
     human_demo_registry: v1.0/pretrain/composite/RestockBowls/20250725
     predicate_source: robocasa/environments/kitchen/composite/restocking_supplies/restock_bowls.py
   - task: ReturnWashingSupplies
@@ -34,13 +34,12 @@ candidates:
   - task: HeatMug
     fixture_family: microwave
     target_object: obj
-    horizon: 1350
+    horizon: 1800
     human_demo_registry: v1.0/pretrain/composite/HeatMug/20250725
     predicate_source: robocasa/environments/kitchen/composite/reheating_food/heat_mug.py
   - task: FreezeIceTray
     fixture_family: freezer
     target_object: ice_tray
-    horizon: 1800
+    horizon: 2400
     human_demo_registry: v1.0/pretrain/composite/FreezeIceTray/20250807
     predicate_source: robocasa/environments/kitchen/composite/managing_freezer_space/freeze_ice_tray.py
-

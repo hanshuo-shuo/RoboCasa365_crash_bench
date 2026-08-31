@@ -1,0 +1,9 @@
+rank,task,fixture_family,target_object,official_horizon,seeds_constructed,screen_status,demo_status,decision,reason
+1,FoodCleanup,cabinet,food0,1200,"0;1;2",pass,pending,provisional_select,"Natural containment+closure predicate; seed 0/2 are single-object; shortest cabinet candidate"
+2,PlaceVeggiesInDrawer,fridge_drawer,vegetable1,1950,"0;1;2",pass,pending,fallback,"Explicit place-then-close drawer language and fixed vegetable family; two target vegetables"
+3,SortingCleanup,cabinet,bowl,3000,"0;1;2",pass,pending,reserve,"Natural bowl-in-cabinet close transition; extra mug-to-sink prerequisite"
+4,RestockBowls,cabinet_double_door,obj1,3600,"0;1;2",pass,pending,reserve,"Natural cabinet task but two bowls and open/place/close sequence"
+5,ReturnWashingSupplies,cabinet,supply1,5100,"0;1;2",pass,pending,reserve,"Natural closure goal but two supplies and longest horizon"
+6,HeatMug,microwave,obj,1800,"0;1;2",pass,pending,out_of_first_family,"Clean one-object mechanism but microwave is deferred"
+7,FreezeIceTray,freezer,ice_tray,2400,"0;1;2",pass,pending,out_of_first_family,"Clean one-object mechanism but freezer is deferred"
+
