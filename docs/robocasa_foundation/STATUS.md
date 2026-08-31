@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-08-31
 **Current phase:** F5 author first certified branch points
-**Implementation verdict:** **F0–F4 gates passed; F5 in progress**
+**Implementation verdict:** **Initial branch validated 10/10; F5 remains 1/5**
 
 ## Completed
 
@@ -157,10 +157,19 @@ range is unavailable from both tested package indexes. This is documented in
   1.26 mm / 0.00229 rad / 0.00045 of branch values, but cabinet openness only
   reached 0.901. Recovery v7 restores the full branch EEF pose, including OSC
   base-frame axis-angle orientation, instead of position alone.
+- Recovery authoring job `5244908` physically moved the object inward 0.03146 m,
+  completed the unchanged original task without door/object contact, and saved
+  999 low-level actions. Its authoring-only 5 mm return subgoal timed out at
+  18.8 mm, so that run remained fail-closed.
+- Independent low-level witness job `5245224` excluded the ten branch-settle
+  actions and replayed the 989-action witness from the stable hazard state.
+  Start-safe, bad-contact, safe-twin success, recovery safe task success, and
+  identity all passed 10/10. This validates one initial branch, not the required
+  five-instance foundation.
 
 ## Next action
 
-1. Freeze the fixture-local displacement grid and semantic closure/object crash
-   predicate before searching.
-2. Author the smallest stable protrusion that makes the same nominal closure
-   suffix collide, then construct a physical task-completing recovery.
+1. Promote the initial branch into the strict manifest/artifact layout and hash
+   audit.
+2. Author four additional independent single-object FoodCleanup episodes under
+   the already frozen mechanism/predicate, without changing the grid or goal.
