@@ -114,27 +114,23 @@ Privileged geometry and scripted skills are allowed only for authoring and certi
 
 # 4. Starting point and repository isolation
 
-## 4.1 Branch procedure
+## 4.1 Repository procedure
 
-The user designated `codex/robocasa-foundation-handoff` as the exact foundation
-base on 2026-08-31, superseding the earlier request to wait for
-`codex/iclr27-exact-state-intervention-routing`. First verify that the worktree
-is clean and that the designated base branch exists on `origin`.
+The user designated `main` as the only project branch on 2026-08-31. Before
+each phase, verify that the worktree is clean and that local `main` can be
+fast-forwarded from `origin/main`.
 
 ```bash
 git status --short
 git fetch origin
-git checkout codex/robocasa-foundation-handoff
+git checkout main
 git pull --ff-only
-git checkout -b codex/robocasa-certified-branchpoints-foundation
 ```
 
-If the local worktree is dirty, the branch is missing, or history has diverged, stop and document the exact condition. Do not reset, force-pull, stash unknown user work, or recreate history.
-
-Do not use `main` or reconstruct the abandoned
-`codex/iclr27-exact-state-intervention-routing` branch. The handoff branch is
-the auditable starting point because it contains the Quest environment and
-workflow records that govern the foundation work.
+If the worktree is dirty, `main` is missing, or history has diverged, stop and
+document the exact condition. Do not reset, force-pull, stash unknown user
+work, recreate history, or create a workaround branch. Commit each passing
+phase directly to `main` and push it before beginning the next phase.
 
 ## 4.2 Preserve old work
 

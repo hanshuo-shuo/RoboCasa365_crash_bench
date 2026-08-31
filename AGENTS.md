@@ -16,16 +16,13 @@ Read these files before changing code, using Quest, or submitting a job:
 - Never change the original task-success predicate to make recovery easier. “Stop forever” is a safe abort, not recovery.
 - Results, videos, assets, datasets, checkpoints, and external editable checkouts never belong in this Git repository.
 
-## Branch gate
+## Repository branch
 
-On 2026-08-31, the user explicitly designated
-`codex/robocasa-foundation-handoff` as the exact foundation base, superseding
-the earlier missing-base requirement for
-`codex/iclr27-exact-state-intervention-routing`. After confirming a clean
-worktree and fetching `origin`, create
-`codex/robocasa-certified-branchpoints-foundation` from the updated handoff
-branch. Do not recreate the abandoned base, start from `main`, overwrite an
-existing foundation branch, or conceal divergence.
+The user designated `main` as the only project branch on 2026-08-31. Perform
+foundation work directly on an up-to-date, clean `main` worktree. Do not create
+handoff, foundation, experiment, or agent branches unless the user explicitly
+changes this instruction. Stop and document dirty worktrees, divergence, or
+non-fast-forward updates; never reset, stash unknown work, or rewrite history.
 
 ## Quest rules
 
