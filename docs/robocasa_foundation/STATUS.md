@@ -79,6 +79,12 @@ range is unavailable from both tested package indexes. This is documented in
   treated RoboCasa's Gym `Dict` action space as a flat array. The replacement
   recursively emits neutral `Dict`, `Box`, and `Discrete` actions and records
   the full action-space schema.
+- Structured-action CPU job `5239773` passed all three fixed-seed task identity
+  repeats and neutral steps on `qnode0137` (exit 0, 4 minutes 11 seconds).
+- GPU retry `5239800` remained pending with an estimated multi-hour start and
+  was cancelled. A checked-in OSMesa job will perform the required Quest
+  offscreen-render smoke on `short`; GPU EGL compatibility remains a separate
+  pending verification and is not claimed as passed.
 
 ## Next action
 
