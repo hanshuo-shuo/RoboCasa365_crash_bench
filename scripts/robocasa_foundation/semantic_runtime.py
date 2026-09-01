@@ -1204,6 +1204,93 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
     return records
 
 
+def close_fixture_with_joint_pd(runner: ActionRunner) -> list[dict[str, object]]:
+    """Physically close fixture joints with bounded authoring-only torque control."""
+
+    import numpy as np
+
+    env = runner.env
+    config = runner.config["fixture_close_skill"]
+    joints = list(env.cab.door_joint_names)
+    start_states = env.cab.get_joint_state(env, joints)
+    maximum_torque = float(config["maximum_joint_torque_nm"])
+    torque_trace: list[dict[str, object]] = []
+    dof_addresses: list[int] = []
+    runner.closure_commanded = True
+    for step_index in range(int(config["maximum_joint_pd_steps"])):
+        normalized = env.cab.get_joint_state(env, joints)
+        if all(
+            float(value) <= float(config["closed_threshold"])
+            for value in normalized.values()
+        ):
+            break
+        step_torques: dict[str, float] = {}
+        dof_addresses.clear()
+        for joint_name in joints:
+            joint_id = env.sim.model.joint_name2id(joint_name)
+            qpos_address = int(env.sim.model.jnt_qposadr[joint_id])
+            dof_address = int(env.sim.model.jnt_dofadr[joint_id])
+            dof_addresses.append(dof_address)
+            joint_range = np.asarray(env.sim.model.jnt_range[joint_id], dtype=float)
+            target_qpos = float(joint_range[np.argmin(np.abs(joint_range))])
+            qpos = float(env.sim.data.qpos[qpos_address])
+            qvel = float(env.sim.data.qvel[dof_address])
+            torque = float(
+                np.clip(
+                    float(config["joint_kp"]) * (target_qpos - qpos)
+                    - float(config["joint_kd"]) * qvel,
+                    -maximum_torque,
+                    maximum_torque,
+                )
+            )
+            env.sim.data.qfrc_applied[dof_address] = torque
+            step_torques[joint_name] = torque
+        runner.step(runner.neutral(), force_frame=bool(disallowed_contacts(env)))
+        for dof_address in dof_addresses:
+            env.sim.data.qfrc_applied[dof_address] = 0.0
+        torque_trace.append(
+            {
+                "step": step_index,
+                "normalized_openness": {
+                    key: float(value) for key, value in normalized.items()
+                },
+                "joint_torque_nm": step_torques,
+            }
+        )
+    runner.closure_commanded = False
+    end_states = env.cab.get_joint_state(env, joints)
+    records = [
+        {
+            "primitive": "CloseFixture",
+            "controller": "bounded_fixture_joint_pd",
+            "joint": joint_name,
+            "start_openness": float(start_states[joint_name]),
+            "end_openness": float(end_states[joint_name]),
+            "closed": float(end_states[joint_name])
+            <= float(config["closed_threshold"]),
+            "steps": len(torque_trace),
+            "maximum_joint_torque_nm": maximum_torque,
+            "privileged_geometry": True,
+            "physical_joint_torque": True,
+        }
+        for joint_name in joints
+    ]
+    runner.primitives.append(
+        {
+            "primitive": "CloseFixture",
+            "controller": "bounded_fixture_joint_pd",
+            "records": records,
+            "torque_trace": torque_trace,
+            "privileged_geometry": True,
+            "physical_joint_torque": True,
+            "post_branch_state_edit": False,
+        }
+    )
+    for _ in range(int(config["retreat_steps"])):
+        runner.step(runner.neutral())
+    return records
+
+
 def run_recovery_case(payload: tuple[object, ...]) -> dict[str, object]:
     import numpy as np
     import yaml
@@ -1404,7 +1491,10 @@ def run_recovery_case(payload: tuple[object, ...]) -> dict[str, object]:
         else:
             runner.capture(True)
             runner.attach_closure_monitor()
-            close_records = close_fixture_with_live_handles(runner, axis)
+            if config["fixture_close_skill"]["version"] == "bounded_fixture_joint_pd_v1":
+                close_records = close_fixture_with_joint_pd(runner)
+            else:
+                close_records = close_fixture_with_live_handles(runner, axis)
         preclose_contacts = [
             item
             for item in runner.disallowed_events

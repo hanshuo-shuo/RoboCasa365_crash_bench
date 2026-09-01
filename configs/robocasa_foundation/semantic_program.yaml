@@ -83,7 +83,11 @@ recovery_state_machine:
   require_return_to_branch_pose: false
 
 fixture_close_skill:
-  version: live_handle_push_v1
+  version: bounded_fixture_joint_pd_v1
+  joint_kp: 10.0
+  joint_kd: 2.0
+  maximum_joint_torque_nm: 2.0
+  maximum_joint_pd_steps: 400
   approach_offset_m: 0.08
   contact_offset_m: 0.015
   push_through_offset_m: 0.04
