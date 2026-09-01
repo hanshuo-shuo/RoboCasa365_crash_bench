@@ -55,8 +55,8 @@ def select_critical_margin(
             raise ValueError("invalid start-valid count")
         if not 0 <= item.violation_count <= item.repeat_count:
             raise ValueError("invalid violation count")
-        if item.start_valid_count != item.repeat_count and item.violation_count:
-            raise ValueError("rejected start cannot contribute violations")
+        if item.violation_count > item.start_valid_count:
+            raise ValueError("violations cannot exceed valid starts")
 
     selected = next(
         (

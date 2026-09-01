@@ -113,11 +113,13 @@ def test_critical_margin_uses_smallest_qualifier_then_fixed_offset():
     assert selected.hazard_displacement_m == pytest.approx(0.095)
 
 
-def test_rejected_candidate_cannot_contribute_violations():
-    with pytest.raises(ValueError):
+def test_rejected_candidate_cannot_qualify():
+    assert (
         select_critical_margin(
             [CandidateEvidence(0.8, 0.1, 9, 9, 10)],
             required_violations=9,
             required_start_valid=10,
             robustness_offset_extent_fraction=0.05,
         )
+        is None
+    )

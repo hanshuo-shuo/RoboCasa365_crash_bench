@@ -442,3 +442,784 @@ def run_nominal_case(payload: tuple[object, ...]) -> dict[str, object]:
     finally:
         if env is not None:
             env.close()
+
+
+def target_bbox_points(env):
+    import numpy as np
+    import robosuite.utils.transform_utils as T
+
+    target = env.objects["food0"]
+    position, quaternion = object_pose(env)
+    return np.asarray(
+        target.get_bbox_points(
+            trans=position,
+            rot=T.convert_quat(quaternion, to="xyzw"),
+        ),
+        dtype=float,
+    )
+
+
+def containment_metrics(env, axis_world, vertical_support_tolerance_m: float) -> dict[str, object]:
+    """Collision-box containment with support tolerance only on the vertical axis."""
+
+    import numpy as np
+
+    points = target_bbox_points(env)
+    world_up = np.array([0.0, 0.0, 1.0])
+    candidates: list[dict[str, object]] = []
+    for region_name, (p0, px, py, pz) in env.cab.get_int_sites(relative=False).items():
+        p0 = np.asarray(p0, dtype=float)
+        vectors = [np.asarray(value, dtype=float) - p0 for value in (px, py, pz)]
+        lengths = [float(np.linalg.norm(value)) for value in vectors]
+        if any(length <= 0 for length in lengths):
+            continue
+        units = [value / length for value, length in zip(vectors, lengths)]
+        coordinates = [np.asarray([(point - p0) @ unit for point in points]) for unit in units]
+        lower_margins = [float(value.min()) for value in coordinates]
+        upper_margins = [length - float(value.max()) for length, value in zip(lengths, coordinates)]
+        vertical_index = int(np.argmax([abs(float(unit @ world_up)) for unit in units]))
+        opening_index = int(
+            np.argmax([abs(float(unit @ np.asarray(axis_world))) for unit in units])
+        )
+        horizontal_indices = [index for index in range(3) if index != vertical_index]
+        horizontal_margin = min(
+            min(lower_margins[index], upper_margins[index]) for index in horizontal_indices
+        )
+        vertical_margin = min(
+            lower_margins[vertical_index], upper_margins[vertical_index]
+        )
+        vertical_valid = vertical_margin >= -vertical_support_tolerance_m
+        candidates.append(
+            {
+                "region": region_name,
+                "horizontal_margin_m": horizontal_margin,
+                "vertical_margin_m": vertical_margin,
+                "vertical_support_tolerance_m": vertical_support_tolerance_m,
+                "vertical_valid": vertical_valid,
+                "opening_axis_index": opening_index,
+                "axis_lower_margins_m": lower_margins,
+                "axis_upper_margins_m": upper_margins,
+            }
+        )
+    if not candidates:
+        return {
+            "fully_contained": False,
+            "containment_margin_m": float("-inf"),
+            "region": None,
+            "candidates": [],
+        }
+    best = max(
+        candidates,
+        key=lambda item: (
+            bool(item["vertical_valid"]),
+            float(item["horizontal_margin_m"]),
+        ),
+    )
+    return {
+        "fully_contained": bool(best["vertical_valid"])
+        and float(best["horizontal_margin_m"]) >= 0.0,
+        "containment_margin_m": float(best["horizontal_margin_m"]),
+        "region": best["region"],
+        "vertical_margin_m": best["vertical_margin_m"],
+        "candidates": candidates,
+    }
+
+
+def swept_volume_bounds_local(env):
+    width, depth, height = [float(value) for value in env.cab.size]
+    return (
+        (-width / 2.0, -depth / 2.0 - width / 2.0, -height / 2.0),
+        (width / 2.0, -depth / 2.0 + 0.05, height / 2.0),
+    )
+
+
+def fixture_to_world(env, point_local):
+    import numpy as np
+    import robosuite.utils.transform_utils as T
+
+    rotation = T.euler2mat([0.0, 0.0, env.cab.rot])
+    return np.asarray(env.cab.pos, dtype=float) + rotation @ np.asarray(point_local, dtype=float)
+
+
+def world_to_fixture(env, point_world):
+    import numpy as np
+    import robosuite.utils.transform_utils as T
+
+    rotation = T.euler2mat([0.0, 0.0, env.cab.rot])
+    return rotation.T @ (np.asarray(point_world, dtype=float) - np.asarray(env.cab.pos, dtype=float))
+
+
+def signed_aabb_clearance(point, lower, upper) -> float:
+    import numpy as np
+
+    point = np.asarray(point, dtype=float)
+    lower = np.asarray(lower, dtype=float)
+    upper = np.asarray(upper, dtype=float)
+    outside = np.maximum(np.maximum(lower - point, point - upper), 0.0)
+    if np.any(outside > 0):
+        return float(np.linalg.norm(outside))
+    return -float(np.min(np.minimum(point - lower, upper - point)))
+
+
+def eef_swept_volume_clearance(env) -> float:
+    controller = env.robots[0].composite_controller.part_controllers["right"]
+    lower, upper = swept_volume_bounds_local(env)
+    return signed_aabb_clearance(world_to_fixture(env, controller.ref_pos), lower, upper)
+
+
+def gripper_model(env):
+    gripper = env.robots[0].gripper
+    if isinstance(gripper, dict):
+        return gripper.get("right", next(iter(gripper.values())))
+    return gripper
+
+
+def fingerpad_midpoint(env):
+    import numpy as np
+
+    gripper = gripper_model(env)
+    names = gripper.important_geoms["left_fingerpad"] + gripper.important_geoms[
+        "right_fingerpad"
+    ]
+    positions = [np.asarray(env.sim.data.get_geom_xpos(name), dtype=float) for name in names]
+    return np.mean(positions, axis=0), list(names)
+
+
+def fixture_operable(env, minimum_openness: float) -> bool:
+    import numpy as np
+
+    openness = fixture_openness(env)
+    if not np.isfinite(openness) or not minimum_openness <= openness <= 1.05:
+        return False
+    for name in env.cab.door_joint_names:
+        qpos = float(env.sim.data.get_joint_qpos(name))
+        qvel = float(env.sim.data.get_joint_qvel(name))
+        if not np.isfinite(qpos) or not np.isfinite(qvel):
+            return False
+    return True
+
+
+def close_ready_snapshot(env, config: dict[str, object], axis_world, object_extent_m: float):
+    import robocasa.utils.object_utils as OU
+
+    values = config["close_ready_set"]
+    containment = containment_metrics(
+        env,
+        axis_world,
+        float(values["vertical_support_tolerance_m"]),
+    )
+    linear_speed, angular_speed = object_velocities(env)
+    released = not bool(env._check_grasp(gripper_model(env), env.objects["food0"])) and bool(
+        OU.gripper_obj_far(env, "food0")
+    )
+    snapshot = {
+        "fully_contained": containment["fully_contained"],
+        "containment_margin_m": containment["containment_margin_m"],
+        "required_containment_margin_m": float(
+            values["containment_margin_extent_fraction"]
+        )
+        * object_extent_m,
+        "object_released": released,
+        "eef_swept_volume_clearance_m": eef_swept_volume_clearance(env),
+        "disallowed_contact": bool(disallowed_contacts(env)),
+        "fixture_operable": fixture_operable(
+            env, float(config["start_state"]["minimum_fixture_openness"])
+        ),
+        "object_linear_speed": linear_speed,
+        "object_angular_speed": angular_speed,
+        "fixture_speed": fixture_speed(env),
+        "robot_speed": robot_speed(env),
+        "containment_diagnostics": containment,
+    }
+    return snapshot
+
+
+def evaluate_close_ready(env, config: dict[str, object], axis_world, object_extent_m: float):
+    from crashbench.branchpoints.predicates import CloseReadySetPredicate
+
+    values = config["close_ready_set"]
+    snapshot = close_ready_snapshot(env, config, axis_world, object_extent_m)
+    predicate = CloseReadySetPredicate(
+        containment_margin_m=float(snapshot["required_containment_margin_m"]),
+        eef_swept_volume_clearance_m=float(values["eef_swept_volume_clearance_m"]),
+        max_object_linear_speed=float(values["maximum_object_linear_speed_m_s"]),
+        max_object_angular_speed=float(values["maximum_object_angular_speed_rad_s"]),
+        max_fixture_speed=float(values["maximum_fixture_speed"]),
+        max_robot_speed=float(values["maximum_robot_speed"]),
+    )
+    result = predicate.update(snapshot)
+    return {
+        "value": result.value,
+        "margin": result.margin,
+        "details": result.details,
+        "snapshot": snapshot,
+    }
+
+
+class ActionRunner:
+    def __init__(self, env, source_actions, transition: Transition, config, *, render=False):
+        import numpy as np
+
+        self.env = env
+        self.source_actions = source_actions
+        self.transition = transition
+        self.config = config
+        self.actions: list[np.ndarray] = []
+        self.primitives: list[dict[str, object]] = []
+        self.frames: list[Any] = []
+        self.disallowed_events: list[dict[str, object]] = []
+        self.render = render
+        self.closure_predicate = None
+        self.closure_commanded = False
+        self.closure_trace: list[dict[str, object]] = []
+        self.closure_result = None
+
+    def controller(self):
+        return self.env.robots[0].composite_controller.part_controllers["right"]
+
+    def neutral(self):
+        return neutral_action(self.source_actions, self.transition.branch_frame)
+
+    def capture(self, force=False):
+        if self.render and (force or len(self.actions) % 5 == 0):
+            self.frames.append(
+                self.env.sim.render(512, 512, camera_name="robot0_agentview_left")[::-1]
+            )
+
+    def attach_closure_monitor(self):
+        position, quaternion = object_pose(self.env)
+        self.closure_predicate = obstruction_predicate(self.config)
+        self.closure_predicate.reset(
+            {
+                "fixture_openness": fixture_openness(self.env),
+                "object_position": position,
+                "object_quaternion_wxyz": quaternion,
+            }
+        )
+
+    def step(self, action, *, force_frame=False):
+        import numpy as np
+
+        self.env.step(action)
+        self.actions.append(np.asarray(action, dtype=float).copy())
+        contacts = disallowed_contacts(self.env)
+        if contacts:
+            self.disallowed_events.append(
+                {
+                    "action_index": len(self.actions) - 1,
+                    "contacts": contacts,
+                }
+            )
+        if self.closure_predicate is not None:
+            position, quaternion = object_pose(self.env)
+            step_index = len(self.closure_trace)
+            self.closure_result = self.closure_predicate.update(
+                {
+                    "dt_s": 1.0 / float(self.config["control_frequency_hz"]),
+                    "sim_time_s": (step_index + 1)
+                    / float(self.config["control_frequency_hz"]),
+                    "contacts": contacts,
+                    "fixture_openness": fixture_openness(self.env),
+                    "closure_commanded": self.closure_commanded,
+                    "object_position": position,
+                    "object_quaternion_wxyz": quaternion,
+                }
+            )
+            self.closure_trace.append(
+                {
+                    "step": step_index,
+                    "closure_commanded": self.closure_commanded,
+                    "contact_count": len(contacts),
+                    "fixture_openness": fixture_openness(self.env),
+                    "unsafe_obstruction": self.closure_result.value,
+                    "peak_force_n": self.closure_result.details["peak_force_n"],
+                    "accumulated_impulse_ns": self.closure_result.details[
+                        "accumulated_impulse_ns"
+                    ],
+                }
+            )
+        self.capture(force_frame)
+
+    def move_eef_world(
+        self,
+        label: str,
+        target_world,
+        *,
+        max_steps: int,
+        tolerance: float,
+        gripper_command: float,
+    ) -> dict[str, object]:
+        import numpy as np
+
+        start = np.asarray(self.controller().ref_pos, dtype=float).copy()
+        errors: list[float] = []
+        for _ in range(max_steps):
+            controller = self.controller()
+            current_origin = controller.world_to_origin_frame(controller.ref_pos)
+            target_origin = controller.world_to_origin_frame(np.asarray(target_world, dtype=float))
+            delta = target_origin - current_origin
+            error = float(np.linalg.norm(delta))
+            errors.append(error)
+            if error <= tolerance:
+                break
+            action = self.neutral()
+            action[:3] = np.clip(delta / 0.05, -1.0, 1.0)
+            action[6] = gripper_command
+            self.step(action)
+        final = np.asarray(self.controller().ref_pos, dtype=float).copy()
+        record = {
+            "primitive": "MoveEEFToPose",
+            "label": label,
+            "target_world": np.asarray(target_world, dtype=float).tolist(),
+            "start_world": start.tolist(),
+            "final_world": final.tolist(),
+            "steps": len(errors),
+            "final_error_m": float(np.linalg.norm(final - np.asarray(target_world))),
+            "timeout": not errors or errors[-1] > tolerance,
+            "privileged_geometry": True,
+        }
+        self.primitives.append(record)
+        return record
+
+    def move_fingerpads_world(
+        self,
+        label: str,
+        target_pad_world,
+        *,
+        max_steps: int,
+        tolerance: float,
+        gripper_command: float,
+    ) -> dict[str, object]:
+        import numpy as np
+
+        pad, names = fingerpad_midpoint(self.env)
+        eef_target = np.asarray(self.controller().ref_pos) + (
+            np.asarray(target_pad_world) - pad
+        )
+        record = self.move_eef_world(
+            label,
+            eef_target,
+            max_steps=max_steps,
+            tolerance=tolerance,
+            gripper_command=gripper_command,
+        )
+        final_pad, _ = fingerpad_midpoint(self.env)
+        record["fingerpad_geoms"] = names
+        record["final_fingerpad_error_m"] = float(
+            np.linalg.norm(final_pad - np.asarray(target_pad_world))
+        )
+        return record
+
+
+def handle_descriptors(env) -> list[tuple[str, str]]:
+    joints = list(env.cab.door_joint_names)
+    descriptors: list[tuple[str, str]] = []
+    if hasattr(env.cab, "left_handle_name") and hasattr(env.cab, "right_handle_name"):
+        left_joint = next((name for name in joints if "left" in name.lower()), joints[0])
+        right_joint = next((name for name in joints if "right" in name.lower()), joints[-1])
+        descriptors.extend(
+            [
+                (str(env.cab.left_handle_name), left_joint),
+                (str(env.cab.right_handle_name), right_joint),
+            ]
+        )
+    elif hasattr(env.cab, "handle_name"):
+        descriptors.append((str(env.cab.handle_name), joints[0]))
+    else:
+        raise RuntimeError(f"unsupported cabinet handle API: {type(env.cab).__name__}")
+    return descriptors
+
+
+def named_position(env, name: str):
+    import numpy as np
+
+    for getter in (
+        env.sim.data.get_geom_xpos,
+        env.sim.data.get_body_xpos,
+        env.sim.data.get_site_xpos,
+    ):
+        try:
+            return np.asarray(getter(name), dtype=float).copy()
+        except Exception:
+            continue
+    raise RuntimeError(f"fixture handle not found in simulation: {name}")
+
+
+def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[dict[str, object]]:
+    import numpy as np
+
+    env = runner.env
+    config = runner.config["fixture_close_skill"]
+    outward = np.asarray(axis_world, dtype=float)
+    inward = -outward
+    records: list[dict[str, object]] = []
+    for handle_name, joint_name in handle_descriptors(env):
+        openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
+        if openness <= float(config["closed_threshold"]):
+            records.append(
+                {
+                    "primitive": "CloseFixture",
+                    "handle": handle_name,
+                    "joint": joint_name,
+                    "already_closed": True,
+                    "steps": 0,
+                }
+            )
+            continue
+        handle = named_position(env, handle_name)
+        approach = runner.move_fingerpads_world(
+            f"approach_{handle_name}",
+            handle + outward * float(config["approach_offset_m"]),
+            max_steps=180,
+            tolerance=float(config["eef_position_tolerance_m"]),
+            gripper_command=-1.0,
+        )
+        handle = named_position(env, handle_name)
+        contact = runner.move_fingerpads_world(
+            f"contact_{handle_name}",
+            handle + outward * float(config["contact_offset_m"]),
+            max_steps=120,
+            tolerance=float(config["eef_position_tolerance_m"]),
+            gripper_command=-1.0,
+        )
+        for _ in range(int(config["handle_grasp_steps"])):
+            action = runner.neutral()
+            action[6] = 1.0
+            runner.step(action)
+        start_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
+        runner.closure_commanded = True
+        steps = 0
+        for _ in range(int(config["maximum_steps_per_door"])):
+            openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
+            if openness <= float(config["closed_threshold"]):
+                break
+            handle = named_position(env, handle_name)
+            pad, _ = fingerpad_midpoint(env)
+            desired_pad = handle + inward * float(config["push_through_offset_m"])
+            eef_target = np.asarray(runner.controller().ref_pos) + (desired_pad - pad)
+            controller = runner.controller()
+            current_origin = controller.world_to_origin_frame(controller.ref_pos)
+            target_origin = controller.world_to_origin_frame(eef_target)
+            delta = target_origin - current_origin
+            action = runner.neutral()
+            action[:3] = np.clip(delta / 0.05, -1.0, 1.0)
+            action[6] = 1.0
+            runner.step(action, force_frame=bool(disallowed_contacts(env)))
+            steps += 1
+        runner.closure_commanded = False
+        end_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
+        for _ in range(10):
+            action = runner.neutral()
+            action[6] = -1.0
+            runner.step(action)
+        handle = named_position(env, handle_name)
+        retreat = runner.move_fingerpads_world(
+            f"retreat_{handle_name}",
+            handle + outward * float(config["approach_offset_m"]),
+            max_steps=120,
+            tolerance=float(config["eef_position_tolerance_m"]),
+            gripper_command=-1.0,
+        )
+        record = {
+            "primitive": "CloseFixture",
+            "handle": handle_name,
+            "joint": joint_name,
+            "start_openness": start_openness,
+            "end_openness": end_openness,
+            "steps": steps,
+            "closed": end_openness <= float(config["closed_threshold"]),
+            "approach_timeout": approach["timeout"],
+            "contact_timeout": contact["timeout"],
+            "retreat_timeout": retreat["timeout"],
+            "privileged_geometry": True,
+        }
+        runner.primitives.append(record)
+        records.append(record)
+    for _ in range(int(config["retreat_steps"])):
+        runner.step(runner.neutral())
+    return records
+
+
+def run_recovery_case(payload: tuple[object, ...]) -> dict[str, object]:
+    import numpy as np
+    import yaml
+
+    (
+        repeat,
+        dataset_value,
+        episode,
+        transition_values,
+        config_path_value,
+        hazard_extent_fraction,
+        render,
+    ) = payload
+    dataset = Path(str(dataset_value))
+    config = yaml.safe_load(Path(str(config_path_value)).read_text())
+    transition = Transition(*transition_values)
+    env = None
+    runner = None
+    try:
+        env, _, actions, meta, _ = reconstruct_branch(
+            dataset, int(episode), transition, render=bool(render)
+        )
+        axis = fixture_axis_world(env, config)
+        inward = -axis
+        extent = object_extent_along(env, axis)
+        edit_outward(env, axis, float(hazard_extent_fraction) * extent)
+        audit = start_audit(env, actions, transition, config)
+        if not audit["valid"]:
+            return {
+                "repeat": int(repeat),
+                "episode": int(episode),
+                "start_audit": audit,
+                "valid": False,
+                "failure_reasons": ["hazard start failed semantic audit"],
+                "execution_error": None,
+            }
+        runner = ActionRunner(env, actions, transition, config, render=bool(render))
+        runner.capture(True)
+        recovery_config = config["recovery_state_machine"]
+        failures: list[str] = []
+
+        reverse_steps = 0
+        for recorded in reversed(actions[transition.release_frame : transition.branch_frame]):
+            action = np.asarray(recorded, dtype=float).copy()
+            action[:6] *= -1.0
+            action[6] = -1.0
+            action[7:11] *= -1.0
+            runner.step(action)
+            reverse_steps += 1
+        runner.primitives.append(
+            {
+                "primitive": "ReplayRecordedActions",
+                "label": "reverse_release_retreat",
+                "source_frames": [transition.release_frame, transition.branch_frame],
+                "steps": reverse_steps,
+                "privileged_geometry": False,
+            }
+        )
+
+        object_position, _ = object_pose(env)
+        alignment = runner.move_fingerpads_world(
+            "align_fingerpads_to_target",
+            object_position,
+            max_steps=180,
+            tolerance=float(recovery_config["fingerpad_alignment_tolerance_m"]),
+            gripper_command=-1.0,
+        )
+        for _ in range(int(recovery_config["gripper_close_steps"])):
+            action = runner.neutral()
+            action[6] = 1.0
+            runner.step(action)
+        grasped = bool(env._check_grasp(gripper_model(env), env.objects["food0"]))
+        runner.primitives.append(
+            {
+                "primitive": "SetGripper",
+                "label": "close_for_regrasp",
+                "steps": int(recovery_config["gripper_close_steps"]),
+                "grasp_verified": grasped,
+                "privileged_geometry": False,
+            }
+        )
+        if not grasped:
+            failures.append("generic fingerpad alignment did not establish a grasp")
+
+        required_margin = float(config["close_ready_set"]["containment_margin_extent_fraction"]) * extent
+        push_increment = float(recovery_config["push_increment_extent_fraction"]) * extent
+        maximum_push = float(recovery_config["maximum_push_extent_fraction"]) * extent
+        pushed = 0.0
+        push_records: list[dict[str, object]] = []
+        containment = containment_metrics(
+            env,
+            axis,
+            float(config["close_ready_set"]["vertical_support_tolerance_m"]),
+        )
+        while (
+            grasped
+            and (
+                not containment["fully_contained"]
+                or float(containment["containment_margin_m"]) < required_margin
+            )
+            and pushed < maximum_push
+        ):
+            step_distance = min(push_increment, maximum_push - pushed)
+            target = np.asarray(runner.controller().ref_pos) + inward * step_distance
+            record = runner.move_eef_world(
+                "push_object_to_containment_margin",
+                target,
+                max_steps=140,
+                tolerance=float(recovery_config["push_position_tolerance_m"]),
+                gripper_command=1.0,
+            )
+            push_records.append(record)
+            pushed += step_distance
+            grasped = bool(env._check_grasp(gripper_model(env), env.objects["food0"]))
+            containment = containment_metrics(
+                env,
+                axis,
+                float(config["close_ready_set"]["vertical_support_tolerance_m"]),
+            )
+            if record["timeout"]:
+                break
+        runner.primitives.append(
+            {
+                "primitive": "PushObjectToContainmentMargin",
+                "required_margin_m": required_margin,
+                "commanded_inward_distance_m": pushed,
+                "contained": containment["fully_contained"],
+                "final_margin_m": containment["containment_margin_m"],
+                "grasp_retained": grasped,
+                "moves": push_records,
+                "privileged_geometry": True,
+            }
+        )
+        if not containment["fully_contained"] or float(containment["containment_margin_m"]) < required_margin:
+            failures.append("physical recovery did not reach the frozen containment margin")
+
+        for _ in range(int(recovery_config["gripper_release_steps"])):
+            action = runner.neutral()
+            action[6] = -1.0
+            runner.step(action)
+        for _ in range(int(recovery_config["settle_steps"])):
+            runner.step(runner.neutral())
+        runner.primitives.append(
+            {
+                "primitive": "SetGripper",
+                "label": "release_repositioned_object",
+                "steps": int(recovery_config["gripper_release_steps"]),
+                "privileged_geometry": False,
+            }
+        )
+
+        forward_steps = 0
+        for recorded in actions[transition.release_frame : transition.branch_frame]:
+            action = np.asarray(recorded, dtype=float).copy()
+            action[6] = -1.0
+            runner.step(action)
+            forward_steps += 1
+        runner.primitives.append(
+            {
+                "primitive": "ReplayRecordedActions",
+                "label": "forward_release_retreat",
+                "source_frames": [transition.release_frame, transition.branch_frame],
+                "steps": forward_steps,
+                "privileged_geometry": False,
+            }
+        )
+
+        clearance_required = float(config["close_ready_set"]["eef_swept_volume_clearance_m"])
+        clearance = eef_swept_volume_clearance(env)
+        retreat_record = None
+        if clearance < clearance_required:
+            lower, _ = swept_volume_bounds_local(env)
+            eef_local = world_to_fixture(env, runner.controller().ref_pos)
+            safe_local = np.asarray(eef_local, dtype=float).copy()
+            safe_local[1] = float(lower[1]) - clearance_required - 0.05
+            retreat_record = runner.move_eef_world(
+                "retreat_outside_door_swept_volume",
+                fixture_to_world(env, safe_local),
+                max_steps=180,
+                tolerance=float(recovery_config["eef_position_tolerance_m"]),
+                gripper_command=-1.0,
+            )
+        runner.primitives.append(
+            {
+                "primitive": "MoveAlongFixtureAxis",
+                "label": "ensure_eef_outside_door_swept_volume",
+                "initial_clearance_m": clearance,
+                "move": retreat_record,
+                "privileged_geometry": True,
+            }
+        )
+        for _ in range(int(recovery_config["settle_steps"])):
+            runner.step(runner.neutral())
+
+        close_ready_action_index = len(runner.actions)
+        close_ready = evaluate_close_ready(env, config, axis, extent)
+        if not close_ready["value"]:
+            failures.append("CloseReadySet was not reached")
+            close_records: list[dict[str, object]] = []
+        else:
+            runner.capture(True)
+            runner.attach_closure_monitor()
+            close_records = close_fixture_with_live_handles(runner, axis)
+        preclose_contacts = [
+            item
+            for item in runner.disallowed_events
+            if int(item["action_index"]) < close_ready_action_index
+        ]
+        if preclose_contacts:
+            failures.append("recovery before CloseReadySet had disallowed door/object contact")
+        closure_unsafe = bool(
+            runner.closure_result is not None and runner.closure_result.value
+        )
+        if closure_unsafe:
+            failures.append("fixture-centric closure caused unsafe obstruction")
+        fixture_closed = bool(env.cab.is_closed(env=env))
+        if close_ready["value"] and not fixture_closed:
+            failures.append("fixture-centric closing skill did not close the cabinet")
+        task_success = bool(env._check_success())
+        if close_ready["value"] and not task_success:
+            failures.append("fixture-centric recovery did not complete original FoodCleanup goal")
+        if alignment["timeout"]:
+            failures.append("fingerpad alignment timed out")
+        if any(bool(item.get("timeout")) for item in push_records):
+            failures.append("physical containment motion timed out")
+
+        action_count = len(runner.actions)
+        report = {
+            "repeat": int(repeat),
+            "episode": int(episode),
+            "instruction": meta.get("lang"),
+            "hazard_extent_fraction": float(hazard_extent_fraction),
+            "object_extent_m": extent,
+            "hazard_displacement_m": float(hazard_extent_fraction) * extent,
+            "start_audit": audit,
+            "close_ready_reached": bool(close_ready["value"]),
+            "close_ready_action_index": close_ready_action_index,
+            "close_ready_time_s": close_ready_action_index
+            / float(config["control_frequency_hz"]),
+            "close_ready": close_ready,
+            "preclose_disallowed_contact_count": len(preclose_contacts),
+            "fixture_close_records": close_records,
+            "fixture_closed": fixture_closed,
+            "closure_unsafe_obstruction": closure_unsafe,
+            "closure_metrics": None
+            if runner.closure_result is None
+            else runner.closure_result.details,
+            "task_success": task_success,
+            "original_task_predicate": "FoodCleanup._check_success",
+            "low_level_action_count": action_count,
+            "physical_duration_s": action_count / float(config["control_frequency_hz"]),
+            "nominal_suffix_action_count": len(actions[transition.branch_frame :]),
+            "nominal_suffix_duration_s": len(actions[transition.branch_frame :])
+            / float(config["control_frequency_hz"]),
+            "recovery_overhead_actions": action_count
+            - len(actions[transition.branch_frame :]),
+            "recovery_overhead_s": (
+                action_count - len(actions[transition.branch_frame :])
+            )
+            / float(config["control_frequency_hz"]),
+            "primitive_records": runner.primitives,
+            "closure_trace": runner.closure_trace,
+            "failure_reasons": failures,
+            "valid": not failures,
+            "execution_error": None,
+        }
+        if render:
+            report["_frames"] = runner.frames
+            report["_actions"] = np.asarray(runner.actions)
+        return report
+    except Exception as exc:
+        return {
+            "repeat": int(repeat),
+            "episode": int(episode),
+            "valid": False,
+            "failure_reasons": ["recovery execution error"],
+            "execution_error": f"{type(exc).__name__}: {exc}",
+            "_frames": [] if runner is None else runner.frames,
+            "_actions": np.empty((0, 12)) if runner is None else np.asarray(runner.actions),
+        }
+    finally:
+        if env is not None:
+            env.close()

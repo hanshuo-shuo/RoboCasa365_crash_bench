@@ -77,6 +77,7 @@ recovery_state_machine:
   gripper_release_steps: 20
   push_increment_extent_fraction: 0.25
   maximum_push_extent_fraction: 1.50
+  push_position_tolerance_m: 0.008
   settle_steps: 10
   require_return_to_branch_pose: false
 
@@ -84,7 +85,9 @@ fixture_close_skill:
   version: live_handle_push_v1
   approach_offset_m: 0.08
   contact_offset_m: 0.015
+  push_through_offset_m: 0.04
   eef_position_tolerance_m: 0.025
+  handle_grasp_steps: 20
   closed_threshold: 0.005
   maximum_steps_per_door: 240
   retreat_steps: 20
