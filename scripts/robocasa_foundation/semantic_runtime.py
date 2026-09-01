@@ -677,6 +677,9 @@ class ActionRunner:
     def controller(self):
         return self.env.robots[0].composite_controller.part_controllers["right"]
 
+    def base_controller(self):
+        return self.env.robots[0].composite_controller.part_controllers["base"]
+
     def neutral(self):
         return neutral_action(self.source_actions, self.transition.branch_frame)
 
@@ -810,6 +813,56 @@ class ActionRunner:
         )
         return record
 
+    def move_base_by_world_delta(
+        self,
+        label: str,
+        world_delta,
+        *,
+        max_distance: float,
+        max_steps: int,
+        tolerance: float,
+    ) -> dict[str, object]:
+        import numpy as np
+
+        controller = self.base_controller()
+        start_pos, start_ori = controller.get_base_pose()
+        planar = np.asarray(world_delta, dtype=float).copy()
+        planar[2] = 0.0
+        norm = float(np.linalg.norm(planar[:2]))
+        if norm > max_distance:
+            planar *= max_distance / norm
+        target_pos = np.asarray(start_pos, dtype=float) + planar
+        errors: list[float] = []
+        for _ in range(max_steps):
+            current_pos, current_ori = controller.get_base_pose()
+            delta_world = target_pos - np.asarray(current_pos, dtype=float)
+            error = float(np.linalg.norm(delta_world[:2]))
+            errors.append(error)
+            if error <= tolerance:
+                break
+            delta_local = np.asarray(current_ori, dtype=float).T @ delta_world
+            action = self.neutral()
+            action[7] = np.clip(delta_local[0] * 5.0, -1.0, 1.0)
+            action[8] = np.clip(delta_local[1] * 5.0, -1.0, 1.0)
+            action[9] = 0.0
+            action[10] = 0.0
+            action[11] = 1.0
+            self.step(action)
+        final_pos, _ = controller.get_base_pose()
+        record = {
+            "primitive": "MoveMobileBaseToPose",
+            "label": label,
+            "start_world": np.asarray(start_pos, dtype=float).tolist(),
+            "target_world": target_pos.tolist(),
+            "final_world": np.asarray(final_pos, dtype=float).tolist(),
+            "steps": len(errors),
+            "final_error_m": errors[-1] if errors else None,
+            "timeout": not errors or errors[-1] > tolerance,
+            "privileged_geometry": True,
+        }
+        self.primitives.append(record)
+        return record
+
 
 def handle_descriptors(env) -> list[tuple[str, str]]:
     joints = list(env.cab.door_joint_names)
@@ -817,11 +870,10 @@ def handle_descriptors(env) -> list[tuple[str, str]]:
     if hasattr(env.cab, "left_handle_name") and hasattr(env.cab, "right_handle_name"):
         left_joint = next((name for name in joints if "left" in name.lower()), joints[0])
         right_joint = next((name for name in joints if "right" in name.lower()), joints[-1])
-        # Close the positive-range leaf first so the mirrored leaf remains reachable.
         descriptors.extend(
             [
-                (str(env.cab.right_handle_name), right_joint),
                 (str(env.cab.left_handle_name), left_joint),
+                (str(env.cab.right_handle_name), right_joint),
             ]
         )
     elif hasattr(env.cab, "handle_name"):
@@ -902,6 +954,30 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             tolerance=float(config["eef_position_tolerance_m"]),
             gripper_command=-1.0,
         )
+        base_repositions: list[dict[str, object]] = []
+        for retry in range(int(config["contact_retry_count"])):
+            if not contact["timeout"]:
+                break
+            handle = named_position(env, handle_name)
+            target_pad = handle + outward * float(config["contact_offset_m"])
+            pad, _ = fingerpad_midpoint(env)
+            base_repositions.append(
+                runner.move_base_by_world_delta(
+                    f"recenter_base_for_{handle_name}_{retry}",
+                    target_pad - pad,
+                    max_distance=float(config["base_reposition_max_m"]),
+                    max_steps=int(config["base_reposition_steps"]),
+                    tolerance=float(config["base_reposition_tolerance_m"]),
+                )
+            )
+            handle = named_position(env, handle_name)
+            contact = runner.move_fingerpads_world(
+                f"retry_contact_{handle_name}_{retry}",
+                handle + outward * float(config["contact_offset_m"]),
+                max_steps=180,
+                tolerance=float(config["eef_position_tolerance_m"]),
+                gripper_command=-1.0,
+            )
         for _ in range(int(config["handle_grasp_steps"])):
             action = runner.neutral()
             action[6] = 1.0
@@ -952,6 +1028,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             "closed": end_openness <= float(config["closed_threshold"]),
             "approach_timeout": approach["timeout"],
             "contact_timeout": contact["timeout"],
+            "base_repositions": base_repositions,
             "retreat_timeout": retreat["timeout"],
             "privileged_geometry": True,
         }
