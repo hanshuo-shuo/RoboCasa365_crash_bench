@@ -91,9 +91,6 @@ fixture_close_skill:
   handle_grasp_steps: 20
   closed_threshold: 0.005
   maximum_steps_per_door: 240
-  direction_probe_steps: 20
-  minimum_probe_progress: 0.01
-  maximum_direction_flips: 1
   retreat_steps: 20
 
 restart_equivalence:

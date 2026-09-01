@@ -848,13 +848,29 @@ def named_position(env, name: str):
     raise RuntimeError(f"fixture handle not found in simulation: {name}")
 
 
+def joint_closing_tangent(env, joint_name: str, handle_position):
+    import numpy as np
+
+    joint_id = env.sim.model.joint_name2id(joint_name)
+    joint_range = np.asarray(env.sim.model.jnt_range[joint_id], dtype=float)
+    axis = np.asarray(env.sim.data.xaxis[joint_id], dtype=float)
+    anchor = np.asarray(env.sim.data.xanchor[joint_id], dtype=float)
+    radius = np.asarray(handle_position, dtype=float) - anchor
+    tangent = np.cross(axis, radius)
+    norm = float(np.linalg.norm(tangent))
+    if norm <= 1e-9:
+        raise RuntimeError(f"degenerate handle radius for joint: {joint_name}")
+    # RoboCasa reverses normalized openness for negative-range hinge joints.
+    closing_qpos_sign = -1.0 if joint_range[0] >= 0 else 1.0
+    return closing_qpos_sign * tangent / norm
+
+
 def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[dict[str, object]]:
     import numpy as np
 
     env = runner.env
     config = runner.config["fixture_close_skill"]
     outward = np.asarray(axis_world, dtype=float)
-    inward = -outward
     records: list[dict[str, object]] = []
     for handle_name, joint_name in handle_descriptors(env):
         openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
@@ -892,25 +908,13 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
         start_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         runner.closure_commanded = True
         steps = 0
-        drive = inward.copy()
-        probe_start = start_openness
-        probe_steps = 0
-        direction_flips = 0
         for _ in range(int(config["maximum_steps_per_door"])):
             openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
             if openness <= float(config["closed_threshold"]):
                 break
-            if (
-                probe_steps >= int(config["direction_probe_steps"])
-                and probe_start - openness < float(config["minimum_probe_progress"])
-                and direction_flips < int(config["maximum_direction_flips"])
-            ):
-                drive *= -1.0
-                direction_flips += 1
-                probe_start = openness
-                probe_steps = 0
             handle = named_position(env, handle_name)
             pad, _ = fingerpad_midpoint(env)
+            drive = joint_closing_tangent(env, joint_name, handle)
             desired_pad = handle + drive * float(config["push_through_offset_m"])
             eef_target = np.asarray(runner.controller().ref_pos) + (desired_pad - pad)
             controller = runner.controller()
@@ -922,7 +926,6 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             action[6] = 1.0
             runner.step(action, force_frame=bool(disallowed_contacts(env)))
             steps += 1
-            probe_steps += 1
         runner.closure_commanded = False
         end_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         for _ in range(10):
@@ -944,7 +947,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             "start_openness": start_openness,
             "end_openness": end_openness,
             "steps": steps,
-            "direction_flips": direction_flips,
+            "direction_mode": "live_joint_closing_tangent",
             "closed": end_openness <= float(config["closed_threshold"]),
             "approach_timeout": approach["timeout"],
             "contact_timeout": contact["timeout"],
