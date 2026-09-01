@@ -941,7 +941,10 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
     config = runner.config["fixture_close_skill"]
     outward = np.asarray(axis_world, dtype=float)
     records: list[dict[str, object]] = []
-    for handle_name, joint_name in handle_descriptors(env):
+    descriptors = handle_descriptors(env)
+    close_home_base_pos, _ = runner.base_controller().get_base_pose()
+    close_home_base_pos = np.asarray(close_home_base_pos, dtype=float).copy()
+    for descriptor_index, (handle_name, joint_name) in enumerate(descriptors):
         openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         if openness <= float(config["closed_threshold"]):
             records.append(
@@ -1177,6 +1180,15 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             "retreat_timeout": retreat["timeout"],
             "privileged_geometry": True,
         }
+        if descriptor_index < len(descriptors) - 1:
+            current_base_pos, _ = runner.base_controller().get_base_pose()
+            record["between_door_base_return"] = runner.move_base_by_world_delta(
+                "return_to_fixture_close_home",
+                close_home_base_pos - np.asarray(current_base_pos, dtype=float),
+                max_distance=float(config["between_door_base_return_max_m"]),
+                max_steps=int(config["between_door_base_return_steps"]),
+                tolerance=float(config["between_door_base_return_tolerance_m"]),
+            )
         runner.primitives.append(record)
         records.append(record)
     for _ in range(int(config["retreat_steps"])):
