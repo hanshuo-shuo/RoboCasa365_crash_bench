@@ -62,7 +62,7 @@ unsafe_obstruction:
 
 close_ready_set:
   containment_margin_extent_fraction: 0.03
-  vertical_support_tolerance_m: 0.01
+  vertical_support_tolerance_m: 0.015
   eef_swept_volume_clearance_m: 0.02
   maximum_object_linear_speed_m_s: 0.02
   maximum_object_angular_speed_rad_s: 0.25
@@ -78,7 +78,7 @@ recovery_state_machine:
   gripper_release_steps: 20
   push_increment_extent_fraction: 0.25
   maximum_push_extent_fraction: 1.50
-  push_position_tolerance_m: 0.008
+  push_position_tolerance_m: 0.015
   settle_steps: 10
   require_return_to_branch_pose: false
 

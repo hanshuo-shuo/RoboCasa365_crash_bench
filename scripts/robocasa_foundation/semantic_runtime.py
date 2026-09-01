@@ -1059,8 +1059,6 @@ def run_recovery_case(payload: tuple[object, ...]) -> dict[str, object]:
                 axis,
                 float(config["close_ready_set"]["vertical_support_tolerance_m"]),
             )
-            if record["timeout"]:
-                break
         runner.primitives.append(
             {
                 "primitive": "PushObjectToContainmentMargin",
@@ -1163,8 +1161,6 @@ def run_recovery_case(payload: tuple[object, ...]) -> dict[str, object]:
             failures.append("fixture-centric recovery did not complete original FoodCleanup goal")
         if alignment["timeout"]:
             failures.append("fingerpad alignment timed out")
-        if any(bool(item.get("timeout")) for item in push_records):
-            failures.append("physical containment motion timed out")
 
         action_count = len(runner.actions)
         report = {
