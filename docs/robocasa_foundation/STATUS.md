@@ -2,17 +2,17 @@
 
 **Last updated:** 2026-09-01
 
-**Phase:** development certified; frozen five-source transfer next
+**Phase:** frozen five-source transfer complete
 
-**Foundation verdict:** **PENDING** — no fresh-source result has been counted yet
+**Foundation verdict:** **NO-GO — 0/5 fresh sources certified**
 
 ## At a glance
 
 | Question | Answer |
 | --- | --- |
-| What are we doing? | Certifying one partial-containment mechanism on five frozen FoodCleanup sources. |
-| What is working? | Environment, source replay, restart protocol, critical-margin search, severity monitor, CloseReadySet, physical object recovery, and bounded fixture closure. |
-| What is the current problem? | Independent transfer is unknown until the five untouched sources finish. |
+| What did we do? | Ran one frozen partial-containment program on five untouched FoodCleanup sources. |
+| What is working? | The development source certified 10/10; one fresh source passed every semantic outcome but failed an extra primitive-timeout gate. |
+| What is the current problem? | The frozen program did not transfer: unstable offset, recovery reach, start dynamics, and no-obstruction cases produced 0/5 certified sources. |
 | What are we not doing? | No new task, failure category, VLA, policy tuning, or extra source replacement. |
 
 ```mermaid
@@ -20,9 +20,8 @@ flowchart LR
     D[dev-000 authoring] --> F[Frozen program]
     F --> R[10-repeat dev recertification]
     R --> S[Five untouched sources]
-    S --> G{At least 4 of 5?}
-    G -->|yes| GO[Foundation GO]
-    G -->|no| NG[Honest NO-GO]
+    S --> N[0 of 5 certified]
+    N --> NG[Foundation NO-GO]
 ```
 
 ## Frozen source count
@@ -42,8 +41,16 @@ authoring:
 | `source-004` | 7 | 21 | onion |
 | `source-005` | 9 | 55 | bell pepper |
 
-They have distinct source IDs, layouts, and model XMLs. Failed sources will not
-be replaced.
+They have distinct source IDs, layouts, and model XMLs. They were not replaced
+after failure.
+
+| Source | Frozen result | Main reason |
+| --- | ---: | --- |
+| `source-001` | not certified | robustness-offset start became unstable |
+| `source-002` | not certified | extra alignment-timeout gate, despite semantic recovery 10/10 |
+| `source-003` | not certified | robot velocity exceeded the frozen start bound |
+| `source-004` | not certified | fixture drift exceeded the frozen start bound |
+| `source-005` | not certified | no grid point caused the frozen unsafe predicate |
 
 ## What is verified
 
@@ -62,6 +69,9 @@ be replaced.
   fresh authoring preceded it.
 - Full revised development certification passed all five repeat groups `10/10`
   in job `5272419`.
+- Frozen fresh-source array `5273093` completed without replacement: `0/5`
+  certified.
+- Final read-only audit found no integrity mismatch and confirmed `NO-GO`.
 
 ## Frozen semantics
 
@@ -87,26 +97,25 @@ The corrected searched-margin development diagnostic used 1,211 actions
 nominal suffix was 860 actions (`43.00 s`). These are measurements, not
 optimization targets.
 
-## Current result and next gate
+## Final source-level result
 
-Frozen dev job `5271204` passed start validity, bad closure, safe twin, and
-identity/restart equivalence `10/10`, but recovery was `0/10`. The same generic
-fingerpad alignment stopped at `20.1 mm` error and failed to grasp in every
-repeat. This occurred at the searched `0.65`-extent hazard; the successful
-development diagnostic at `0.85` extents had reached `16 mm` alignment error.
+The independent sample is `n=5`, not the number of rollouts. No source
+certified, so the `4/5` GO threshold failed.
 
-The same program with generic fingerpad termination tightened to `10 mm` passed
-the searched `0.65`-extent diagnostic in job `5272319`. Full revised dev
-certification then passed start, bad branch, safe twin, physical recovery, and
-identity/restart equivalence `10/10` in job `5272419`.
+Frozen repeat totals across fresh reports were: start validity `10`, bad branch
+`10`, safe-twin success `20`, certified recovery `0`, and restart equivalence
+`10`. Some sources correctly stopped before final repeats because the critical
+search or start gate failed.
 
-Fresh sources remain untouched. The next action is the single frozen
-five-source array. Each source must independently provide ten repeats of start
-validity, bad nominal closure, safe twin, physical recovery, and
-identity/restart equivalence.
+Source 2 is an important diagnostic: all ten recoveries reached CloseReadySet,
+closed safely, and completed FoodCleanup, but the frozen report rejected them
+because an intermediate alignment primitive timed out at `18.7 mm`. The
+primary frozen certification remains failed; this sensitivity is reported, not
+post-hoc repaired.
 
-Foundation `GO` requires at least four certified fresh sources. Repeat totals
-will be reported separately from the independent source count `n=5`.
+The foundation now stops before any VLA work, extra task, replacement source,
+or confirmatory cohort. The full result and next research decision are in
+`FOUNDATION_RESULT.md`.
 
 ## Kept as history
 

@@ -37,3 +37,15 @@ export MUJOCO_GL=egl
 ```
 
 Do not download dependencies or assets inside that job.
+
+## Current semantic foundation
+
+The active scientific configuration is
+`configs/robocasa_foundation/semantic_program.yaml`; the immutable source list
+is `configs/robocasa_foundation/foodcleanup_sources.json`.
+
+The five-source array has completed as Quest job `5273093` with a foundation
+`NO-GO`. Do not rerun it, replace sources, or submit the development/fresh
+certification scripts as a workaround. Read
+`docs/robocasa_foundation/FOUNDATION_RESULT.md` and `STATUS.md` for the result
+and next authorized step.
