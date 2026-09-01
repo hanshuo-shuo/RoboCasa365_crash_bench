@@ -90,8 +90,8 @@ fixture_close_skill:
   eef_position_tolerance_m: 0.025
   handle_grasp_steps: 20
   base_reposition_max_m: 0.10
-  base_reposition_tolerance_m: 0.01
-  base_reposition_steps: 120
+  base_reposition_tolerance_m: 0.015
+  base_reposition_steps: 240
   contact_retry_count: 1
   closed_threshold: 0.005
   maximum_steps_per_door: 720
