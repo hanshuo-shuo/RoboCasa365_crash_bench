@@ -1,5 +1,13 @@
 from .base import PredicateResult
-from .enclosure import EnclosureContactPredicate
+from .enclosure import (
+    CloseReadySetPredicate,
+    EnclosureContactPredicate,
+    EnclosureObstructionPredicate,
+)
 
-__all__ = ["EnclosureContactPredicate", "PredicateResult"]
-
+__all__ = [
+    "CloseReadySetPredicate",
+    "EnclosureContactPredicate",
+    "EnclosureObstructionPredicate",
+    "PredicateResult",
+]

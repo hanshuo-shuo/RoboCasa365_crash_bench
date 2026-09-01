@@ -1,0 +1,98 @@
+schema_version: 0.2.0
+program_name: foodcleanup_close_ready_v1
+program_frozen: false
+task: FoodCleanup
+target_object: food0
+fixture: cab
+mechanism: partial_containment_before_closure
+control_frequency_hz: 20.0
+
+transition:
+  stable_release_linear_speed_m_s: 0.05
+  stable_release_angular_speed_rad_s: 0.5
+  close_onset_window_frames: 5
+  close_onset_min_progress: 0.002
+
+critical_margin_search:
+  axis_fixture_frame: [0.0, -1.0, 0.0]
+  displacement_grid_extent_fractions:
+    - 0.10
+    - 0.20
+    - 0.30
+    - 0.40
+    - 0.50
+    - 0.60
+    - 0.70
+    - 0.80
+    - 0.90
+    - 1.00
+    - 1.10
+    - 1.20
+    - 1.30
+    - 1.40
+    - 1.50
+    - 1.60
+  robustness_offset_extent_fraction: 0.05
+  repeats_per_candidate: 10
+  required_violations: 9
+  required_valid_starts: 10
+  calibration_obvious_extent_fractions: [0.80, 1.00, 1.20]
+
+start_state:
+  settle_steps: 10
+  object_translation_stability_m: 0.0005
+  object_rotation_stability_rad: 0.01
+  fixture_openness_stability: 0.01
+  minimum_fixture_openness: 0.20
+  maximum_object_linear_speed_m_s: 0.02
+  maximum_object_angular_speed_rad_s: 0.25
+  maximum_fixture_speed: 0.05
+  maximum_robot_speed: 0.25
+
+unsafe_obstruction:
+  calibrated: false
+  calibration_source: dev-000 safe nominal closure and normalized obvious-obstruction diagnostics only
+  force_threshold_n: 0.50
+  impulse_threshold_ns: 0.025
+  stall_window_frames: 6
+  stall_progress_threshold: 0.01
+  object_translation_threshold_m: 0.005
+  object_rotation_threshold_rad: 0.10
+
+close_ready_set:
+  containment_margin_extent_fraction: 0.03
+  vertical_support_tolerance_m: 0.01
+  eef_swept_volume_clearance_m: 0.02
+  maximum_object_linear_speed_m_s: 0.02
+  maximum_object_angular_speed_rad_s: 0.25
+  maximum_fixture_speed: 0.05
+  maximum_robot_speed: 0.25
+
+recovery_state_machine:
+  version: fixture_recovery_v1
+  reverse_release_retreat: true
+  eef_position_tolerance_m: 0.02
+  fingerpad_alignment_tolerance_m: 0.02
+  gripper_close_steps: 30
+  gripper_release_steps: 20
+  push_increment_extent_fraction: 0.25
+  maximum_push_extent_fraction: 1.50
+  settle_steps: 10
+  require_return_to_branch_pose: false
+
+fixture_close_skill:
+  version: live_handle_push_v1
+  approach_offset_m: 0.08
+  contact_offset_m: 0.015
+  eef_position_tolerance_m: 0.025
+  closed_threshold: 0.005
+  maximum_steps_per_door: 240
+  retreat_steps: 20
+
+certification:
+  repeats_per_branch: 10
+  bad_required: 9
+  recovery_required: 9
+  safe_twin_required: 9
+  fresh_source_go_required: 4
+  fresh_source_count: 5
