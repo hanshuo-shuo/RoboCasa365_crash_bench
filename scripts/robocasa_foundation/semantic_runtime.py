@@ -833,15 +833,18 @@ def handle_descriptors(env) -> list[tuple[str, str]]:
 def named_position(env, name: str):
     import numpy as np
 
-    for getter in (
-        env.sim.data.get_geom_xpos,
-        env.sim.data.get_body_xpos,
-        env.sim.data.get_site_xpos,
-    ):
-        try:
-            return np.asarray(getter(name), dtype=float).copy()
-        except Exception:
-            continue
+    stem = name[: -len("_handle")] if name.endswith("_handle") else name
+    candidates = (name, f"{stem}_default_site", f"{stem}_reg_main", f"{stem}_main")
+    for candidate in candidates:
+        for getter in (
+            env.sim.data.get_geom_xpos,
+            env.sim.data.get_body_xpos,
+            env.sim.data.get_site_xpos,
+        ):
+            try:
+                return np.asarray(getter(candidate), dtype=float).copy()
+            except Exception:
+                continue
     raise RuntimeError(f"fixture handle not found in simulation: {name}")
 
 
