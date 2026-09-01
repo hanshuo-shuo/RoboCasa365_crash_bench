@@ -892,13 +892,26 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
         start_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         runner.closure_commanded = True
         steps = 0
+        drive = inward.copy()
+        probe_start = start_openness
+        probe_steps = 0
+        direction_flips = 0
         for _ in range(int(config["maximum_steps_per_door"])):
             openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
             if openness <= float(config["closed_threshold"]):
                 break
+            if (
+                probe_steps >= int(config["direction_probe_steps"])
+                and probe_start - openness < float(config["minimum_probe_progress"])
+                and direction_flips < int(config["maximum_direction_flips"])
+            ):
+                drive *= -1.0
+                direction_flips += 1
+                probe_start = openness
+                probe_steps = 0
             handle = named_position(env, handle_name)
             pad, _ = fingerpad_midpoint(env)
-            desired_pad = handle + inward * float(config["push_through_offset_m"])
+            desired_pad = handle + drive * float(config["push_through_offset_m"])
             eef_target = np.asarray(runner.controller().ref_pos) + (desired_pad - pad)
             controller = runner.controller()
             current_origin = controller.world_to_origin_frame(controller.ref_pos)
@@ -909,6 +922,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             action[6] = 1.0
             runner.step(action, force_frame=bool(disallowed_contacts(env)))
             steps += 1
+            probe_steps += 1
         runner.closure_commanded = False
         end_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         for _ in range(10):
@@ -930,6 +944,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             "start_openness": start_openness,
             "end_openness": end_openness,
             "steps": steps,
+            "direction_flips": direction_flips,
             "closed": end_openness <= float(config["closed_threshold"]),
             "approach_timeout": approach["timeout"],
             "contact_timeout": contact["timeout"],
