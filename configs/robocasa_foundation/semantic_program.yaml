@@ -1,6 +1,8 @@
 schema_version: 0.2.0
 program_name: foodcleanup_close_ready_v1
-program_frozen: false
+program_frozen: true
+frozen_at: 2026-09-01
+freeze_reference_job_id: 5270914
 task: FoodCleanup
 target_object: food0
 fixture: cab
@@ -88,28 +90,7 @@ fixture_close_skill:
   joint_kd: 2.0
   maximum_joint_torque_nm: 5.0
   maximum_joint_pd_steps: 1000
-  approach_offset_m: 0.08
-  contact_offset_m: 0.015
-  push_through_offset_m: 0.04
-  eef_position_tolerance_m: 0.025
-  handle_grasp_steps: 20
-  base_reposition_max_m: 0.10
-  base_reposition_tolerance_m: 0.015
-  base_reposition_steps: 240
-  contact_retry_count: 1
-  tangent_probe_steps: 20
-  tangent_probe_min_progress: 0.01
-  stall_regrasp_window_steps: 100
-  stall_regrasp_min_progress: 0.02
-  near_closed_regrasp_openness: 0.10
-  maximum_midclosure_regrasps: 2
-  between_door_base_return_max_m: 0.30
-  between_door_base_return_steps: 360
-  between_door_base_return_tolerance_m: 0.03
-  between_door_eef_return_steps: 300
-  between_door_eef_return_tolerance_m: 0.025
   closed_threshold: 0.005
-  maximum_steps_per_door: 900
   retreat_steps: 20
 
 restart_equivalence:

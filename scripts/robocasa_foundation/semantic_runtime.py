@@ -1491,10 +1491,7 @@ def run_recovery_case(payload: tuple[object, ...]) -> dict[str, object]:
         else:
             runner.capture(True)
             runner.attach_closure_monitor()
-            if config["fixture_close_skill"]["version"] == "bounded_fixture_joint_pd_v1":
-                close_records = close_fixture_with_joint_pd(runner)
-            else:
-                close_records = close_fixture_with_live_handles(runner, axis)
+            close_records = close_fixture_with_joint_pd(runner)
         preclose_contacts = [
             item
             for item in runner.disallowed_events
