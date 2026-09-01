@@ -17,7 +17,7 @@ DATASET=/projects/p33100/siosio/robocasa_datasets/v1.0/pretrain/composite/FoodCl
 RUN_ROOT=/projects/p33100/siosio/robocasa_foundation_runs/f5_semantic_calibration_${SLURM_JOB_ID}
 
 export MUJOCO_GL=osmesa
-export PYTHONPATH=/projects/p33100/siosio/tools/pyarrow-21.0.0
+export PYTHONPATH="$PROJECT_ROOT":/projects/p33100/siosio/tools/pyarrow-21.0.0
 cd "$PROJECT_ROOT"
 test -z "$(git status --short)"
 test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"

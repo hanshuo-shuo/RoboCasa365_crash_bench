@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=rc-semantic-recovery
+#SBATCH --job-name=rc-certify-dev
 #SBATCH --account=p33100
 #SBATCH --partition=short
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 #SBATCH --cpus-per-task=4
-#SBATCH --mem=24G
+#SBATCH --mem=32G
 
 set -euo pipefail
 
@@ -14,7 +14,7 @@ module load mesa/23.3.6-gcc-12.4.0
 PROJECT_ROOT=/gpfs/home/shv7753/RoboCasa365_crash_bench
 PYTHON=/projects/p33100/siosio/envs/robocasa-foundation/bin/python
 DATASET=/projects/p33100/siosio/robocasa_datasets/v1.0/pretrain/composite/FoodCleanup/20250725/lerobot
-RUN_ROOT=/projects/p33100/siosio/robocasa_foundation_runs/f5_semantic_recovery_${SLURM_JOB_ID}
+RUN_ROOT=/projects/p33100/siosio/robocasa_foundation_runs/f5_dev_recert_${SLURM_JOB_ID}
 
 export MUJOCO_GL=osmesa
 export PYTHONPATH="$PROJECT_ROOT":/projects/p33100/siosio/tools/pyarrow-21.0.0
@@ -26,9 +26,10 @@ printf 'commit=%s\njob_id=%s\nnode=%s\nsource=dev-000-foodcleanup-cabinet-obstru
   "$(git rev-parse HEAD)" "$SLURM_JOB_ID" "${SLURMD_NODENAME:-unknown}" \
   > "$RUN_ROOT/job_provenance.txt"
 
-"$PYTHON" scripts/robocasa_foundation/debug_semantic_recovery.py \
+"$PYTHON" scripts/robocasa_foundation/certify_semantic_program.py \
   --config configs/robocasa_foundation/semantic_program.yaml \
+  --source-manifest configs/robocasa_foundation/foodcleanup_sources.json \
   --dataset "$DATASET" \
-  --episode 0 \
-  --hazard-extent-fraction 1.00 \
-  --output-root "$RUN_ROOT/recovery"
+  --development \
+  --workers 4 \
+  --output-root "$RUN_ROOT/certification"

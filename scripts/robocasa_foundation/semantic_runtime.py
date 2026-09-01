@@ -1211,15 +1211,186 @@ def run_recovery_case(payload: tuple[object, ...]) -> dict[str, object]:
             report["_actions"] = np.asarray(runner.actions)
         return report
     except Exception as exc:
-        return {
+        failure = {
             "repeat": int(repeat),
             "episode": int(episode),
             "valid": False,
             "failure_reasons": ["recovery execution error"],
             "execution_error": f"{type(exc).__name__}: {exc}",
-            "_frames": [] if runner is None else runner.frames,
-            "_actions": np.empty((0, 12)) if runner is None else np.asarray(runner.actions),
+        }
+        if render:
+            failure["_frames"] = [] if runner is None else runner.frames
+            failure["_actions"] = (
+                np.empty((0, 12)) if runner is None else np.asarray(runner.actions)
+            )
+        return failure
+    finally:
+        if env is not None:
+            env.close()
+
+
+def semantic_fingerprint(env) -> dict[str, object]:
+    position, quaternion = object_pose(env)
+    meta = env.get_ep_meta()
+    return {
+        "instruction": meta.get("lang"),
+        "layout_id": meta.get("layout_id"),
+        "style_id": meta.get("style_id"),
+        "object_names": sorted(env.objects),
+        "fixture_class": type(env.cab).__name__,
+        "door_joint_names": list(env.cab.door_joint_names),
+        "object_position": position.tolist(),
+        "object_quaternion_wxyz": quaternion.tolist(),
+        "fixture_openness": fixture_openness(env),
+        "task_success": bool(env._check_success()),
+        "disallowed_contact": bool(disallowed_contacts(env)),
+    }
+
+
+def run_start_case(payload: tuple[object, ...]) -> dict[str, object]:
+    import yaml
+
+    repeat, dataset_value, episode, transition_values, config_path_value, hazard_fraction = payload
+    dataset = Path(str(dataset_value))
+    config = yaml.safe_load(Path(str(config_path_value)).read_text())
+    transition = Transition(*transition_values)
+    env = None
+    try:
+        env, _, actions, _, _ = reconstruct_branch(dataset, int(episode), transition)
+        axis = fixture_axis_world(env, config)
+        extent = object_extent_along(env, axis)
+        edit_outward(env, axis, float(hazard_fraction) * extent)
+        audit = start_audit(env, actions, transition, config)
+        return {
+            "repeat": int(repeat),
+            "episode": int(episode),
+            "hazard_extent_fraction": float(hazard_fraction),
+            "object_extent_m": extent,
+            "start_audit": audit,
+            "fingerprint_after_audit": semantic_fingerprint(env),
+            "execution_error": None,
+        }
+    except Exception as exc:
+        return {
+            "repeat": int(repeat),
+            "episode": int(episode),
+            "start_audit": {"valid": False},
+            "execution_error": f"{type(exc).__name__}: {exc}",
         }
     finally:
         if env is not None:
             env.close()
+
+
+def fingerprint_difference(left: dict[str, object], right: dict[str, object]) -> dict[str, object]:
+    import numpy as np
+
+    categorical = (
+        "instruction",
+        "layout_id",
+        "style_id",
+        "object_names",
+        "fixture_class",
+        "door_joint_names",
+        "task_success",
+        "disallowed_contact",
+    )
+    return {
+        "categorical_match": all(left[key] == right[key] for key in categorical),
+        "object_position_error_m": float(
+            np.linalg.norm(
+                np.asarray(left["object_position"], dtype=float)
+                - np.asarray(right["object_position"], dtype=float)
+            )
+        ),
+        "object_rotation_error_rad": rotation_distance_wxyz(
+            left["object_quaternion_wxyz"], right["object_quaternion_wxyz"]
+        ),
+        "fixture_openness_error": abs(
+            float(left["fixture_openness"]) - float(right["fixture_openness"])
+        ),
+    }
+
+
+def run_identity_case(payload: tuple[object, ...]) -> dict[str, object]:
+    import numpy as np
+    import yaml
+
+    repeat, dataset_value, episode, transition_values, config_path_value, hazard_fraction = payload
+    dataset = Path(str(dataset_value))
+    config = yaml.safe_load(Path(str(config_path_value)).read_text())
+    transition = Transition(*transition_values)
+    prefix_env = None
+    snapshot_env = None
+    try:
+        prefix_env, states, actions, meta, xml = reconstruct_branch(
+            dataset, int(episode), transition
+        )
+        snapshot_state = np.asarray(prefix_env.sim.get_state().flatten(), dtype=float).copy()
+        snapshot_env = make_env(dataset)
+        reset_source(snapshot_env, states, xml, meta)
+        snapshot_env.sim.set_state_from_flattened(snapshot_state)
+        snapshot_env.sim.forward()
+        if hasattr(snapshot_env, "update_state"):
+            snapshot_env.update_state()
+
+        axis_prefix = fixture_axis_world(prefix_env, config)
+        axis_snapshot = fixture_axis_world(snapshot_env, config)
+        extent_prefix = object_extent_along(prefix_env, axis_prefix)
+        extent_snapshot = object_extent_along(snapshot_env, axis_snapshot)
+        edit_outward(prefix_env, axis_prefix, float(hazard_fraction) * extent_prefix)
+        edit_outward(snapshot_env, axis_snapshot, float(hazard_fraction) * extent_snapshot)
+        neutral = neutral_action(actions, transition.branch_frame)
+        for _ in range(int(config["start_state"]["settle_steps"])):
+            prefix_env.step(neutral)
+            snapshot_env.step(neutral)
+        branch_prefix = semantic_fingerprint(prefix_env)
+        branch_snapshot = semantic_fingerprint(snapshot_env)
+        branch_difference = fingerprint_difference(branch_prefix, branch_snapshot)
+        for _ in range(int(config["restart_equivalence"]["neutral_steps"])):
+            prefix_env.step(neutral)
+            snapshot_env.step(neutral)
+        evolved_prefix = semantic_fingerprint(prefix_env)
+        evolved_snapshot = semantic_fingerprint(snapshot_env)
+        evolved_difference = fingerprint_difference(evolved_prefix, evolved_snapshot)
+        limits = config["restart_equivalence"]
+
+        def within(diff):
+            return (
+                diff["categorical_match"]
+                and diff["object_position_error_m"]
+                <= float(limits["object_position_tolerance_m"])
+                and diff["object_rotation_error_rad"]
+                <= float(limits["object_rotation_tolerance_rad"])
+                and diff["fixture_openness_error"]
+                <= float(limits["fixture_openness_tolerance"])
+            )
+
+        valid = within(branch_difference) and within(evolved_difference)
+        return {
+            "repeat": int(repeat),
+            "episode": int(episode),
+            "canonical_restart": "prefix_replay",
+            "comparison_restart": "new_instance_snapshot",
+            "hazard_extent_fraction": float(hazard_fraction),
+            "branch_prefix": branch_prefix,
+            "branch_snapshot": branch_snapshot,
+            "branch_difference": branch_difference,
+            "evolved_prefix": evolved_prefix,
+            "evolved_snapshot": evolved_snapshot,
+            "evolved_difference": evolved_difference,
+            "valid": valid,
+            "execution_error": None,
+        }
+    except Exception as exc:
+        return {
+            "repeat": int(repeat),
+            "episode": int(episode),
+            "valid": False,
+            "execution_error": f"{type(exc).__name__}: {exc}",
+        }
+    finally:
+        if prefix_env is not None:
+            prefix_env.close()
+        if snapshot_env is not None:
+            snapshot_env.close()
