@@ -944,6 +944,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
     descriptors = handle_descriptors(env)
     close_home_base_pos, _ = runner.base_controller().get_base_pose()
     close_home_base_pos = np.asarray(close_home_base_pos, dtype=float).copy()
+    close_home_eef_pos = np.asarray(runner.controller().ref_pos, dtype=float).copy()
     for descriptor_index, (handle_name, joint_name) in enumerate(descriptors):
         openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         if openness <= float(config["closed_threshold"]):
@@ -1188,6 +1189,13 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
                 max_distance=float(config["between_door_base_return_max_m"]),
                 max_steps=int(config["between_door_base_return_steps"]),
                 tolerance=float(config["between_door_base_return_tolerance_m"]),
+            )
+            record["between_door_eef_return"] = runner.move_eef_world(
+                "return_to_fixture_close_eef_home",
+                close_home_eef_pos,
+                max_steps=int(config["between_door_eef_return_steps"]),
+                tolerance=float(config["between_door_eef_return_tolerance_m"]),
+                gripper_command=-1.0,
             )
         runner.primitives.append(record)
         records.append(record)
