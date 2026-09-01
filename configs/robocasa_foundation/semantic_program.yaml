@@ -97,7 +97,7 @@ fixture_close_skill:
   stall_regrasp_min_progress: 0.02
   maximum_midclosure_regrasps: 1
   closed_threshold: 0.005
-  maximum_steps_per_door: 720
+  maximum_steps_per_door: 900
   retreat_steps: 20
 
 restart_equivalence:
