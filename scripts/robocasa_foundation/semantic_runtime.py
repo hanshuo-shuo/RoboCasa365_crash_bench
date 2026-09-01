@@ -985,6 +985,10 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
         start_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         runner.closure_commanded = True
         steps = 0
+        tangent_sign = 1.0
+        tangent_probe_start = start_openness
+        tangent_probe_count = 0
+        tangent_flipped = False
         checkpoint_step = 0
         checkpoint_openness = start_openness
         midclosure_regrasps: list[dict[str, object]] = []
@@ -992,6 +996,16 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
             if openness <= float(config["closed_threshold"]):
                 break
+            if (
+                tangent_probe_count >= int(config["tangent_probe_steps"])
+                and not tangent_flipped
+                and tangent_probe_start - openness
+                < float(config["tangent_probe_min_progress"])
+            ):
+                tangent_sign = -1.0
+                tangent_flipped = True
+                tangent_probe_start = openness
+                tangent_probe_count = 0
             window_elapsed = steps - checkpoint_step >= int(
                 config["stall_regrasp_window_steps"]
             )
@@ -1063,7 +1077,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
                 checkpoint_openness = openness
             handle = named_position(env, handle_name)
             pad, _ = fingerpad_midpoint(env)
-            drive = joint_closing_tangent(env, joint_name, handle)
+            drive = tangent_sign * joint_closing_tangent(env, joint_name, handle)
             desired_pad = handle + drive * float(config["push_through_offset_m"])
             eef_target = np.asarray(runner.controller().ref_pos) + (desired_pad - pad)
             controller = runner.controller()
@@ -1075,6 +1089,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             action[6] = 1.0
             runner.step(action, force_frame=bool(disallowed_contacts(env)))
             steps += 1
+            tangent_probe_count += 1
         runner.closure_commanded = False
         end_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         for _ in range(10):
@@ -1097,6 +1112,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             "end_openness": end_openness,
             "steps": steps,
             "direction_mode": "live_joint_closing_tangent",
+            "tangent_flipped": tangent_flipped,
             "closed": end_openness <= float(config["closed_threshold"]),
             "approach_timeout": approach["timeout"],
             "contact_timeout": contact["timeout"],

@@ -93,6 +93,8 @@ fixture_close_skill:
   base_reposition_tolerance_m: 0.015
   base_reposition_steps: 240
   contact_retry_count: 1
+  tangent_probe_steps: 20
+  tangent_probe_min_progress: 0.01
   stall_regrasp_window_steps: 100
   stall_regrasp_min_progress: 0.02
   near_closed_regrasp_openness: 0.10
