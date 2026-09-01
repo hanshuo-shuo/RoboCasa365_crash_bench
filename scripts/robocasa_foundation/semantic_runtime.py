@@ -872,8 +872,8 @@ def handle_descriptors(env) -> list[tuple[str, str]]:
         right_joint = next((name for name in joints if "right" in name.lower()), joints[-1])
         descriptors.extend(
             [
-                (str(env.cab.left_handle_name), left_joint),
                 (str(env.cab.right_handle_name), right_joint),
+                (str(env.cab.left_handle_name), left_joint),
             ]
         )
     elif hasattr(env.cab, "handle_name"):
