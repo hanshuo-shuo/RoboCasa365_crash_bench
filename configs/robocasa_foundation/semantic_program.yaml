@@ -50,14 +50,15 @@ start_state:
   maximum_robot_speed: 0.25
 
 unsafe_obstruction:
-  calibrated: false
+  calibrated: true
   calibration_source: dev-000 safe nominal closure and normalized obvious-obstruction diagnostics only
-  force_threshold_n: 0.50
-  impulse_threshold_ns: 0.025
+  calibration_job_id: 5263563
+  force_threshold_n: 0.05
+  impulse_threshold_ns: 0.002
   stall_window_frames: 6
-  stall_progress_threshold: 0.01
-  object_translation_threshold_m: 0.005
-  object_rotation_threshold_rad: 0.10
+  stall_progress_threshold: 0.001
+  object_translation_threshold_m: 0.015
+  object_rotation_threshold_rad: 0.08
 
 close_ready_set:
   containment_margin_extent_fraction: 0.03
