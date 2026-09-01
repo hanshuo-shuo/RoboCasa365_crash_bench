@@ -1,6 +1,6 @@
 schema_version: 0.2.0
 program_name: foodcleanup_close_ready_v1
-program_frozen: true
+program_frozen: false
 frozen_at: 2026-09-01
 freeze_reference_job_id: 5270914
 task: FoodCleanup
@@ -72,10 +72,10 @@ close_ready_set:
   maximum_robot_speed: 0.25
 
 recovery_state_machine:
-  version: fixture_recovery_v1
+  version: fixture_recovery_v2
   reverse_release_retreat: true
   eef_position_tolerance_m: 0.02
-  fingerpad_alignment_tolerance_m: 0.02
+  fingerpad_alignment_tolerance_m: 0.01
   gripper_close_steps: 30
   gripper_release_steps: 20
   push_increment_extent_fraction: 0.25

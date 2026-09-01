@@ -30,5 +30,5 @@ printf 'commit=%s\njob_id=%s\nnode=%s\nsource=dev-000-foodcleanup-cabinet-obstru
   --config configs/robocasa_foundation/semantic_program.yaml \
   --dataset "$DATASET" \
   --episode 0 \
-  --hazard-extent-fraction 0.85 \
+  --hazard-extent-fraction 0.65 \
   --output-root "$RUN_ROOT/recovery"
