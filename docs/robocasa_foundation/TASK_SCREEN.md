@@ -1,7 +1,7 @@
 # Existing-task and demonstration screen
 
 **Phase:** F2  
-**Status:** passed; canonical task and source episode selected
+**Status:** passed; canonical task, development source, and fresh cohort frozen
 
 ## Method
 
@@ -55,7 +55,7 @@ episode had equal state/action/parquet lengths, 12-dimensional actions,
 terminal reward 1, terminal done true, valid compressed XML, and aligned
 language metadata. It also generated the source-demo GIF and contact sheet.
 
-Episode 0 is the selected canonical source:
+Episode 0 is the selected development source and restart reference:
 
 - instruction: “Pick the sweet potato from the counter and place it in the
   cabinet. Then close the cabinet.”
@@ -71,8 +71,16 @@ environments and replayed all 721 actions. Original task success was 10/10,
 language/object identity was 10/10, and task-incomplete-at-start was 10/10.
 The per-step simulator state was not bit exact: divergence starts at step 0 and
 the repeat-stable maximum flattened-state L2 error is approximately 1.997.
-F4 must therefore measure semantic state/predicate/outcome tolerances and may
-not claim bit-exact action replay.
+F4 therefore adopted semantic state/predicate/outcome checks and does not claim
+bit-exact action replay.
+
+## Frozen independent sources
+
+Before revised authoring began, Quest job `5262642` verified the immutable
+fresh cohort `2, 4, 6, 7, 9`. The five episodes have distinct source IDs,
+layouts, and model XMLs. The list and `never_replace_failed_sources` rule live
+in `configs/robocasa_foundation/foodcleanup_sources.json`. Episode 0 is named
+`dev-000-foodcleanup-cabinet-obstruction` and never counts toward final `n`.
 
 ## Fallback
 

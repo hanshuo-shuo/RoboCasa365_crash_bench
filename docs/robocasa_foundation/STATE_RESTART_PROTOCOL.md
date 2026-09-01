@@ -1,8 +1,14 @@
 # State restart protocol v0
 
 **Canonical task:** `FoodCleanup`  
-**Source episode:** `episode_000000`  
+**Development source:** `dev-000-foodcleanup-cabinet-obstruction` (`episode_000000`)
+
 **Canonical branch frame:** action-prefix frame 370
+
+Episode 0 establishes the protocol but is not an independent final source.
+Each fresh source independently detects its release-to-close transition,
+reconstructs it by prefix replay, and runs ten identity/restart-equivalence
+checks under the frozen tolerances below.
 
 ## Canonical truth
 
@@ -51,11 +57,11 @@ neutral steps produced repeat-identical measurements:
 - task remained incomplete;
 - support-contact classification remained unchanged.
 
-Based only on these safe-control measurements, F4 freezes diagnostic
-tolerances of `5e-5 m` object translation and `0.01` normalized door openness
-for this state and controller-neutral duration. Hazard certification will
-independently require no disallowed contact and must not tune these tolerances
-against policy outcomes.
+The historical F4 audit used `5e-5 m` object translation. The transferable
+five-source program uses the predeclared cross-object start bounds in
+`semantic_program.yaml`: `0.0005 m` translation, `0.01 rad` rotation, and
+`0.01` normalized door-openness drift. These bounds were frozen before the
+fresh sources and are not tuned against policy outcomes.
 
 ## State-bundle audit
 
@@ -69,4 +75,3 @@ array.
 The selected task does not configure observation delay/filter buffers. Policy
 hidden state and pending action chunks are intentionally not preserved under
 `state_recovery_v0`.
-

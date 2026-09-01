@@ -1,4 +1,9 @@
-# Initial certified-mechanism result
+# Historical first-round development result
+
+> This report is preserved as development history. Its episode is now named
+> `dev-000-foodcleanup-cabinet-obstruction`, does not count toward the final
+> independent sample, and uses the superseded pose-return/contact-persistence
+> program. Current semantics are in `PREDICATE_SPEC.md`.
 
 **Status:** one branch mechanism validated; full five-instance foundation incomplete  
 **Canonical task:** `FoodCleanup`  
@@ -60,4 +65,3 @@ at 18.8 mm, even though its emitted low-level trajectory safely completed the
 original task. The emitted sequence—not the authoring planner state—was replayed
 independently 10/10 and is the witness evidence. This authoring limitation is
 retained rather than hidden.
-

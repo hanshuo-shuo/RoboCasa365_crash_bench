@@ -1,175 +1,112 @@
 # RoboCasa foundation status
 
-**Last updated:** 2026-08-31
-**Current phase:** F5 author first certified branch points
-**Implementation verdict:** **Initial branch validated 10/10; F5 remains 1/5**
+**Last updated:** 2026-09-01
 
-## Completed
+**Phase:** development recertification correction before the final freeze
 
-- Read the execution plan and preserved the clean worktrees.
-- Consolidated the linear environment-handoff and branch-transition commits
-  into `main` without rewriting history.
-- On 2026-08-31, the user designated `main` as the only project branch. The two
-  temporary `codex/robocasa-*` branches were removed
-  locally, on Quest, and from `origin`.
-- Provisioned and smoke-tested the independent Quest RoboCasa365 core
-  environment. Exact pins, commands, paths, asset status, and limitations are
-  recorded in `ENVIRONMENT_HANDOFF.md`.
-- Confirmed the remote private project checkout was clean. No synchronization
-  between the local and remote project checkouts was performed.
-- On user authorization, moved the local untracked `.DS_Store` to the
-  recoverable backup `/tmp/RoboCasa365_crash_bench.DS_Store.20260831`.
-- Fast-forward checked local `main`; it was already equal to `origin/main` at
-  `7d395e56d883ad64c17dacf537f7ebf3205424a3`.
-- Reconfirmed the Quest checkout is clean on `main` and has the same commit.
-- Defined the foundation scientific boundary and frozen-evidence rule in
-  `FOUNDATION_CHARTER.md`.
-- Created the F0 dependency-audit skeleton without modifying the handed-off
-  Quest environment.
-- Passed the F0 documentation gate with `git diff --check`; baseline test count
-  is zero because no test suite existed before the foundation implementation.
+**Foundation verdict:** **PENDING** — no fresh-source result has been counted yet
 
-## F0 baseline
+## At a glance
 
-- Baseline command: `rg --files`
-- Tracked source/test scripts present before F0: none; the repository contained
-  seven Markdown handoff/planning files and one path-template shell file.
-- Baseline zero-GPU test count: **0** (no test suite existed).
-- Pre-existing test failures: **none observable because no tests existed**.
-- No frozen result content was present or modified.
+| Question | Answer |
+| --- | --- |
+| What are we doing? | Certifying one partial-containment mechanism on five frozen FoodCleanup sources. |
+| What is working? | Environment, source replay, restart protocol, critical-margin search, severity monitor, CloseReadySet, physical object recovery, and bounded fixture closure. |
+| What is the current problem? | The searched dev hazard missed the recovery grasp by about 20 mm; fresh transfer has not started. |
+| What are we not doing? | No new task, failure category, VLA, policy tuning, or extra source replacement. |
 
-## Repository decision
+```mermaid
+flowchart LR
+    D[dev-000 authoring] --> F[Frozen program]
+    F --> R[10-repeat dev recertification]
+    R --> S[Five untouched sources]
+    S --> G{At least 4 of 5?}
+    G -->|yes| GO[Foundation GO]
+    G -->|no| NG[Honest NO-GO]
+```
 
-- `main` is the sole working and remote branch for this project.
-- The previous branch-gate discussion is obsolete. Future phases begin only
-  after clean-worktree and fast-forward checks on local and Quest `main`.
+## Frozen source count
 
-## Gates not yet started
+The first-round episode is now
+`dev-000-foodcleanup-cabinet-obstruction`. It is development evidence only and
+never counts toward the independent sample.
 
-- Dependency audit document and machine-readable dependency manifest.
-- Candidate task screen and selected canonical task.
-- Predicate specification, restart audit, witness authoring, and certification.
-- CPU and GPU Slurm integration verification scripts.
+Quest job `5262642` froze and verified these five sources before revised
+authoring:
 
-## Known environment exception
+| Source | Episode | Layout | Object instruction |
+| --- | ---: | ---: | --- |
+| `source-001` | 2 | 32 | mango |
+| `source-002` | 4 | 28 | corn |
+| `source-003` | 6 | 41 | bell pepper |
+| `source-004` | 7 | 21 | onion |
+| `source-005` | 9 | 55 | bell pepper |
 
-The core simulator smoke test passes, but `pip check` reports that RoboCasa's
-LeRobot-dependent dataset utility is absent because its pinned old `rerun-sdk`
-range is unavailable from both tested package indexes. This is documented in
-`ENVIRONMENT_HANDOFF.md`; it is not a waiver for data-conversion work.
+They have distinct source IDs, layouts, and model XMLs. Failed sources will not
+be replaced.
 
-## F1 job record
+## What is verified
 
-- CPU smoke job `5239421` failed closed after 2 seconds on node `qnode0111`
-  because Git was absent from the compute-node default `PATH`; no simulator
-  claim was made. The job scripts now explicitly load Quest module
-  `git/2.47.0-gcc-12.4.0`.
-- Pending render job `5239429` was cancelled before allocation because it used
-  the same provenance preflight and would have failed for the same reason.
-- CPU smoke job `5239490` passed dependency provenance, then failed while
-  initializing inherited EGL on CPU node `qnode0158`. The replacement job
-  explicitly selects Quest's Mesa module and `MUJOCO_GL=osmesa`.
-- Render smoke job `5239503` received one A100 GPU on `qgpu0406` with
-  `CUDA_VISIBLE_DEVICES=0`, then failed because the smoke script duplicated the
-  official wrapper's fixed `has_offscreen_renderer` keyword. The duplicate was
-  removed; the replacement job explicitly loads CUDA and records GPU/driver
-  provenance before EGL initialization.
-- CPU `5239654` and render `5239661` both initialized their explicit GL
-  backends and constructed `CloseDrawer`, then failed because the smoke script
-  treated RoboCasa's Gym `Dict` action space as a flat array. The replacement
-  recursively emits neutral `Dict`, `Box`, and `Discrete` actions and records
-  the full action-space schema.
-- Structured-action CPU job `5239773` passed all three fixed-seed task identity
-  repeats and neutral steps on `qnode0137` (exit 0, 4 minutes 11 seconds).
-- GPU retry `5239800` remained pending with an estimated multi-hour start and
-  was cancelled. A checked-in OSMesa job will perform the required Quest
-  offscreen-render smoke on `short`; GPU EGL compatibility remains a separate
-  pending verification and is not claimed as passed.
-- OSMesa job `5240280` initialized rendering and completed a camera-backed
-  reset/neutral step, then failed while extracting a PNG because the script
-  searched raw `*_image` keys after the official wrapper had mapped them to
-  `video.*`. The replacement uses the wrapper's documented `env.render()`
-  cache and validates that it is an RGB array.
-- OSMesa job `5240369` passed on `qnode0113` at commit `a1212cc` (exit 0,
-  4:11). It produced three hashed PNGs and a `valid=true` fixed-seed identity
-  manifest. Together with CPU job `5239773`, this closes F1.
+- Quest environment: RoboCasa `1.0.1`, robosuite `1.5.2`, MuJoCo `3.3.1`.
+- Canonical task: unchanged `FoodCleanup` task and success predicate.
+- Canonical restart: fresh construction plus deterministic action-prefix replay.
+- Historical restart audit: nominal success and identity `10/10` in all three
+  tested restart modes (job `5242278`).
+- Source-freeze audit: passed (job `5262642`).
+- Zero-GPU suite: `25/25` passed on Quest after program freeze.
+- Severity calibration: ten safe closures were contact-free; the normalized
+  obvious obstruction contacted in `10/10` (job `5263563`).
+- Development semantic diagnostic: CloseReadySet reached before closure;
+  unchanged FoodCleanup success true; no obstruction evidence (job `5270914`).
+- Candidate authoring program was frozen at commit `f545013`; no fresh
+  authoring preceded it.
 
-## F2 job record
+## Frozen semantics
 
-- Candidate task screen `5240564` passed 21/21 constructions with no failures.
-- Source-demo audit `5241104` passed five one-object FoodCleanup episodes and
-  produced an episode-0 GIF/contact sheet.
-- First fresh-replay submission `5241173` failed before environment creation
-  because both the sbatch wrapper and Python no-overwrite gate created the same
-  report directory. The wrapper now creates only the run root; no replay result
-  was claimed from the failed job.
-- Serial retry `5241204` was healthy but used only one of four allocated CPUs
-  and was cancelled after 6:31 to avoid approaching the one-hour limit. The
-  replacement uses four independent spawn workers; every repeat still creates
-  and closes its own environment.
-- Parallel fresh replay `5241364` passed on `qnode0158` at commit `ad1411a`
-  (exit 0, 3:54): original task success 10/10, language/object identity 10/10,
-  task incomplete at start 10/10. State trajectories diverged numerically from
-  recorded states starting at step 0 with repeat-stable maximum L2 1.997; F4
-  must audit this rather than claiming bit-exact replay.
-- F2 selected `FoodCleanup` episode 0 as the canonical natural source and
-  retained `PlaceVeggiesInDrawer` as fallback.
-- F3 simulator-free suite passed 20/20 tests on Quest in 3.44 seconds at
-  commit `83c2e4c`. It covers strict schema/I/O/hashes/no-overwrite,
-  fail-closed certification, outcome partition, toy witnesses, CLI validation,
-  and the temporal enclosure-contact predicate state machine.
-- F4 transition job `5242098` selected canonical prefix frame 370 immediately
-  before cabinet closure begins at frame 371 and generated a recorded-state
-  transition GIF/contact sheet.
-- F4 restart job `5242278` passed all three nominal suffix modes 10/10 with
-  identity 10/10. The canonical action-prefix state is safe, incomplete, and
-  supported; recorded frame 370 differs by 7.16 mm and is noncanonical.
-- F5 frozen-grid job `5242790` selected the smallest qualifying outward
-  displacement, 0.10 m. The safe twin completed without door/object contact;
-  the bad suffix first contacted at 2.35 simulated seconds and contact persisted
-  for at least three frames.
-- Recovery attempt `5243065` failed closed: its 0.14 m deep EEF target was
-  outside the reachable workspace, the physical push moved the object inward
-  only 0.00386 m, and original task success was false. The emitted 736 actions
-  and failed GIF were retained; recovery v2 uses the 0.01 m causal boundary
-  measured by the frozen grid instead of an arbitrary deep push.
-- Recovery attempt `5243313` also failed closed. It approached successfully,
-  but its diagonal target retained a 0.049 m unreachable world-y component;
-  the object moved only 0.00213 m and the cabinet did not close. Recovery v3
-  regrasps at the actually reached pose, moves only along the fixture inward
-  axis, releases, and returns to the branch EEF pose with a 0.005 m tolerance.
-- Recovery attempt `5243463` failed closed because closing at the rough wrist
-  pose did not establish a grasp; the object moved only 0.00115 m and closure
-  still contacted it. Recovery v4 computes the actual left/right fingerpad
-  world midpoint, aligns that midpoint to the object center, and requires
-  robosuite `_check_grasp` to pass before repositioning.
-- Recovery attempt `5243768` showed an 0.0859 m fingerpad/object error at the
-  already-retreated branch posture, outside arm reach. Recovery v5 uses the
-  natural demonstration's physical frame-241-to-370 retreat segment: reverse
-  its EEF/base deltas to return to the placement posture, regrasp/reposition,
-  then execute the retreat forward before closure.
-- Recovery attempt `5244132` achieved a verified grasp and moved the object
-  inward 0.03146 m without door contact, but the forward retreat left the
-  mobile-base/torso context displaced and the cabinet stayed open. Recovery v6
-  physically drives base x/y/yaw and torso back to their saved branch values,
-  then refines EEF position before the nominal closure suffix.
-- Recovery attempt `5244726` verified that base/torso were already within
-  1.26 mm / 0.00229 rad / 0.00045 of branch values, but cabinet openness only
-  reached 0.901. Recovery v7 restores the full branch EEF pose, including OSC
-  base-frame axis-angle orientation, instead of position alone.
-- Recovery authoring job `5244908` physically moved the object inward 0.03146 m,
-  completed the unchanged original task without door/object contact, and saved
-  999 low-level actions. Its authoring-only 5 mm return subgoal timed out at
-  18.8 mm, so that run remained fail-closed.
-- Independent low-level witness job `5245224` excluded the ten branch-settle
-  actions and replayed the 989-action witness from the stable hazard state.
-  Start-safe, bad-contact, safe-twin success, recovery safe task success, and
-  identity all passed 10/10. This validates one initial branch, not the required
-  five-instance foundation.
+- Search uses object-extent fractions, ten repeats per point, the smallest
+  `9/10` violation point, and a fixed `0.05`-extent robustness offset.
+- Unsafe obstruction requires food/door contact plus calibrated force, impulse,
+  stall, translation, or rotation evidence.
+- Recovery must enter CloseReadySet; exact frame-370 pose return is not scored.
+- The hazardous and natural-safe-twin branches use the same nominal suffix.
+- Recovery uses physical robot object repositioning followed by a bounded,
+  physical fixture-joint PD skill; it never replays the source closure suffix or
+  edits cabinet state.
 
-## Next action
+Full parameters and the simple branch diagram are in `PREDICATE_SPEC.md`.
 
-1. Promote the initial branch into the strict manifest/artifact layout and hash
-   audit.
-2. Author four additional independent single-object FoodCleanup episodes under
-   the already frozen mechanism/predicate, without changing the grid or goal.
+## Development timing
+
+The historical 989-action witness remains preserved: `49.45 s` physical
+duration versus a `17.55 s` nominal suffix, or `31.90 s` overhead.
+
+The revised successful development diagnostic used 1,172 actions (`58.60 s`).
+CloseReadySet was reached at `23.85 s`; overhead relative to the nominal suffix
+was 821 actions (`41.05 s`). These are measurements, not optimization targets.
+
+## Current result and next gate
+
+Frozen dev job `5271204` passed start validity, bad closure, safe twin, and
+identity/restart equivalence `10/10`, but recovery was `0/10`. The same generic
+fingerpad alignment stopped at `20.1 mm` error and failed to grasp in every
+repeat. This occurred at the searched `0.65`-extent hazard; the successful
+development diagnostic at `0.85` extents had reached `16 mm` alignment error.
+
+The program is reopened only to tighten that generic semantic termination to
+`10 mm`, then dev will be recertified again. Fresh sources remain untouched.
+Only after dev passes will the exact program be frozen and the single
+five-source array run. Each source must independently provide ten repeats of
+start validity, bad nominal closure, safe twin, physical recovery, and
+identity/restart equivalence.
+
+Foundation `GO` requires at least four certified fresh sources. Repeat totals
+will be reported separately from the independent source count `n=5`.
+
+## Kept as history
+
+The original report and its GIF paths remain in `INITIAL_RESULT.md`. Detailed
+failed authoring traces remain under the Quest run root; the status page no
+longer repeats the full chronological debugging log.
+
+The only environment limitation is the already documented optional LeRobot
+conversion dependency. It does not affect the simulator or this certification.

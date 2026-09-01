@@ -16,7 +16,13 @@ state it must provide:
 2. a physically executed recovery that restores full containment and satisfies
    the unchanged original task-success predicate; and
 3. a matched safe twin, differing only in the declared target-object pose
-   intervention, on which the same closing objective safely succeeds.
+   intervention, on which the same nominal closure safely succeeds.
+
+Recovery enters the frozen semantic `CloseReadySet` and then uses a bounded
+fixture-centric closing skill. It does not replay the original low-level
+closure suffix and is not required to return to an earlier robot pose. The
+original suffix is reserved for the hazardous-state versus natural-safe-twin
+causal comparison.
 
 Certification fails closed when identity, provenance, replay, stability,
 predicate, twin matching, or outcome evidence is missing or inconsistent.
@@ -64,4 +70,3 @@ by the execution plan. Large outputs remain outside Git.
   task under its unchanged predicate.
 - The matched twin differs only in the declared hazard intervention.
 - Fewer than four certified instances out of five is a foundation `NO-GO`.
-
