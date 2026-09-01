@@ -992,10 +992,21 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
             if openness <= float(config["closed_threshold"]):
                 break
-            if steps - checkpoint_step >= int(config["stall_regrasp_window_steps"]):
+            window_elapsed = steps - checkpoint_step >= int(
+                config["stall_regrasp_window_steps"]
+            )
+            near_closed_regrasp = (
+                bool(contact["timeout"])
+                and bool(midclosure_regrasps)
+                and openness <= float(config["near_closed_regrasp_openness"])
+            )
+            if window_elapsed or near_closed_regrasp:
                 window_progress = checkpoint_openness - openness
                 if (
-                    window_progress < float(config["stall_regrasp_min_progress"])
+                    (
+                        window_progress < float(config["stall_regrasp_min_progress"])
+                        or near_closed_regrasp
+                    )
                     and len(midclosure_regrasps)
                     < int(config["maximum_midclosure_regrasps"])
                 ):

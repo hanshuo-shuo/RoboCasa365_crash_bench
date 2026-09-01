@@ -95,7 +95,8 @@ fixture_close_skill:
   contact_retry_count: 1
   stall_regrasp_window_steps: 100
   stall_regrasp_min_progress: 0.02
-  maximum_midclosure_regrasps: 1
+  near_closed_regrasp_openness: 0.10
+  maximum_midclosure_regrasps: 2
   closed_threshold: 0.005
   maximum_steps_per_door: 900
   retreat_steps: 20
