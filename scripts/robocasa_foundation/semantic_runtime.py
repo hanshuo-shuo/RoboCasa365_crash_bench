@@ -985,10 +985,71 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
         start_openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
         runner.closure_commanded = True
         steps = 0
+        checkpoint_step = 0
+        checkpoint_openness = start_openness
+        midclosure_regrasps: list[dict[str, object]] = []
         for _ in range(int(config["maximum_steps_per_door"])):
             openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
             if openness <= float(config["closed_threshold"]):
                 break
+            if steps - checkpoint_step >= int(config["stall_regrasp_window_steps"]):
+                window_progress = checkpoint_openness - openness
+                if (
+                    window_progress < float(config["stall_regrasp_min_progress"])
+                    and len(midclosure_regrasps)
+                    < int(config["maximum_midclosure_regrasps"])
+                ):
+                    runner.closure_commanded = False
+                    for _ in range(10):
+                        action = runner.neutral()
+                        action[6] = -1.0
+                        runner.step(action)
+                    handle = named_position(env, handle_name)
+                    reacquire = runner.move_fingerpads_world(
+                        f"midclosure_contact_{handle_name}_{len(midclosure_regrasps)}",
+                        handle + outward * float(config["contact_offset_m"]),
+                        max_steps=180,
+                        tolerance=float(config["eef_position_tolerance_m"]),
+                        gripper_command=-1.0,
+                    )
+                    repositions: list[dict[str, object]] = []
+                    if reacquire["timeout"]:
+                        handle = named_position(env, handle_name)
+                        target_pad = handle + outward * float(config["contact_offset_m"])
+                        pad, _ = fingerpad_midpoint(env)
+                        repositions.append(
+                            runner.move_base_by_world_delta(
+                                f"midclosure_recenter_{handle_name}_{len(midclosure_regrasps)}",
+                                target_pad - pad,
+                                max_distance=float(config["base_reposition_max_m"]),
+                                max_steps=int(config["base_reposition_steps"]),
+                                tolerance=float(config["base_reposition_tolerance_m"]),
+                            )
+                        )
+                        handle = named_position(env, handle_name)
+                        reacquire = runner.move_fingerpads_world(
+                            f"midclosure_retry_{handle_name}_{len(midclosure_regrasps)}",
+                            handle + outward * float(config["contact_offset_m"]),
+                            max_steps=180,
+                            tolerance=float(config["eef_position_tolerance_m"]),
+                            gripper_command=-1.0,
+                        )
+                    for _ in range(int(config["handle_grasp_steps"])):
+                        action = runner.neutral()
+                        action[6] = 1.0
+                        runner.step(action)
+                    midclosure_regrasps.append(
+                        {
+                            "trigger_openness": openness,
+                            "window_progress": window_progress,
+                            "contact_timeout": reacquire["timeout"],
+                            "base_repositions": repositions,
+                        }
+                    )
+                    runner.closure_commanded = True
+                    openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
+                checkpoint_step = steps
+                checkpoint_openness = openness
             handle = named_position(env, handle_name)
             pad, _ = fingerpad_midpoint(env)
             drive = joint_closing_tangent(env, joint_name, handle)
@@ -1029,6 +1090,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[di
             "approach_timeout": approach["timeout"],
             "contact_timeout": contact["timeout"],
             "base_repositions": base_repositions,
+            "midclosure_regrasps": midclosure_regrasps,
             "retreat_timeout": retreat["timeout"],
             "privileged_geometry": True,
         }
