@@ -94,7 +94,7 @@ fixture_close_skill:
   base_reposition_steps: 120
   contact_retry_count: 1
   closed_threshold: 0.005
-  maximum_steps_per_door: 480
+  maximum_steps_per_door: 720
   retreat_steps: 20
 
 restart_equivalence:
