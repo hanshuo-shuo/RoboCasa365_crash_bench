@@ -817,10 +817,11 @@ def handle_descriptors(env) -> list[tuple[str, str]]:
     if hasattr(env.cab, "left_handle_name") and hasattr(env.cab, "right_handle_name"):
         left_joint = next((name for name in joints if "left" in name.lower()), joints[0])
         right_joint = next((name for name in joints if "right" in name.lower()), joints[-1])
+        # Close the positive-range leaf first so the mirrored leaf remains reachable.
         descriptors.extend(
             [
-                (str(env.cab.left_handle_name), left_joint),
                 (str(env.cab.right_handle_name), right_joint),
+                (str(env.cab.left_handle_name), left_joint),
             ]
         )
     elif hasattr(env.cab, "handle_name"):
