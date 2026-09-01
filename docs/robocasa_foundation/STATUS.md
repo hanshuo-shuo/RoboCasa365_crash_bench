@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-09-01
 
-**Phase:** final semantic program frozen; dev recertification rerun next
+**Phase:** development certified; frozen five-source transfer next
 
 **Foundation verdict:** **PENDING** — no fresh-source result has been counted yet
 
@@ -12,7 +12,7 @@
 | --- | --- |
 | What are we doing? | Certifying one partial-containment mechanism on five frozen FoodCleanup sources. |
 | What is working? | Environment, source replay, restart protocol, critical-margin search, severity monitor, CloseReadySet, physical object recovery, and bounded fixture closure. |
-| What is the current problem? | Full dev reproducibility must be rerun after the alignment correction; fresh transfer has not started. |
+| What is the current problem? | Independent transfer is unknown until the five untouched sources finish. |
 | What are we not doing? | No new task, failure category, VLA, policy tuning, or extra source replacement. |
 
 ```mermaid
@@ -60,6 +60,8 @@ be replaced.
   unchanged FoodCleanup success true; no obstruction evidence (job `5270914`).
 - The searched-margin recovery correction passed on dev job `5272319`; no
   fresh authoring preceded it.
+- Full revised development certification passed all five repeat groups `10/10`
+  in job `5272419`.
 
 ## Frozen semantics
 
@@ -94,12 +96,14 @@ repeat. This occurred at the searched `0.65`-extent hazard; the successful
 development diagnostic at `0.85` extents had reached `16 mm` alignment error.
 
 The same program with generic fingerpad termination tightened to `10 mm` passed
-the searched `0.65`-extent diagnostic in job `5272319`. The exact program is
-frozen again and full dev recertification will now be rerun. Fresh sources
-remain untouched. Only after dev passes will the single five-source array run.
-Each source must independently provide ten repeats of start validity, bad
-nominal closure, safe twin, physical recovery, and identity/restart
-equivalence.
+the searched `0.65`-extent diagnostic in job `5272319`. Full revised dev
+certification then passed start, bad branch, safe twin, physical recovery, and
+identity/restart equivalence `10/10` in job `5272419`.
+
+Fresh sources remain untouched. The next action is the single frozen
+five-source array. Each source must independently provide ten repeats of start
+validity, bad nominal closure, safe twin, physical recovery, and
+identity/restart equivalence.
 
 Foundation `GO` requires at least four certified fresh sources. Repeat totals
 will be reported separately from the independent source count `n=5`.
