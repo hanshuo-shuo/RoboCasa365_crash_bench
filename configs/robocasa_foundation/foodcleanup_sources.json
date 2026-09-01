@@ -1,0 +1,53 @@
+{
+  "schema_version": "0.2.0",
+  "frozen_at": "2026-09-01",
+  "task": "FoodCleanup",
+  "dataset_release": "v1.0/pretrain/composite/FoodCleanup/20250725",
+  "selection_rule": "First five non-development episodes, ordered by source episode ID, with exactly one food object, an original close-the-cabinet instruction, and a layout not already selected.",
+  "replacement_policy": "never_replace_failed_sources",
+  "development_source": {
+    "branchpoint_id": "dev-000-foodcleanup-cabinet-obstruction",
+    "episode": 0,
+    "layout_id": 37,
+    "style_id": 25,
+    "model_xml_gz_sha256": "8ef7429c8d4787e8f2a1729688d602f1b93b0e4161acfe3783b481c109c1c2b2",
+    "independent_final_source": false
+  },
+  "fresh_sources": [
+    {
+      "source_id": "source-001-foodcleanup-episode-000002",
+      "episode": 2,
+      "layout_id": 32,
+      "style_id": 25,
+      "model_xml_gz_sha256": "579172d22ec841adffb7cb883e4a1b251c692ae85fe41471a6358de7375a24e3"
+    },
+    {
+      "source_id": "source-002-foodcleanup-episode-000004",
+      "episode": 4,
+      "layout_id": 28,
+      "style_id": 41,
+      "model_xml_gz_sha256": "72688052cd3debc403bcca5cd4de2f85d35b907cffe8c24e7ee18e3991c66b6b"
+    },
+    {
+      "source_id": "source-003-foodcleanup-episode-000006",
+      "episode": 6,
+      "layout_id": 41,
+      "style_id": 30,
+      "model_xml_gz_sha256": "900c4bb3df5462c6b886a115ac69a571bd529604a98c2ea6d2be189b525a49fd"
+    },
+    {
+      "source_id": "source-004-foodcleanup-episode-000007",
+      "episode": 7,
+      "layout_id": 21,
+      "style_id": 36,
+      "model_xml_gz_sha256": "4dba0827e02213b26bda4118a8276fd535acb2d47536ab02e536497cae329716"
+    },
+    {
+      "source_id": "source-005-foodcleanup-episode-000009",
+      "episode": 9,
+      "layout_id": 55,
+      "style_id": 49,
+      "model_xml_gz_sha256": "7dd5e1d6755ab8b82a12a05b7fe5b2f781248e09858d49f39f65cb689bfbdd13"
+    }
+  ]
+}
