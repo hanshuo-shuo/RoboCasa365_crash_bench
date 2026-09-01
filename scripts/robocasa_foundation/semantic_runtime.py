@@ -918,17 +918,28 @@ def joint_closing_tangent(env, joint_name: str, handle_position):
     return closing_qpos_sign * tangent / norm
 
 
-def handle_contact_target(env, handle_name: str, joint_name: str, offset_m: float):
+def handle_contact_target(
+    env, handle_name: str, joint_name: str, offset_m: float, fixture_outward
+):
+    import numpy as np
+
     handle = named_position(env, handle_name)
-    closing_tangent = joint_closing_tangent(env, joint_name, handle)
-    return handle - closing_tangent * offset_m
+    joint_id = env.sim.model.joint_name2id(joint_name)
+    joint_range = np.asarray(env.sim.model.jnt_range[joint_id], dtype=float)
+    if joint_range[0] < 0:
+        contact_direction = np.asarray(fixture_outward, dtype=float)
+        contact_direction /= np.linalg.norm(contact_direction)
+    else:
+        contact_direction = -joint_closing_tangent(env, joint_name, handle)
+    return handle + contact_direction * offset_m
 
 
-def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[dict[str, object]]:
+def close_fixture_with_live_handles(runner: ActionRunner, axis_world) -> list[dict[str, object]]:
     import numpy as np
 
     env = runner.env
     config = runner.config["fixture_close_skill"]
+    outward = np.asarray(axis_world, dtype=float)
     records: list[dict[str, object]] = []
     for handle_name, joint_name in handle_descriptors(env):
         openness = float(env.cab.get_joint_state(env, [joint_name])[joint_name])
@@ -946,7 +957,11 @@ def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[d
         approach = runner.move_fingerpads_world(
             f"approach_{handle_name}",
             handle_contact_target(
-                env, handle_name, joint_name, float(config["approach_offset_m"])
+                env,
+                handle_name,
+                joint_name,
+                float(config["approach_offset_m"]),
+                outward,
             ),
             max_steps=180,
             tolerance=float(config["eef_position_tolerance_m"]),
@@ -955,7 +970,11 @@ def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[d
         contact = runner.move_fingerpads_world(
             f"contact_{handle_name}",
             handle_contact_target(
-                env, handle_name, joint_name, float(config["contact_offset_m"])
+                env,
+                handle_name,
+                joint_name,
+                float(config["contact_offset_m"]),
+                outward,
             ),
             max_steps=120,
             tolerance=float(config["eef_position_tolerance_m"]),
@@ -966,7 +985,11 @@ def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[d
             if not contact["timeout"]:
                 break
             target_pad = handle_contact_target(
-                env, handle_name, joint_name, float(config["contact_offset_m"])
+                env,
+                handle_name,
+                joint_name,
+                float(config["contact_offset_m"]),
+                outward,
             )
             pad, _ = fingerpad_midpoint(env)
             base_repositions.append(
@@ -981,7 +1004,11 @@ def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[d
             contact = runner.move_fingerpads_world(
                 f"retry_contact_{handle_name}_{retry}",
                 handle_contact_target(
-                    env, handle_name, joint_name, float(config["contact_offset_m"])
+                    env,
+                    handle_name,
+                    joint_name,
+                    float(config["contact_offset_m"]),
+                    outward,
                 ),
                 max_steps=180,
                 tolerance=float(config["eef_position_tolerance_m"]),
@@ -1045,6 +1072,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[d
                             handle_name,
                             joint_name,
                             float(config["contact_offset_m"]),
+                            outward,
                         ),
                         max_steps=180,
                         tolerance=float(config["eef_position_tolerance_m"]),
@@ -1057,6 +1085,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[d
                             handle_name,
                             joint_name,
                             float(config["contact_offset_m"]),
+                            outward,
                         )
                         pad, _ = fingerpad_midpoint(env)
                         repositions.append(
@@ -1075,6 +1104,7 @@ def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[d
                                 handle_name,
                                 joint_name,
                                 float(config["contact_offset_m"]),
+                                outward,
                             ),
                             max_steps=180,
                             tolerance=float(config["eef_position_tolerance_m"]),
@@ -1120,7 +1150,11 @@ def close_fixture_with_live_handles(runner: ActionRunner, _axis_world) -> list[d
         retreat = runner.move_fingerpads_world(
             f"retreat_{handle_name}",
             handle_contact_target(
-                env, handle_name, joint_name, float(config["approach_offset_m"])
+                env,
+                handle_name,
+                joint_name,
+                float(config["approach_offset_m"]),
+                outward,
             ),
             max_steps=120,
             tolerance=float(config["eef_position_tolerance_m"]),
