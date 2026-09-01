@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-09-01
 
-**Phase:** development recertification correction before the final freeze
+**Phase:** final semantic program frozen; dev recertification rerun next
 
 **Foundation verdict:** **PENDING** — no fresh-source result has been counted yet
 
@@ -12,7 +12,7 @@
 | --- | --- |
 | What are we doing? | Certifying one partial-containment mechanism on five frozen FoodCleanup sources. |
 | What is working? | Environment, source replay, restart protocol, critical-margin search, severity monitor, CloseReadySet, physical object recovery, and bounded fixture closure. |
-| What is the current problem? | The searched dev hazard missed the recovery grasp by about 20 mm; fresh transfer has not started. |
+| What is the current problem? | Full dev reproducibility must be rerun after the alignment correction; fresh transfer has not started. |
 | What are we not doing? | No new task, failure category, VLA, policy tuning, or extra source replacement. |
 
 ```mermaid
@@ -58,8 +58,8 @@ be replaced.
   obvious obstruction contacted in `10/10` (job `5263563`).
 - Development semantic diagnostic: CloseReadySet reached before closure;
   unchanged FoodCleanup success true; no obstruction evidence (job `5270914`).
-- Candidate authoring program was frozen at commit `f545013`; no fresh
-  authoring preceded it.
+- The searched-margin recovery correction passed on dev job `5272319`; no
+  fresh authoring preceded it.
 
 ## Frozen semantics
 
@@ -80,9 +80,10 @@ Full parameters and the simple branch diagram are in `PREDICATE_SPEC.md`.
 The historical 989-action witness remains preserved: `49.45 s` physical
 duration versus a `17.55 s` nominal suffix, or `31.90 s` overhead.
 
-The revised successful development diagnostic used 1,172 actions (`58.60 s`).
-CloseReadySet was reached at `23.85 s`; overhead relative to the nominal suffix
-was 821 actions (`41.05 s`). These are measurements, not optimization targets.
+The corrected searched-margin development diagnostic used 1,211 actions
+(`60.55 s`). CloseReadySet was reached at `18.25 s`; overhead relative to the
+nominal suffix was 860 actions (`43.00 s`). These are measurements, not
+optimization targets.
 
 ## Current result and next gate
 
@@ -92,12 +93,13 @@ fingerpad alignment stopped at `20.1 mm` error and failed to grasp in every
 repeat. This occurred at the searched `0.65`-extent hazard; the successful
 development diagnostic at `0.85` extents had reached `16 mm` alignment error.
 
-The program is reopened only to tighten that generic semantic termination to
-`10 mm`, then dev will be recertified again. Fresh sources remain untouched.
-Only after dev passes will the exact program be frozen and the single
-five-source array run. Each source must independently provide ten repeats of
-start validity, bad nominal closure, safe twin, physical recovery, and
-identity/restart equivalence.
+The same program with generic fingerpad termination tightened to `10 mm` passed
+the searched `0.65`-extent diagnostic in job `5272319`. The exact program is
+frozen again and full dev recertification will now be rerun. Fresh sources
+remain untouched. Only after dev passes will the single five-source array run.
+Each source must independently provide ten repeats of start validity, bad
+nominal closure, safe twin, physical recovery, and identity/restart
+equivalence.
 
 Foundation `GO` requires at least four certified fresh sources. Repeat totals
 will be reported separately from the independent source count `n=5`.
