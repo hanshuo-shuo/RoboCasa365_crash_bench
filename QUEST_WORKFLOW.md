@@ -28,9 +28,17 @@ ssh -S /tmp/quest.sock quest.northwestern.edu '<command>'
 ```
 
 The local workspace and the remote private checkout have independent Git work
-trees. No synchronization method was provided or performed during environment
-setup. A future agent must ask before copying, pushing, pulling, or otherwise
-synchronizing project files between them.
+trees. The foundation charter subsequently established Git-only synchronization:
+for work implemented locally, commit on `main`, push `origin/main`, then run
+`git pull --ff-only` in the clean remote project checkout. Inspect branch,
+worktree and history on both sides first; stop affected synchronization if
+unknown changes or divergence are present. Do not infer that a historical
+clean-state record still describes the current checkout.
+
+Do not use `rsync`, `scp`, a new checkout or an alternate sync script. If work
+was implemented remotely, inspect its actual commits before deciding how to
+bring them back; never overwrite one checkout with the other. The plan-refactor
+task itself requires no Quest synchronization or job submission.
 
 ## Activate the verified environment
 
@@ -58,7 +66,14 @@ login node.
   detached at the commits listed in the handoff document.
 - Do not redownload the 23 GB asset directory merely because an import emits
   optional-component warnings.
-- Do not download full RoboCasa demonstrations or datasets. Foundation work may
-  later fetch only the explicitly approved demonstration subset.
+- The FoodCleanup package has already been downloaded and contains 101
+  episodes (see `docs/robocasa_foundation/TASK_SCREEN.md`). Curated authoring may
+  screen and select episodes within that package. Do not download more tasks
+  or the full RoboCasa dataset under the current plan.
 - Do not use a compute node for installation or downloading. GPU rendering and
   later simulator integration tests require a documented Slurm job script.
+- During implementation, adapt the existing checked-in job resources/modules
+  for the curated entry point; do not rerun the frozen five-source array as if
+  it implemented the new protocol. Use new output directories and record code,
+  configuration and job IDs. A candidate failure calls for diagnosis or
+  exclusion, not another global approval stage.

@@ -1,72 +1,66 @@
-# RoboCasa certified branch-point foundation charter
+# RoboCasa curated benchmark charter
 
-**Effective date:** 2026-08-31  
-**Working branch:** `main`  
-**Foundation mechanism:** partial object containment before enclosure closure
+**Effective date:** 2026-09-04
+**Working branch:** `main`
+**Current protocol:** `curated_v0` (planned; implementation follows in a separate task)
 
-## Scientific objective
+## Objective
 
-The foundation will certify one natural RoboCasa task transition in which an
-object has been released and is stably supported inside an enclosure, but
-protrudes into the closure swept volume. From the same reconstructed branch
-state it must provide:
+Build five curated FoodCleanup branch-point items and a working replay/scoring
+entry point. The mechanism remains partial object containment before cabinet
+closure. Each item provides a safe, stable, incomplete hazardous start, an
+unsafe nominal continuation, a task-completing robot-action recovery, and a
+matched safe twin using the same nominal continuation.
 
-1. a nominal closing continuation that causes an objective closure/object
-   collision or jam;
-2. a physically executed recovery that restores full containment and satisfies
-   the unchanged original task-success predicate; and
-3. a matched safe twin, differing only in the declared target-object pose
-   intervention, on which the same nominal closure safely succeeds.
+The detailed current instructions are in
+[`CrashBench_Codex_Foundation_Execution_Plan.md`](../../CrashBench_Codex_Foundation_Execution_Plan.md).
+Automatic authoring transfer to five preselected sources is not a prerequisite
+for constructing or delivering this benchmark prototype.
 
-Recovery enters the frozen semantic `CloseReadySet` and then uses a bounded
-fixture-centric closing skill. It does not replay the original low-level
-closure suffix and is not required to return to an earlier robot pose. The
-original suffix is reserved for the hazardous-state versus natural-safe-twin
-causal comparison.
+## Construction and scoring
 
-Certification fails closed when identity, provenance, replay, stability,
-predicate, twin matching, or outcome evidence is missing or inconsistent.
+- Author, adjust and select individual items within the installed FoodCleanup
+  package. Record exclusions and development exposure. Episode 0 may be a
+  disclosed construction item; five distinct source episodes count toward the
+  delivery target. Do not present curation as untouched-source generalization.
+- Start by adapting the historical robot-action witness into one real item
+  through the common runner. Add the remaining items after that path works.
+- Freeze the final item list and scoring before later model evaluation.
+  Development search uses single runs; final selected items receive ten fresh
+  replays per continuation with at least nine expected outcomes in each group.
+  All starts and identities must be valid. Reuse those runs for identity and
+  start checks instead of adding redundant repeat campaigns.
+- Preserve `FoodCleanup._check_success`. Safe noncompletion is not recovery;
+  unsafe task success is not safe success. Intermediate planner tolerances,
+  timeouts and CloseReadySet diagnostics do not independently determine score.
+- Recovery executes through saved robot actions, with no post-start object
+  teleportation or direct cabinet torque. Privileged geometry may help author
+  the witness. A cabinet torque controller can remain a labeled diagnostic.
+- Canonical restart is fresh construction plus recorded prefix replay. Do not
+  make general snapshot restoration or pixel equality a prerequisite.
+- Failed evidence leaves the affected item unready. Repair or exclude it and
+  continue. Progress is `ready_items: N/5`; five validated items plus a working
+  entry point complete the prototype. There is no old-cohort 4/5 GO gate.
 
-## Foundation scope
+## Scope and history
 
-The ordered work is limited to dependency provenance, a canonical natural task
-and demonstration screen, restart auditing, one enclosure-obstruction
-mechanism, five seeded instances, deterministic witness infrastructure, and the
-required repeat certification. Scripted skills and privileged geometry are
-authoring and certification tools, not learned recovery policies.
+No VLA integration/training, broad evaluation, new task/hazard family or
+confirmatory cohort is part of this construction plan.
 
-No VLA training, broad evaluation, task-family scaling, confirmatory cohort,
-new hazard taxonomy, or learned safety policy is authorized in this phase.
+Preserve LIBERO evidence and the historical RoboCasa reports, frozen inputs
+and raw outputs. The old five-source result remains `0/5, NO-GO`. Old reports'
+next-step restrictions describe that experiment; the current plan supersedes
+them for new curated work. Use a separate configuration, item list and output
+root for the new protocol, not edited historical verdicts.
 
-## Frozen evidence boundary
+## Execution
 
-All prior LIBERO wall, glass, probe, router, checkpoint, result, and media
-artifacts are frozen evidence. They must not be edited, deleted, migrated,
-reinterpreted as RoboCasa results, or used as the new benchmark implementation.
-New foundation code and compact documentation live only in the paths declared
-by the execution plan. Large outputs remain outside Git.
+Follow `AGENTS.md` and `QUEST_WORKFLOW.md`: use `main`, the existing Quest
+socket, checkout, environment and Git-only synchronization. Keep data, actions,
+videos, checkpoints and external dependencies outside Git. Protect unknown
+worktree changes and never rewrite history.
 
-## Repository and Quest contract
-
-- Work proceeds directly on a clean, up-to-date `main`, as designated by the
-  user. No additional branch is created.
-- Each passing phase receives one focused commit and is pushed before the next
-  phase begins.
-- Local implementation is synchronized through Git only: push `origin/main`,
-  then `git pull --ff-only` in the clean Quest checkout.
-- Simulator execution and rendering run on Quest. The only SSH control socket
-  is `/tmp/quest.sock`; the only checkout is
-  `/gpfs/home/shv7753/RoboCasa365_crash_bench`.
-- Results, videos, assets, datasets, checkpoints, and editable dependencies do
-  not enter this repository.
-
-## Non-negotiable gates
-
-- The branch starts safe, stable, incomplete, and open enough to recover.
-- Canonical restart is deterministic prefix replay unless a stricter mode is
-  independently shown equivalent.
-- The bad continuation has positive simulated time to first violation.
-- The recovery uses no post-branch teleportation and completes the original
-  task under its unchanged predicate.
-- The matched twin differs only in the declared hazard intervention.
-- Fewer than four certified instances out of five is a foundation `NO-GO`.
+Run checks appropriate to actual changes and record compact progress in
+`STATUS.md`. Documentation changes need document checks, not simulation.
+Continue through local candidate failures without inventing new phase approvals
+or expanding a general controller before the concrete items work.

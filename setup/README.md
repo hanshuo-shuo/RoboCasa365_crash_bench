@@ -38,14 +38,36 @@ export MUJOCO_GL=egl
 
 Do not download dependencies or assets inside that job.
 
-## Current semantic foundation
+## Current work: curated benchmark prototype
 
-The active scientific configuration is
-`configs/robocasa_foundation/semantic_program.yaml`; the immutable source list
-is `configs/robocasa_foundation/foodcleanup_sources.json`.
+The 2026-09-04 revision of
+[`CrashBench_Codex_Foundation_Execution_Plan.md`](../CrashBench_Codex_Foundation_Execution_Plan.md)
+targets five curated FoodCleanup items and one replay/scoring entry point.
+The current change is planning only; a curated runner, configuration and Slurm
+wrapper still need to be implemented by the next execution task.
 
-The five-source array has completed as Quest job `5273093` with a foundation
-`NO-GO`. Do not rerun it, replace sources, or submit the development/fresh
-certification scripts as a workaround. Read
-`docs/robocasa_foundation/FOUNDATION_RESULT.md` and `STATUS.md` for the result
-and next authorized step.
+Start with the historical robot-action witness from `INITIAL_RESULT.md`, make
+one item run through the unified interface, then author additional items from
+the already downloaded FoodCleanup package. Per-item parameters, candidate
+exclusion and disclosed reuse of the development episode are allowed.
+
+Search with one rollout per candidate; run the final ten repeats only for
+selected items. Intermediate alignment timeouts do not override safe original
+task completion. A complete recovery witness must execute through robot
+actions; direct cabinet torque remains an auxiliary diagnostic.
+
+For implementation jobs, reuse the existing environment, dependency reader,
+modules and Slurm resource choices. Use the ignored paths file and new output
+directories. Follow [`QUEST_WORKFLOW.md`](../QUEST_WORKFLOW.md) for Git-only
+synchronization. No new environment bootstrap or three-mode restart campaign
+is needed.
+
+## Historical frozen experiment
+
+`configs/robocasa_foundation/semantic_program.yaml` and
+`configs/robocasa_foundation/foodcleanup_sources.json` describe the completed
+five-source experiment, Quest job `5273093`, with `0/5, NO-GO`.
+Preserve them and the old reports. They are not the active curated item list,
+and their no-replacement rule is not a prohibition on new curated authoring.
+Do not edit old inputs to reclassify the old result. New protocol work uses
+separate configuration and output paths; see `STATUS.md` for actual progress.
