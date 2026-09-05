@@ -8,3 +8,6 @@ ROBOCASA_ASSET_DIR=/projects/p33100/siosio/third_party/robocasa365/robocasa/mode
 ROBOCASA_DATA_ROOT=/projects/p33100/siosio/robocasa_datasets
 PIP_CACHE_DIR=/projects/p33100/siosio/pip_cache
 CONDA_PKGS_DIRS=/projects/p33100/siosio/conda_pkgs
+
+ROBOCASA_RUN_ROOT=/projects/p33100/siosio/robocasa_foundation_runs
+ROBOCASA_READER_ROOT=/projects/p33100/siosio/tools/pyarrow-21.0.0

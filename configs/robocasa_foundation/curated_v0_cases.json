@@ -1,0 +1,19 @@
+{
+  "protocol": "curated_v0",
+  "ready_items": 0,
+  "cases": [
+    {
+      "id": "curated-000",
+      "episode": 0,
+      "seed": 0,
+      "development_item": true,
+      "status": "candidate",
+      "branch_frame": 370,
+      "displacement_m": 0.1,
+      "common_neutral_steps": 0,
+      "recovery_actions": "f5_recovery_5244908/recovery/recovery_actions.npz",
+      "recovery_skip_steps": 0,
+      "settling_note": "Replay all historical actions, including ten neutral steps, after intervention; stability probe is discarded."
+    }
+  ]
+}

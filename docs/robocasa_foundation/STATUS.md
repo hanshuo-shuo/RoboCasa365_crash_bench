@@ -1,10 +1,29 @@
 # RoboCasa benchmark status
 
-**Last updated:** 2026-09-04
+**Last updated:** 2026-09-05
 **Active direction:** curated_v0 — five curated FoodCleanup items and a unified replay/scoring entry point
-**Current task:** plan refactor only; runtime/configuration changes and new experiments have not begun
-**Current item count:** not yet measured under curated_v0; target is five distinct source episodes
+**Current task:** implementing curated_v0; first action-only replay integration pending
+**Current item count:** ready_items: 0/5 (no curated item certified)
 **Historical frozen-cohort verdict:** unchanged, **0/5, NO-GO**
+
+## 2026-09-05 implementation
+
+- Both main worktrees were clean; local main was current at `ce270dc` and
+  Quest main fast-forwarded from `2e4295e` to `ce270dc`.
+- Located `f5_recovery_5244908/recovery/recovery_actions.npz` under the existing
+  external run root. New `run_benchmark.py` replays the complete historical
+  action file (including its ten initial neutral actions), from fresh prefix
+  reconstruction. The separate stability probe is discarded before replay.
+- Added separate curated configuration/case list and a checked-in Slurm wrapper.
+  Initial candidate: episode 0, seed 0, frame 370, outward displacement 0.10 m.
+  This is a development candidate, not a certified item.
+- Scoring checks: three direct Python assertions passed; Python AST and shell
+  syntax checks passed. Both local Python interpreters lack pytest; run related
+  pytest checks in the installed Quest environment before simulation submission.
+- Historical scoring, frozen inputs, and reports remain unchanged. New runner
+  does not invoke the authoring planner or apply fixture torque.
+- Pending: real four-branch integration, provenance freeze, stronger start and
+  matching validation, additional candidates, final ten-repeat certification.
 
 ## What changed in the plan
 
@@ -27,9 +46,9 @@ will assign implementation to another model. The revised
   curated configuration/list and outputs. A failed candidate does not halt
   development of the remaining items.
 
-The current Python code and old Slurm scripts still implement the historical
-protocol. Editing this plan has not removed their runtime gates or created the
-new runner. The proposed curated files listed in the plan do not exist yet.
+The old Python entry points and Slurm scripts retain the historical protocol.
+The separate curated entry point is now being implemented; see the current
+implementation record above. No curated item has passed final validation.
 
 ## Next implementation action
 

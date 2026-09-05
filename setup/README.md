@@ -43,8 +43,11 @@ Do not download dependencies or assets inside that job.
 The 2026-09-04 revision of
 [`CrashBench_Codex_Foundation_Execution_Plan.md`](../CrashBench_Codex_Foundation_Execution_Plan.md)
 targets five curated FoodCleanup items and one replay/scoring entry point.
-The current change is planning only; a curated runner, configuration and Slurm
-wrapper still need to be implemented by the next execution task.
+The curated runner and Slurm wrapper now exist; item validation is in progress.
+Set `ROBOCASA_RUN_ROOT` and `ROBOCASA_READER_ROOT` in the ignored paths file,
+then run `sbatch setup/run_robocasa_benchmark.sbatch --case curated-000`.
+This defaults to one replay each of bad, recovery, safe twin and Hold.
+Use `--repeats 10` only after the candidate passes development checks.
 
 Start with the historical robot-action witness from `INITIAL_RESULT.md`, make
 one item run through the unified interface, then author additional items from
