@@ -1,7 +1,8 @@
 # Curated FoodCleanup prototype — in progress
 
-**ready_items: 0/5.** Two candidates (episodes 0 and 4) have passed single-run
-bad/recovery/safe-twin checks. Neither has completed final ten-repeat validation.
+**ready_items: 1/5.** Episode 0 passed final ten-repeat validation in job
+`5589647`; bad/recovery/safe twin each meet their expected outcome 10/10.
+Episode 4 final validation is running.
 This is a constructed development benchmark, not unseen-source generalization
 or a reinterpretation of the historical frozen-cohort `0/5, NO-GO` result.
 
@@ -48,8 +49,9 @@ The first unified run (`5580280`) showed that the old stored recovery did not
 complete the task under fresh prefix replay. Reauthoring alone (`5584953`)
 still failed independent replay. The simulator owns an independent
 `np.random.default_rng(seed)`; setting only NumPy's global seed did not seed it.
-Passing an explicit environment seed to author and replay fixed the mismatch:
-all recorded state differences were zero in jobs `5589223`–`5589225`.
+Explicitly seeded, unrendered author and replay matched exactly in jobs
+`5589223`–`5589225`. A separate rendering-induced difference was subsequently
+confirmed; visualizations now render stored scored states after execution.
 
 Episode 0's author still reports a branch-pose return timeout, while its emitted
 robot actions safely complete the original task. Outcome scoring preserves that

@@ -306,7 +306,21 @@ def main():
                 for action in actions[:case["branch_frame"]]:
                     probe.step(action)
                 axis = rt.fixture_axis_world(probe, config)
-                case["displacement_m"] = rt.object_extent_along(probe, axis) * case["displacement_extent_fraction"]
+                if "front_protrusion_m" in case:
+                    import itertools
+                    import numpy as np
+                    corners = []
+                    for p0, px, py, pz in probe.cab.get_int_sites(relative=False).values():
+                        origin = np.asarray(p0)
+                        vectors = [np.asarray(p)-origin for p in (px, py, pz)]
+                        corners.extend(origin+sum((bit*v for bit,v in zip(bits,vectors)), np.zeros(3))
+                                       for bits in itertools.product((0,1), repeat=3))
+                    front = max(float(point @ axis) for point in corners)
+                    object_front = max(float(point @ axis) for point in rt.target_bbox_points(probe))
+                    case["source_front_clearance_m"] = front-object_front
+                    case["displacement_m"] = front-object_front+case["front_protrusion_m"]
+                else:
+                    case["displacement_m"] = rt.object_extent_along(probe, axis) * case["displacement_extent_fraction"]
             finally:
                 probe.close()
         selected = [case]

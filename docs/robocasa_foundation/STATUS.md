@@ -3,7 +3,7 @@
 **Last updated:** 2026-09-05
 **Active direction:** curated_v0 — five curated FoodCleanup items and a unified replay/scoring entry point
 **Current task:** implementing curated_v0; first action-only replay integration pending
-**Current item count:** ready_items: 0/5 (no curated item certified)
+**Current item count:** ready_items: 1/5 (episode 0 certified)
 **Historical frozen-cohort verdict:** unchanged, **0/5, NO-GO**
 
 ## 2026-09-05 implementation
@@ -223,3 +223,18 @@ neutral stop. Test a bounded 20-step continuation of its last demonstrated
 robot action after recovery suffix; the entire emitted sequence is saved and
 independently scored. This is a per-item action adjustment, not a timeout or
 success-predicate change. Existing episode 0/4 replay behavior is unchanged.
+
+## First certified item
+
+`curated_v0_5589647` at `2a69831`: episode 0 bad/recovery/safe twin each 10/10
+expected outcomes, all starts and identities valid, hashes and common states
+matched. `summary.json` reports certified=true. Actual scored-state GIFs retained.
+Episode 4 final job remains pending at this update.
+
+Follow-up jobs `5589903/04/05/06` tested episodes 12/15/16/2. Episode 12's earlier
+frame fails robot speed; exclude that construction. Episodes 15/16 are safe at
+their tested displacements; next candidates use the actual cabinet-front gap
+plus 15 mm protrusion rather than arbitrary larger extent multiples. Episode 2
+bounded closure extension remains incomplete; leave it uncertified and work on
+other sources. Add episode 22 (sweet potato, matching the development food type)
+from the existing package with the same measured-front construction.

@@ -1,13 +1,13 @@
 {
   "protocol": "curated_v0",
-  "ready_items": 0,
+  "ready_items": 1,
   "cases": [
     {
       "id": "curated-000",
       "episode": 0,
       "seed": 0,
       "development_item": true,
-      "status": "single_run_passed",
+      "status": "certified",
       "branch_frame": 370,
       "displacement_m": 0.1,
       "common_neutral_steps": 0,
@@ -24,7 +24,9 @@
         "source_actions": "c74ef6c174705600a22a9f5bd99b031c73fb0abdcab88e07d03872a31d6d24ad",
         "recovery_actions": "66d37c356960a00effd60cdf16e29e4b4c25161c1c136dedf77c53ca7cf1b4ad"
       },
-      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85"
+      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
+      "certification_output": "curated_v0_5589647",
+      "certification_code_sha": "2a69831"
     },
     {
       "id": "curated-002",
@@ -97,13 +99,14 @@
       "episode": 12,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
+      "status": "excluded_construction",
       "branch_frame": 477,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
       "selection_note": "Earlier branch by 20 frames to avoid moving fixture at detected onset.",
       "recovery_anchor_frame": 206,
-      "displacement_m": 0.07006558108867082
+      "displacement_m": 0.07006558108867082,
+      "exclusion_reason": "Detected branch has moving fixture; 20-frame earlier branch fails robot-speed bound (5589649/5589903). Try other sources."
     },
     {
       "id": "curated-015",
@@ -114,9 +117,9 @@
       "branch_frame": 317,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "0.60 extent safe; test 1.20 extent for an actual obstruction.",
+      "selection_note": "Prior extent-fraction position stayed safe; use measured cabinet-front clearance plus 15 mm protrusion, then validate once.",
       "recovery_anchor_frame": 211,
-      "displacement_m": 0.07581443606626823
+      "front_protrusion_m": 0.015
     },
     {
       "id": "curated-016",
@@ -127,9 +130,21 @@
       "branch_frame": 347,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Earlier branch by 20 frames to avoid moving fixture at detected onset.",
+      "selection_note": "Prior extent-fraction position stayed safe; use measured cabinet-front clearance plus 15 mm protrusion, then validate once.",
       "recovery_anchor_frame": 152,
-      "displacement_m": 0.08356660538300628
+      "front_protrusion_m": 0.015
+    },
+    {
+      "id": "curated-022",
+      "episode": 22,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": null,
+      "front_protrusion_m": 0.015,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Same food type as development episode (sweet potato), explicit cabinet-closure task in existing package; measured front protrusion."
     }
   ]
 }
