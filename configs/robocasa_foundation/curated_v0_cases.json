@@ -224,7 +224,7 @@
       "episode": 29,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
+      "status": "hazard_and_twin_passed",
       "branch_frame": 340,
       "transition_aggregation": "mean",
       "branch_lead_frames": 10,

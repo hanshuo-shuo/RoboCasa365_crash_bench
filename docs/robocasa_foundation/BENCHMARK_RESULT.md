@@ -59,8 +59,8 @@ stayed open.
 ## Remaining work
 
 Episode 29 is a boxed-food candidate from the same downloaded data. Its door
-closes, but later source actions reopen it. We are testing a fixed earlier stop
-followed by a short neutral hold on both matched paths.
+closes, but later source actions reopen it. A fixed earlier stop followed by a
+short neutral hold now passes the matched-pair check. Its robot recovery is next.
 Other failed constructions are kept in the run log. They do not count as ready.
 See [STATUS.md](STATUS.md) for exact jobs, versions and failure details.
 

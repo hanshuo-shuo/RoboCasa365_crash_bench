@@ -36,11 +36,15 @@ def main():
         bad_count = bad.get('catastrophe', 0) + bad.get('unsafe_task_success', 0)
         recovery_count = groups['recovery']['counts'].get('recovery_success', 0)
         twin_count = groups['safe_twin']['counts'].get('recovery_success', 0)
-        bad_run = json.loads((folder / 'bad_0.json').read_text())
+        bad_runs = [json.loads((folder / f'bad_{i}.json').read_text()) for i in range(10)]
+        times = [r['time_to_violation_s'] for r in bad_runs if r.get('time_to_violation_s') is not None]
+        if not times:
+            raise ValueError(f"{case['id']}: no recorded danger time")
+        danger_time = f'{min(times):.2f} s' if min(times) == max(times) else f'{min(times):.2f}–{max(times):.2f} s'
         recovery_run = json.loads((folder / 'recovery_0.json').read_text())
         label = f"Episode {case['episode']}" + (' (development)' if case.get('development_item') else '')
         rows.append(f'<tr><td>{label}</td><td>{bad_count}/10</td><td>{recovery_count}/10</td>'
-                    f'<td>{twin_count}/10</td><td>{bad_run["time_to_violation_s"]:.2f} s</td>'
+                    f'<td>{twin_count}/10</td><td>{danger_time}</td>'
                     f'<td>{recovery_run["duration_s"]:.2f} s</td></tr>')
 
     figures = []

@@ -244,3 +244,10 @@ reopen it. The five extra actions made that worse. The next fixed nominal
 sequence ends source motion at frame 397 and holds neutrally for ten steps.
 Both bad and safe twin use this exact same sequence. This tests sustained real
 closure without changing the original success predicate or its threshold.
+
+Boxed-food stop-and-hold job `5597650` passes the matched pair: the safe twin
+finishes the original task, with final openness 0.001867; the bad path still
+causes danger. Both use the same fixed source segment through frame 397 and
+ten neutral steps. Starts and action-hash matching pass. Author its complete
+robot recovery next. The illustrated report also handles a range of danger
+times across all ten repeats rather than assuming repeat zero is representative.
