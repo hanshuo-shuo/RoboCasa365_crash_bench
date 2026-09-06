@@ -36,3 +36,8 @@ reconstruction:
   object_position_m: 0.01
   object_rotation_rad: 0.05
   fixture_openness: 0.01
+transition:
+  stable_release_linear_speed_m_s: 0.05
+  stable_release_angular_speed_rad_s: 0.5
+  close_onset_window_frames: 5
+  close_onset_min_progress: 0.002

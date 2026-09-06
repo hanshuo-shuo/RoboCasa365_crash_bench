@@ -181,3 +181,23 @@ this is not a change to the frozen contact-plus-severity danger thresholds.
 Certification requires frozen input/predicate hashes, ten starts and identities,
 matched common qpos/qvel, and nine expected outcomes per continuation. Final
 repeats and support/contact checks are pending; ready_items: 0/5.
+
+## Contact and rendering checks
+
+Jobs `5589451/52/53/54/56` correspond to episodes `0/4/2/6/7` at `532fd21`.
+All start guards passed, including released objects and cabinet-bottom support.
+Initial numerical overlap depths were about 0.03–0.08 mm, comparable to matched
+safe twins and below the uniform 1-mm guard. Episode 4 again passed all three
+branches. Episode 2 frame 300 remained task-incomplete. Episode 6's common wait
+broke nominal safe-twin closure, so exclude that construction. Episode 7 at
+0.80 extent had no door-object contact; next single candidate is 1.0 extent.
+
+Rendering enabled a different prefix trajectory for episode 0 (state divergence
+from the first recovery step). New visual generation uses a separate environment
+and the stored actual scored states after the unrendered rollout has finished.
+The simulator replay path is now identical whether a visualization is requested
+or not. Prior rendered recovery failure remains a real recorded failure.
+
+Added metadata-selected episodes 12/15/16 from the existing package as replacement
+candidates. Their frames and metric displacement will be resolved once with the
+existing transition detector and recorded in the external run directory.

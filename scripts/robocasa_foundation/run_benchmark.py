@@ -178,7 +178,7 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
         result["source_identity"] = rt.semantic_fingerprint(env)
         result["start_audit"] = audit_start(env, actions, transition, config)
         env.close()
-        env = build(render)
+        env = build()
         result["replay_identity"] = rt.semantic_fingerprint(env)
         difference = rt.fingerprint_difference(result["source_identity"], result["replay_identity"])
         result["reconstruction_difference"] = difference
@@ -224,7 +224,7 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
                 "object_quaternion_wxyz": quaternion})
             trace.append({"step": index, "unsafe": measurement.value, **measurement.details})
             if render and index % 5 == 0:
-                frames.append(env.sim.render(512, 512, camera_name="robot0_agentview_left")[::-1])
+                frames.append(np.asarray(env.sim.get_state().flatten()).copy())
         linear, angular = rt.object_velocities(env)
         bounds = config["start_state"]
         stable = (linear <= bounds["maximum_object_linear_speed_m_s"]
@@ -244,8 +244,22 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
                 "first_step_above_1e_6": next((i for i, e in enumerate(replay_errors) if e > 1e-6), None),
                 "errors": replay_errors}
         if render:
-            result["_frames"] = frames
+            # Rendering environments alter prefix dynamics in this upstream
+            # stack. Visualize stored scored states only after scoring is done.
+            visual = rt.make_env(dataset, render=True, seed=case["seed"])
+            try:
+                rt.reset_source(visual, states, xml, meta)
+                rendered = []
+                for state in frames:
+                    visual.sim.set_state_from_flattened(state)
+                    visual.sim.forward()
+                    rendered.append(visual.sim.render(512, 512, camera_name="robot0_agentview_left")[::-1])
+                result["_frames"] = rendered
+                result["visualization"] = "stored scored states, rendered after action rollout"
+            finally:
+                visual.close()
     except Exception as exc:
+        result["outcome"] = "invalid"
         result["execution_error"] = f"{type(exc).__name__}: {exc}"
     finally:
         if env is not None:
@@ -277,6 +291,26 @@ def main():
     if len(selected) != 1:
         parser.error("case must identify one item")
     args.output_root.mkdir(parents=True, exist_ok=False)
+    if selected[0].get("branch_frame") is None or "displacement_m" not in selected[0]:
+        import semantic_runtime as rt
+        case = dict(selected[0])
+        if case.get("branch_frame") is None:
+            transition = rt.detect_transition(args.dataset, case["episode"], config)
+            case["branch_frame"] = transition.branch_frame
+            case["recovery_anchor_frame"] = transition.release_frame
+        if "displacement_m" not in case:
+            states, actions, meta, xml = rt.load_source(args.dataset, case["episode"])
+            probe = rt.make_env(args.dataset, seed=case["seed"])
+            try:
+                rt.reset_source(probe, states, xml, meta)
+                for action in actions[:case["branch_frame"]]:
+                    probe.step(action)
+                axis = rt.fixture_axis_world(probe, config)
+                case["displacement_m"] = rt.object_extent_along(probe, axis) * case["displacement_extent_fraction"]
+            finally:
+                probe.close()
+        selected = [case]
+        (args.output_root / "resolved_case.json").write_text(json.dumps(case, indent=2)+"\n")
     provenance = {"code_sha": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
                   "config_sha256": sha256_file(args.config), "cases_sha256": sha256_file(args.cases),
                   "protocol": "curated_v0", "case": selected[0]}

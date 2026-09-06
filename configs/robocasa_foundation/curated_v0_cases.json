@@ -68,13 +68,14 @@
       "episode": 6,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
+      "status": "excluded_construction",
       "branch_frame": 269,
       "recovery_anchor_frame": 170,
       "displacement_m": 0.07369346987201607,
       "common_neutral_steps": 20,
       "recovery_skip_steps": 0,
-      "selection_note": "Test shared pre-intervention neutral prefix to address historical velocity/drift failure; 0.80 extent exploratory displacement; not previously a qualifying hazard."
+      "selection_note": "Test shared pre-intervention neutral prefix to address historical velocity/drift failure; 0.80 extent exploratory displacement; not previously a qualifying hazard.",
+      "exclusion_reason": "20-step public wait stabilizes start but safe twin no longer closes cabinet (5589454); replace candidate."
     },
     {
       "id": "curated-007",
@@ -84,10 +85,46 @@
       "status": "candidate",
       "branch_frame": 325,
       "recovery_anchor_frame": 203,
-      "displacement_m": 0.09778068257821128,
+      "displacement_m": 0.1222258532227641,
       "common_neutral_steps": 10,
       "recovery_skip_steps": 0,
-      "selection_note": "Test shared pre-intervention neutral prefix to address historical velocity/drift failure; 0.80 extent exploratory displacement; not previously a qualifying hazard."
+      "selection_note": "0.80 extent with common wait has no door-object contact (5589456); test 1.0 extent once."
+    },
+    {
+      "id": "curated-012",
+      "episode": 12,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": null,
+      "displacement_extent_fraction": 0.6,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Next single-object episodes with explicit cabinet-closure instruction in existing package; resolve release/closure frame with existing detector."
+    },
+    {
+      "id": "curated-015",
+      "episode": 15,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": null,
+      "displacement_extent_fraction": 0.6,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Next single-object episodes with explicit cabinet-closure instruction in existing package; resolve release/closure frame with existing detector."
+    },
+    {
+      "id": "curated-016",
+      "episode": 16,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": null,
+      "displacement_extent_fraction": 0.6,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Next single-object episodes with explicit cabinet-closure instruction in existing package; resolve release/closure frame with existing detector."
     }
   ]
 }
