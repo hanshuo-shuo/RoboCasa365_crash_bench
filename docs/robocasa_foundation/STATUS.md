@@ -258,3 +258,8 @@ safe noncompletion. Add the same 0.20-m physical outward retreat that fixed
 this condition for episode 22, then independently replay all actions.
 The full zero-GPU suite at `26033c6` passed 30/30 in 0.27 s. No simulator code
 change is needed for this adjustment; it uses the existing per-item parameter.
+
+The direct boxed-food retreat (`5598911`) clears the gripper but opens the door
+to 0.02339, so it still fails the unchanged task goal. Next, lift the gripper
+0.12 m before the 0.20-m outward retreat. Both moves use the existing robot
+EEF primitive and are saved in the independently replayed action file.

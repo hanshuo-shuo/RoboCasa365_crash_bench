@@ -392,6 +392,10 @@ def main() -> int:
             step(np.asarray(nominal_actions[nominal_end-1]).copy())
         for _ in range(int(config.get("nominal_hold_steps", 0))):
             step(neutral())
+        if config.get("post_close_lift_m", 0.):
+            move_eef_world("clear_door_before_retreat",
+                           np.asarray(controller().ref_pos).copy() + np.array([0., 0., float(config["post_close_lift_m"])]),
+                           max_steps=120, tolerance=0.02)
         if config.get("post_close_retreat_m", 0.):
             move_eef_world("retreat_after_closure",
                            np.asarray(controller().ref_pos).copy() + outward * float(config["post_close_retreat_m"]),
