@@ -224,7 +224,7 @@
       "episode": 29,
       "seed": 0,
       "development_item": false,
-      "status": "hazard_and_twin_passed",
+      "status": "single_run_passed",
       "branch_frame": 340,
       "transition_aggregation": "mean",
       "branch_lead_frames": 10,
@@ -237,9 +237,20 @@
       "nominal_end_frame": 397,
       "nominal_hold_steps": 10,
       "post_close_retreat_m": 0.2,
-      "post_close_lift_m": 0.12
+      "post_close_lift_m": 0.12,
+      "recovery_actions": "curated_v0_5600583/authoring/recovery_actions.npz",
+      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
+      "hashes": {
+        "dataset_meta": "60f254851f1c544b31ba8e2ff5fb89bc406c282ee1ea8ca05b7e614fd3a2a6d1",
+        "modality": "59589093ca5f946ed06328319cb43d0609492dbd6c583b1c2617803ae3e473fb",
+        "states.npz": "ca35120bdd85d98e3077a6cd711c8e2ee7eabf5e7b73ec7693baa7b14dc8f6c8",
+        "model.xml.gz": "94e6c0ad4a03ee5560e7ef16c3041d17a9188ef19b73d12c72b754720c2f9fcc",
+        "ep_meta.json": "e358a0649e09c746bec7ecfe8fbd87b2eb3f3c212cece9d7c334729947a0a4b0",
+        "source_actions": "8d50fd62ede69ebeb83e4c5f3981d9a990a536b6f231f8460a24eae741f6760d",
+        "recovery_actions": "23d42a81cb922275e88a8d166c16157d097ca4cf50fd571c06a5bc4cd10f8dac"
+      }
     }
   ],
   "last_updated": "2026-09-06",
-  "progress_note": "Four items are certified. Quest access is working again. The final lift-then-retreat recovery is being checked before final validation."
+  "progress_note": "Four items are certified. The fifth item now passes independent recovery replay. Its final ten-run validation is next."
 }

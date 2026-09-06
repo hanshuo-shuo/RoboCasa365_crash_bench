@@ -55,6 +55,12 @@ def main():
         ('curated_v0_5589647/recovery_0.gif', 'last', '4. The robot closes the cabinet.', 'The full recovery is safe and meets the unchanged FoodCleanup task goal.'),
         ('curated_v0_5584953/recovery_0.gif', 'last', 'Earlier failure: the cabinet stayed open.', 'That replay did not complete the task. Its failure was kept in the record and was not counted as recovery.'),
     ]
+    boxed = next((c for c in manifest['cases'] if c['episode'] == 29 and c['status'] == 'certified'), None)
+    if boxed:
+        relative = boxed['certification_output'] + '/recovery_0.gif'
+        if (args.artifact_root / relative).exists():
+            pictures.append((relative, 'last', 'Final item: the gripper clears the closed cabinet.',
+                             'For the boxed-food item, the robot lifts its gripper before moving back. The door stays closed and the original task is complete.'))
     for relative, frame, title, caption in pictures:
         path = args.artifact_root / relative
         with Image.open(path) as source:

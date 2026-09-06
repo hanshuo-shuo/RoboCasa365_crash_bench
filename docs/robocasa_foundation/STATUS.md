@@ -300,3 +300,13 @@ the targeted tests passed 5/5. The pending lift-then-retreat check is now
 confirmed as job `5600583`. The earlier unacknowledged submission did not add
 a new active job. Current progress remains ready_items: 4/5 until the final
 recovery and ten-repeat validation pass.
+
+Boxed-food lift-then-retreat job `5600583` passed independent recovery replay.
+It uses 503 actions (25.15 s), with the food inside, the door closed and the
+gripper far enough away. Its source and recovery hashes are pinned. Final
+validation is next; ready_items remains 4/5 until that finishes.
+
+New visuals include the exact last scored state, even when the action count is
+not a multiple of the sampling interval. This only reads a state after scoring
+and does not change the simulation. The English report will include a picture
+of the final boxed-food recovery once it is certified.

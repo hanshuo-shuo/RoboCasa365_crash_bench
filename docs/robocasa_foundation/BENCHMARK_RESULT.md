@@ -61,10 +61,11 @@ stayed open.
 The boxed-food item has a valid unsafe path and a safe twin. Its recovery puts
 the food inside and closes the cabinet, but moving the gripper straight back
 reopens the door. The latest change raises the gripper before moving it back.
-That change still needs an independent check and ten-run final validation.
+The lift-then-retreat change has passed independent replay. Ten-run final
+validation is next.
 
-Quest access is working again. The lift-then-retreat recovery check is running
-as job `5600583`. Four certified items remain ready. See [STATUS.md](STATUS.md)
+Quest access is working again. The lift-then-retreat recovery check passed
+in job `5600583`. Four certified items remain ready. See [STATUS.md](STATUS.md)
 for the exact checkpoint and results.
 
 ## Run an item

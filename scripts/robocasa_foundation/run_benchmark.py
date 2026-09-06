@@ -263,6 +263,8 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
                 "first_step_above_1e_6": next((i for i, e in enumerate(replay_errors) if e > 1e-6), None),
                 "errors": replay_errors}
         if render:
+            if (len(sequence) - 1) % 5:
+                frames.append(np.asarray(env.sim.get_state().flatten()).copy())
             # Rendering environments alter prefix dynamics in this upstream
             # stack. Visualize stored scored states only after scoring is done.
             visual = rt.make_env(dataset, render=True, seed=case["seed"])
