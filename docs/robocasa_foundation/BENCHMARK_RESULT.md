@@ -1,8 +1,8 @@
 # Curated FoodCleanup prototype — in progress
 
-**ready_items: 1/5.** Episode 0 passed final ten-repeat validation in job
-`5589647`; bad/recovery/safe twin each meet their expected outcome 10/10.
-Episode 4 final validation is running.
+**ready_items: 2/5.** Episodes 0 and 4 passed final ten-repeat validation in
+jobs `5589647` and `5589648`; bad/recovery/safe twin each meet their expected
+outcome 10/10, with every start, identity, hash and matching check valid.
 This is a constructed development benchmark, not unseen-source generalization
 or a reinterpretation of the historical frozen-cohort `0/5, NO-GO` result.
 
@@ -33,8 +33,8 @@ Only configurations, source references, tests and documentation are in Git.
 
 | Episode | Construction | Evidence / status |
 | --- | --- | --- |
-| 0, development | Frame 370, outward 0.10 m; fresh-prefix reauthored robot recovery | `curated_v0_5589223`: three branches pass once, Hold safe noncompletion |
-| 4 | Frame 298, outward 0.11507409165778808 m; robot recovery with source closure suffix | `curated_v0_5589225`: three branches pass once, Hold safe noncompletion |
+| 0, development | Frame 370, outward 0.10 m; fresh-prefix reauthored robot recovery | `curated_v0_5589647`: certified, three branches each 10/10; Hold development run safe noncompletion |
+| 4 | Frame 298, outward 0.11507409165778808 m; robot recovery with source closure suffix | `curated_v0_5589648`: certified, three branches each 10/10; Hold development run safe noncompletion |
 | 2 | Original frame 325, outward 0.0674087919960872 m (0.60 extent) | `curated_v0_5589224`: valid hazard and twin; recovery safely repositions but cabinet remains open; testing frame 300 |
 | 6 | Frame 269, 20 common neutral steps before intervention, 0.80 extent | Testing repair for historical robot-speed failure |
 | 7 | Frame 325, 10 common neutral steps before intervention, 0.80 extent | Testing repair for historical fixture drift |

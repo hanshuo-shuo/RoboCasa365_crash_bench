@@ -156,7 +156,13 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
                 result["common_context_qpos"] = context_qpos.tolist()
                 result["common_context_qvel"] = context_qvel.tolist()
                 if branch != "safe_twin":
-                    rt.edit_outward(instance, rt.fixture_axis_world(instance, config), case["displacement_m"])
+                    axis = rt.fixture_axis_world(instance, config)
+                    if case.get("lateral_displacement_m", 0.):
+                        translation = axis * case["displacement_m"]
+                        translation += np.cross(axis, [0., 0., 1.]) * case["lateral_displacement_m"]
+                        rt.edit_outward(instance, translation, 1.0)
+                    else:
+                        rt.edit_outward(instance, axis, case["displacement_m"])
                 target_joint = instance.objects["food0"].joints[0]
                 first, last = instance.sim.model.get_joint_qpos_addr(target_joint)
                 changed = np.asarray(instance.sim.data.qpos) - context_qpos
@@ -317,6 +323,9 @@ def main():
                                        for bits in itertools.product((0,1), repeat=3))
                     front = max(float(point @ axis) for point in corners)
                     object_front = max(float(point @ axis) for point in rt.target_bbox_points(probe))
+                    if case.get("center_lateral"):
+                        side = np.cross(axis, [0., 0., 1.])
+                        case["lateral_displacement_m"] = float((np.mean(corners, axis=0)-rt.object_pose(probe)[0]) @ side)
                     case["source_front_clearance_m"] = front-object_front
                     case["displacement_m"] = front-object_front+case["front_protrusion_m"]
                 else:
@@ -336,7 +345,8 @@ def main():
                          "axis_fixture_frame": config["critical_margin_search"]["axis_fixture_frame"],
                          "settle_steps": 10, "contact_persistence_frames": 3,
                          "seed": case["seed"], "common_neutral_steps": case.get("common_neutral_steps", 0),
-                         "closure_tail_steps": case.get("closure_tail_steps", 0)}
+                         "closure_tail_steps": case.get("closure_tail_steps", 0),
+                         "lateral_displacement_m": case.get("lateral_displacement_m", 0.)}
         author_config_path = args.output_root / "author_config.yaml"
         author_config_path.write_text(yaml.safe_dump(author_config))
         author_root = args.output_root / "authoring"

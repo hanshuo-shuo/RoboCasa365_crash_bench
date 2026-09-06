@@ -1,6 +1,6 @@
 {
   "protocol": "curated_v0",
-  "ready_items": 1,
+  "ready_items": 2,
   "cases": [
     {
       "id": "curated-000",
@@ -47,7 +47,7 @@
       "episode": 4,
       "seed": 0,
       "development_item": false,
-      "status": "single_run_passed",
+      "status": "certified",
       "branch_frame": 298,
       "recovery_anchor_frame": 199,
       "displacement_m": 0.11507409165778808,
@@ -64,7 +64,9 @@
         "recovery_actions": "fc31a74acb4d7676c861e08e77cfa79d059df4bb135392de69dd25b098aa4f85"
       },
       "recovery_actions": "curated_v0_5589225/authoring/recovery_actions.npz",
-      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85"
+      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
+      "certification_output": "curated_v0_5589648",
+      "certification_code_sha": "2a69831"
     },
     {
       "id": "curated-006",
@@ -113,13 +115,14 @@
       "episode": 15,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
+      "status": "hazard_and_twin_passed",
       "branch_frame": 317,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
       "selection_note": "Prior extent-fraction position stayed safe; use measured cabinet-front clearance plus 15 mm protrusion, then validate once.",
       "recovery_anchor_frame": 211,
-      "front_protrusion_m": 0.015
+      "front_protrusion_m": 0.015,
+      "displacement_m": 0.08879626039957993
     },
     {
       "id": "curated-016",
@@ -130,21 +133,24 @@
       "branch_frame": 347,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Prior extent-fraction position stayed safe; use measured cabinet-front clearance plus 15 mm protrusion, then validate once.",
+      "selection_note": "15-mm front protrusion initially contacts open door at original lateral position (5590546); center target laterally inside cabinet, then revalidate.",
       "recovery_anchor_frame": 152,
-      "front_protrusion_m": 0.015
+      "front_protrusion_m": 0.015,
+      "center_lateral": true
     },
     {
       "id": "curated-022",
       "episode": 22,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
-      "branch_frame": null,
+      "status": "hazard_and_twin_passed",
+      "branch_frame": 369,
       "front_protrusion_m": 0.015,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Same food type as development episode (sweet potato), explicit cabinet-closure task in existing package; measured front protrusion."
+      "selection_note": "Same food type as development episode (sweet potato), explicit cabinet-closure task in existing package; measured front protrusion.",
+      "recovery_anchor_frame": 249,
+      "displacement_m": 0.1609387672622068
     }
   ]
 }

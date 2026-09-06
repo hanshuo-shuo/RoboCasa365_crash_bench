@@ -241,7 +241,10 @@ def main() -> int:
         rotation = T.euler2mat([0.0, 0.0, env.cab.rot])
         outward = rotation @ local_out
         inward = -outward
-        qpos[:3] += outward * args.distance
+        translation = outward * args.distance
+        if config.get("lateral_displacement_m", 0.):
+            translation += np.cross(outward, [0., 0., 1.]) * float(config["lateral_displacement_m"])
+        qpos[:3] += translation
         env.sim.data.set_joint_qpos(joint, qpos)
         env.sim.forward()
         for _ in range(int(config["settle_steps"])):

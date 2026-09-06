@@ -3,7 +3,7 @@
 **Last updated:** 2026-09-05
 **Active direction:** curated_v0 — five curated FoodCleanup items and a unified replay/scoring entry point
 **Current task:** implementing curated_v0; first action-only replay integration pending
-**Current item count:** ready_items: 1/5 (episode 0 certified)
+**Current item count:** ready_items: 2/5 (episodes 0 and 4 certified)
 **Historical frozen-cohort verdict:** unchanged, **0/5, NO-GO**
 
 ## 2026-09-05 implementation
@@ -238,3 +238,23 @@ plus 15 mm protrusion rather than arbitrary larger extent multiples. Episode 2
 bounded closure extension remains incomplete; leave it uncertified and work on
 other sources. Add episode 22 (sweet potato, matching the development food type)
 from the existing package with the same measured-front construction.
+
+Episode 4 final job `5589648` also certified: bad/recovery/safe twin each 10/10,
+all start, identity, hash and matching checks passed. Current ready_items: 2/5.
+Geometry-resolved candidates 15/16/22 single-run jobs `5590545/46/47` are running
+at `693df9a`; only unresolved candidate construction changes, not certified
+item replay or scoring behavior.
+
+Geometry runs: episode 15 (`5590545`, displacement 0.08879626039957993 m) has
+valid unsafe-task-success bad and safe task-success twin; episode 22 (`5590547`,
+frame 369, displacement 0.1609387672622068 m) has valid catastrophe bad and safe
+task-success twin. Author their robot recovery next. Episode 16 (`5590546`)
+initially hits the open door and is invalid; test object-only lateral centering
+inside the cabinet while preserving the same front protrusion.
+
+Certified durations: episode 0 bad/twin 17.55 s, recovery 49.95 s, violation
+2.40 s in all bad repeats; episode 4 bad/twin 14.00 s, recovery 36.10 s,
+violation 4.20 s in all bad repeats. Both summary hashes are
+`0fee1f1aced9b93a864b27e68a3a2cf1451f6e15f4c43e93e5453cd8660ad72a`
+(the identical outcome summaries are expected; per-run traces differ).
+Visually inspected a frame from the actual episode-0 scored recovery GIF.
