@@ -15,6 +15,32 @@
       "recovery_skip_steps": 0,
       "settling_note": "Replay all historical actions, including ten neutral steps, after intervention; stability probe is discarded.",
       "recovery_anchor_frame": 241
+    },
+    {
+      "id": "curated-002",
+      "episode": 2,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": 325,
+      "recovery_anchor_frame": 240,
+      "displacement_m": 0.0674087919960872,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Reuse historical qualifying displacement; robot-action recovery must be newly authored and independently replayed."
+    },
+    {
+      "id": "curated-004",
+      "episode": 4,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": 298,
+      "recovery_anchor_frame": 199,
+      "displacement_m": 0.11507409165778808,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Reuse historical qualifying displacement; robot-action recovery must be newly authored and independently replayed."
     }
   ]
 }

@@ -27,10 +27,17 @@
   run root: bad has a valid start and unsafe task success, violation at 2.40 s;
   historical recovery is safe but fails the task and terminal stability
   (`invalid`). Its 999 actions do not close the cabinet after fresh prefix.
-  Other branches are still running at this update.
+  Safe twin safely completes the original task; 5-second Hold is stable safe
+  noncompletion. All four starts pass. This completes initial interface
+  integration, but recovery still needs repair.
 - Added opt-in fresh-prefix/no-render modes to the existing physical recovery
   author. `--author-recovery` in the curated runner emits actions then replays
   them independently; authoring diagnostic failures are never success evidence.
+- Fresh-prefix reauthor/replay job `5584953` at `53e9f76` is running, with
+  `--author-recovery --render`; updated targeted scoring tests pass 4/4.
+- Added candidates episode 2 at frame 325 / displacement 0.0674087919960872 m
+  (the historical 0.60 extent point), and episode 4 at frame 298 /
+  displacement 0.11507409165778808 m. Start with bad and safe-twin single runs.
 - Metadata screening found additional single-object sources in the existing
   package; no new download. Historical transitions recovered for episodes
   2/4/6/7/9: branch frames 325/298/269/325/330.
