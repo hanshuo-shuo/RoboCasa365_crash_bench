@@ -92,7 +92,7 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
 
         def build(render=False):
             np.random.seed(case["seed"])
-            instance = rt.make_env(dataset, render=render)
+            instance = rt.make_env(dataset, render=render, seed=case["seed"])
             try:
                 rt.reset_source(instance, states, xml, meta)
                 for action in actions[:frame]:
@@ -124,8 +124,12 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
             and difference["object_rotation_error_rad"] <= tolerance["object_rotation_rad"]
             and difference["fixture_openness_error"] <= tolerance["fixture_openness"])
         # The probe above is discarded; witness starts from a fresh full prefix.
+        reference_states = None
         if branch == "recovery":
-            sequence = np.load(files["recovery_actions"])["actions"][case.get("recovery_skip_steps", 0):]
+            with np.load(files["recovery_actions"]) as archive:
+                sequence = archive["actions"][case.get("recovery_skip_steps", 0):]
+                if "replay_states" in archive and len(archive["replay_states"]):
+                    reference_states = archive["replay_states"][case.get("recovery_skip_steps", 0):]
         elif branch == "hold":
             sequence = np.repeat(neutral[None], config["hold_steps"], axis=0)
         else:
@@ -143,8 +147,12 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
         predicate.reset({"fixture_openness": rt.fixture_openness(env),
                          "object_position": position, "object_quaternion_wxyz": quaternion})
         trace, frames = [], []
+        replay_errors = []
         for index, action in enumerate(sequence):
             env.step(action)
+            if reference_states is not None:
+                actual = np.asarray(env.sim.get_state().flatten())
+                replay_errors.append(float(np.max(np.abs(actual-reference_states[index]))))
             position, quaternion = rt.object_pose(env)
             measurement = predicate.update({"dt_s": 1 / frequency, "sim_time_s": (index + 1) / frequency,
                 "contacts": rt.disallowed_contacts(env), "fixture_openness": rt.fixture_openness(env),
@@ -166,6 +174,11 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
                       metrics=measurement.details, trace=trace,
                       outcome=score(start_valid=result["start_audit"]["valid"], identity_valid=result["identity_valid"],
                                     task_success=success, crash=measurement.value, stable_terminal=stable))
+        if replay_errors:
+            result["author_replay_state_diagnostic"] = {
+                "maximum_absolute_error": max(replay_errors),
+                "first_step_above_1e_6": next((i for i, e in enumerate(replay_errors) if e > 1e-6), None),
+                "errors": replay_errors}
         if render:
             result["_frames"] = frames
     except Exception as exc:
@@ -185,14 +198,15 @@ def main():
     parser.add_argument("--artifact-root", type=Path, required=True)
     parser.add_argument("--branches", nargs="+", choices=["bad", "recovery", "safe_twin", "hold"], default=["bad", "recovery", "safe_twin", "hold"])
     parser.add_argument("--repeats", type=int, default=1)
+    parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--render", action="store_true")
     parser.add_argument("--author-recovery", action="store_true",
                         help="Emit fresh-prefix robot actions using the existing author, then independently replay")
     args = parser.parse_args()
     import yaml
-    if args.repeats < 1:
-        parser.error("repeats must be positive")
+    if args.repeats < 1 or args.workers < 1:
+        parser.error("repeats and workers must be positive")
     config = yaml.safe_load(args.config.read_text())
     cases = json.loads(args.cases.read_text())["cases"]
     selected = [case for case in cases if case["id"] == args.case]
@@ -226,17 +240,32 @@ def main():
         case.get("hashes", {}).pop("recovery_actions", None)
         (args.output_root / "authored_case.json").write_text(json.dumps(case, indent=2)+"\n")
         selected = [case]
+    payloads = [(args.dataset, args.artifact_root, selected[0], config, branch, repeat,
+                 args.render and repeat == 0)
+                for branch in args.branches for repeat in range(args.repeats)]
     results = []
-    for branch in args.branches:
-        for repeat in range(args.repeats):
-            result = run_case(args.dataset, args.artifact_root, selected[0], config, branch, repeat, args.render and repeat == 0)
-            frames = result.pop("_frames", None)
-            if frames:
-                import imageio.v2 as imageio
-                imageio.mimsave(args.output_root / f"{branch}_{repeat}.gif", frames, duration=.25, loop=0)
-            (args.output_root / f"{branch}_{repeat}.json").write_text(json.dumps(result, indent=2)+"\n")
-            results.append(result)
-            print(json.dumps({k: v for k, v in result.items() if k not in ("trace", "hashes")}), flush=True)
+
+    def save(result):
+        branch, repeat = result["branch"], result["repeat"]
+        frames = result.pop("_frames", None)
+        if frames:
+            import imageio.v2 as imageio
+            imageio.mimsave(args.output_root / f"{branch}_{repeat}.gif", frames, duration=.25, loop=0)
+        (args.output_root / f"{branch}_{repeat}.json").write_text(json.dumps(result, indent=2)+"\n")
+        results.append(result)
+        print(json.dumps({k: v for k, v in result.items() if k not in ("trace", "hashes")}), flush=True)
+
+    if args.workers == 1:
+        for payload in payloads:
+            save(run_case(*payload))
+    else:
+        from concurrent.futures import ProcessPoolExecutor, as_completed
+        import multiprocessing
+        with ProcessPoolExecutor(max_workers=args.workers,
+                                 mp_context=multiprocessing.get_context("spawn")) as pool:
+            futures = [pool.submit(run_case, *payload) for payload in payloads]
+            for future in as_completed(futures):
+                save(future.result())
     summary = summarize(results)
     (args.output_root / "summary.json").write_text(json.dumps(summary, indent=2)+"\n")
     return int(any(r["execution_error"] for r in results))

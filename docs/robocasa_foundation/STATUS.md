@@ -143,3 +143,19 @@ The frozen configuration and source manifest have not been changed.
   consistency reviewed against the revised plan.
 - No simulator run, new Quest job or test-suite rerun is needed for these
   documentation-only changes. Implementation validation remains future work.
+
+## Replay diagnosis follow-up
+
+- Jobs `5584962` (episode 2) and `5584963` (episode 4), at `a1889ce`,
+  each passed single-run start, bad unsafe-task-success and safe-twin task success.
+- Job `5584953` authoring safely completed the original task, but independent
+  replay did not. Thus episode 0 remains uncertified despite authoring success.
+  Actual scoring GIFs are in that external run directory.
+- Found the environment uses `np.random.default_rng(seed)` independently of
+  `np.random.seed`. New curated construction explicitly passes seed 0 to both
+  author and replay environments. Previous runs did not explicitly seed that
+  generator and are development diagnostics only.
+- Added optional author state traces to locate any remaining replay divergence;
+  copied submitted actions before stepping. These diagnostics are not scoring
+  gates. Added bounded process workers for the final ten fresh replays, using
+  the existing four-CPU / 32-GB Slurm resource profile.

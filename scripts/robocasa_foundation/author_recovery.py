@@ -59,8 +59,11 @@ def main() -> int:
         has_offscreen_renderer=not args.no_render,
         use_camera_obs=False,
     )
+    if args.fresh_prefix:
+        kwargs["seed"] = 0
     env = robosuite.make(**kwargs)
     low_level_actions: list[np.ndarray] = []
+    replay_states: list[np.ndarray] = []
     primitive_records: list[dict[str, object]] = []
     frames = []
 
@@ -96,8 +99,11 @@ def main() -> int:
         return action
 
     def step(action, force_frame=False):
+        recorded_action = np.asarray(action).copy()
         env.step(action)
-        low_level_actions.append(np.asarray(action).copy())
+        low_level_actions.append(recorded_action)
+        if args.fresh_prefix:
+            replay_states.append(np.asarray(env.sim.get_state().flatten()).copy())
         capture(force_frame)
 
     def move_eef_world(
@@ -402,6 +408,7 @@ def main() -> int:
         np.savez_compressed(
             args.output_root / "recovery_actions.npz",
             actions=np.asarray(low_level_actions),
+            replay_states=np.asarray(replay_states),
         )
         if frames:
             imageio.mimsave(args.output_root / "recovery_witness.gif", frames, duration=0.12, loop=0)

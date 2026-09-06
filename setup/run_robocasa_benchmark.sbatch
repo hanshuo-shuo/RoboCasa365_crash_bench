@@ -3,8 +3,8 @@
 #SBATCH --account=p33100
 #SBATCH --partition=short
 #SBATCH --time=02:00:00
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=16G
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32G
 set -euo pipefail
 module load git/2.47.0-gcc-12.4.0
 module load mesa/23.3.6-gcc-12.4.0
@@ -18,5 +18,5 @@ export MUJOCO_GL=osmesa
 export PYTHONPATH="$PWD:$ROBOCASA_READER_ROOT"
 "$ROBOCASA_FOUNDATION_ENV/bin/python" scripts/robocasa_foundation/run_benchmark.py \
   --dataset "$ROBOCASA_DATA_ROOT/v1.0/pretrain/composite/FoodCleanup/20250725/lerobot" \
-  --artifact-root "$ROBOCASA_RUN_ROOT" \
+  --artifact-root "$ROBOCASA_RUN_ROOT" --workers "${SLURM_CPUS_PER_TASK:-1}" \
   --output-root "$ROBOCASA_RUN_ROOT/curated_v0_${SLURM_JOB_ID}" "$@"

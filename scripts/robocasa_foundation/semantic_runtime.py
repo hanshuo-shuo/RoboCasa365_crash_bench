@@ -36,7 +36,7 @@ def load_source(dataset: Path, episode: int):
     return states, actions, meta, xml
 
 
-def make_env(dataset: Path, *, render: bool = False):
+def make_env(dataset: Path, *, render: bool = False, seed: int | None = None):
     import robocasa  # noqa: F401
     import robosuite
 
@@ -48,6 +48,8 @@ def make_env(dataset: Path, *, render: bool = False):
         has_offscreen_renderer=render,
         use_camera_obs=False,
     )
+    if seed is not None:
+        kwargs["seed"] = seed
     return robosuite.make(**kwargs)
 
 
