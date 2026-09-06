@@ -38,32 +38,39 @@ export MUJOCO_GL=egl
 
 Do not download dependencies or assets inside that job.
 
-## Current work: curated benchmark prototype
+## Curated benchmark: five ready items
 
-The 2026-09-04 revision of
-[`CrashBench_Codex_Foundation_Execution_Plan.md`](../CrashBench_Codex_Foundation_Execution_Plan.md)
-targets five curated FoodCleanup items and one replay/scoring entry point.
-The curated runner and Slurm wrapper now exist; item validation is in progress.
-Set `ROBOCASA_RUN_ROOT` and `ROBOCASA_READER_ROOT` in the ignored paths file,
-then run `sbatch setup/run_robocasa_benchmark.sbatch --case curated-000`.
-This defaults to one replay each of bad, recovery, safe twin and Hold.
-Use `--repeats 10` only after the candidate passes development checks.
+The `curated_v0` prototype is complete: episodes 0, 4, 16, 22 and 29 each passed
+ten fresh runs of bad, robot recovery and safe twin. The item list and score
+settings are frozen. See
+[`BENCHMARK_RESULT.md`](../docs/robocasa_foundation/BENCHMARK_RESULT.md) for the
+simple English report and
+[`STATUS.md`](../docs/robocasa_foundation/STATUS.md) for exact jobs and versions.
 
-Start with the historical robot-action witness from `INITIAL_RESULT.md`, make
-one item run through the unified interface, then author additional items from
-the already downloaded FoodCleanup package. Per-item parameters, candidate
-exclusion and disclosed reuse of the development episode are allowed.
+Set `ROBOCASA_RUN_ROOT` and `ROBOCASA_READER_ROOT` in the ignored paths file.
+From the clean Quest main checkout:
 
-Search with one rollout per candidate; run the final ten repeats only for
-selected items. Intermediate alignment timeouts do not override safe original
-task completion. A complete recovery witness must execute through robot
-actions; direct cabinet torque remains an auxiliary diagnostic.
+```bash
+cd /gpfs/home/shv7753/RoboCasa365_crash_bench
+source setup/.robocasa_foundation_paths.sh
+sbatch --output="$ROBOCASA_RUN_ROOT/curated_v0_%j.log" \
+  setup/run_robocasa_benchmark.sbatch --case curated-029 \
+  --branches bad recovery safe_twin
+```
 
-For implementation jobs, reuse the existing environment, dependency reader,
-modules and Slurm resource choices. Use the ignored paths file and new output
-directories. Follow [`QUEST_WORKFLOW.md`](../QUEST_WORKFLOW.md) for Git-only
-synchronization. No new environment bootstrap or three-mode restart campaign
-is needed.
+Other item IDs are `curated-000`, `curated-004`, `curated-016`, and `curated-022`.
+One run per path is the default. Final validation of a changed item uses
+`--repeats 10`. Existing certificates do not need to be repeated when inputs,
+replay behavior and scoring are unchanged.
+
+`--render` creates images from stored scored states after the action rollout.
+The illustrated HTML report is built from those existing artifacts with
+`scripts/robocasa_foundation/build_progress_report.py`. It and all large outputs
+stay under the external run root, outside Git.
+
+Keep the original FoodCleanup goal. Keep future changes in a new protocol
+version. Continue to use the existing environment, reader, SSH connection and
+Git-only [Quest workflow](../QUEST_WORKFLOW.md).
 
 ## Historical frozen experiment
 

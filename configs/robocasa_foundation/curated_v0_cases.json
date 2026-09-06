@@ -1,6 +1,6 @@
 {
   "protocol": "curated_v0",
-  "ready_items": 4,
+  "ready_items": 5,
   "cases": [
     {
       "id": "curated-000",
@@ -26,7 +26,8 @@
       },
       "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
       "certification_output": "curated_v0_5589647",
-      "certification_code_sha": "2a69831"
+      "certification_code_sha": "2a698314f925f44ecbd6aea5a9fb739376ff56e9",
+      "certification_summary_sha256": "0fee1f1aced9b93a864b27e68a3a2cf1451f6e15f4c43e93e5453cd8660ad72a"
     },
     {
       "id": "curated-002",
@@ -66,7 +67,8 @@
       "recovery_actions": "curated_v0_5589225/authoring/recovery_actions.npz",
       "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
       "certification_output": "curated_v0_5589648",
-      "certification_code_sha": "2a69831"
+      "certification_code_sha": "2a698314f925f44ecbd6aea5a9fb739376ff56e9",
+      "certification_summary_sha256": "0fee1f1aced9b93a864b27e68a3a2cf1451f6e15f4c43e93e5453cd8660ad72a"
     },
     {
       "id": "curated-006",
@@ -157,7 +159,8 @@
         "recovery_actions": "66fbe3207c7df461d01b13255563730b0903032d8d3aa4780b931c303529d223"
       },
       "certification_output": "curated_v0_5595462",
-      "certification_code_sha": "77ca847"
+      "certification_code_sha": "77ca847058eb60dc40130c56d2b0db845d9dc532",
+      "certification_summary_sha256": "0fee1f1aced9b93a864b27e68a3a2cf1451f6e15f4c43e93e5453cd8660ad72a"
     },
     {
       "id": "curated-022",
@@ -185,7 +188,8 @@
         "recovery_actions": "e0cb26e4b9e0973616a2c2a40dc74022a8b9209976bf6bb297e258a8795bb4dd"
       },
       "certification_output": "curated_v0_5593399",
-      "certification_code_sha": "c048d42"
+      "certification_code_sha": "c048d42f6469e7deba5ad248500e2667d446f310",
+      "certification_summary_sha256": "de1bf7659589dd506cab44b4ca4a3a6363799d6a8e5271fc327487856382bbc4"
     },
     {
       "id": "curated-024",
@@ -224,7 +228,7 @@
       "episode": 29,
       "seed": 0,
       "development_item": false,
-      "status": "single_run_passed",
+      "status": "certified",
       "branch_frame": 340,
       "transition_aggregation": "mean",
       "branch_lead_frames": 10,
@@ -248,9 +252,26 @@
         "ep_meta.json": "e358a0649e09c746bec7ecfe8fbd87b2eb3f3c212cece9d7c334729947a0a4b0",
         "source_actions": "8d50fd62ede69ebeb83e4c5f3981d9a990a536b6f231f8460a24eae741f6760d",
         "recovery_actions": "23d42a81cb922275e88a8d166c16157d097ca4cf50fd571c06a5bc4cd10f8dac"
-      }
+      },
+      "certification_output": "curated_v0_5601419",
+      "certification_code_sha": "7c7d7d9d269f6b35e9bf637643850927f690336d",
+      "certification_summary_sha256": "de1bf7659589dd506cab44b4ca4a3a6363799d6a8e5271fc327487856382bbc4"
     }
   ],
   "last_updated": "2026-09-06",
-  "progress_note": "Four items are certified. The fifth item now passes independent recovery replay. Its final ten-run validation is next."
+  "progress_note": "All five selected items are certified. All 150 final runs passed the required outcome checks. The item list, action hashes and scoring configuration are frozen.",
+  "schema_version": "0.1.0",
+  "frozen": true,
+  "frozen_at": "2026-09-06",
+  "benchmark_case_ids": [
+    "curated-000",
+    "curated-004",
+    "curated-016",
+    "curated-022",
+    "curated-029"
+  ],
+  "source_dataset_release": "v1.0/pretrain/composite/FoodCleanup/20250725",
+  "candidate_episode_count": 12,
+  "scoring_config_sha256": "9b3018475423d77c3b59cafffffdf67a06ef7acbeda537b814106f5be2e9602a",
+  "replay_code_commit": "7c7d7d9d269f6b35e9bf637643850927f690336d"
 }
