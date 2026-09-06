@@ -21,7 +21,7 @@ passed. No run in these final checks was invalid. The bad paths for episodes
 0 and 4 also finish the task, but still count as unsafe.
 
 The evidence folders are `curated_v0_5589647/`, `curated_v0_5589648/`, and
-`curated_v0_5593399/`, under:
+`curated_v0_5593399/`, and `curated_v0_5595462/`, under:
 
 ```text
 /projects/p33100/siosio/robocasa_foundation_runs/
@@ -58,11 +58,15 @@ stayed open.
 
 ## Remaining work
 
-Episode 29 is a boxed-food candidate from the same downloaded data. Its door
-closes, but later source actions reopen it. A fixed earlier stop followed by a
-short neutral hold now passes the matched-pair check. Its robot recovery is next.
-Other failed constructions are kept in the run log. They do not count as ready.
-See [STATUS.md](STATUS.md) for exact jobs, versions and failure details.
+The boxed-food item has a valid unsafe path and a safe twin. Its recovery puts
+the food inside and closes the cabinet, but moving the gripper straight back
+reopens the door. The latest change raises the gripper before moving it back.
+That change still needs an independent check and ten-run final validation.
+
+The Quest connection expired before the latest submission could be confirmed.
+The existing `/tmp/quest.sock` must be restored before work can continue on
+Quest. Four certified items remain ready. See [STATUS.md](STATUS.md) for the
+exact checkpoint and safe resume steps.
 
 ## Run an item
 
