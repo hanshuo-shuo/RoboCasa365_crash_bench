@@ -136,12 +136,12 @@
       "seed": 0,
       "development_item": false,
       "status": "candidate",
-      "branch_frame": null,
+      "branch_frame": 229,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Detect first leaf closure via mean door openness, then branch ten frames earlier; original max could hide an already-closing leaf. Revalidate original lateral position.",
+      "selection_note": "First-leaf timing fixes initial contact. At 15 mm protrusion nominal motion shifts food about 9 mm without danger; test 30 mm protrusion.",
       "recovery_anchor_frame": 152,
-      "front_protrusion_m": 0.015,
+      "front_protrusion_m": 0.03,
       "transition_aggregation": "mean",
       "branch_lead_frames": 10
     },
@@ -177,13 +177,15 @@
       "seed": 0,
       "development_item": false,
       "status": "candidate",
-      "branch_frame": null,
+      "branch_frame": 270,
       "front_protrusion_m": 0.015,
-      "common_neutral_steps": 0,
+      "common_neutral_steps": 40,
       "recovery_skip_steps": 0,
-      "selection_note": "Detect first leaf closure via mean door openness, then branch ten frames earlier; original max could hide an already-closing leaf. Revalidate original lateral position.",
+      "selection_note": "First-leaf branch has a real hazard, but natural and edited starts rotate slightly. Add 2 seconds of common neutral settling before object intervention; keep thresholds unchanged.",
       "transition_aggregation": "mean",
-      "branch_lead_frames": 10
+      "branch_lead_frames": 10,
+      "recovery_anchor_frame": 189,
+      "displacement_m": 0.1482520912705766
     }
   ]
 }

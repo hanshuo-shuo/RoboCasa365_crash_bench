@@ -185,3 +185,15 @@ The two worktrees were clean at `c048d42` when work resumed. Jobs `5593399`
 saved scores and real GIF frames. Its output goes to the external run root,
 not the Git tree. It includes the unsafe start, closing contact, physical
 recovery, completed cabinet closure, and an earlier failed replay.
+
+First-leaf results at `c048d42`: episode 16 (`5593400`) resolves to frame 229
+and has valid starts, but its 15-mm protrusion stays safe after about 9 mm of
+object motion. Next test uses 30 mm protrusion. Episode 24 (`5593401`) resolves
+to frame 270 and triggers danger, but both natural and edited starts fail only
+the rotation check (0.0130/0.0153 rad). Add 40 common neutral steps before the
+intervention to allow natural settling, then recheck both paths. No threshold
+is changed. Episode 22 final job `5593399` has completed all ten bad and recovery
+runs with expected outcomes; safe twins are still finishing at this update.
+
+The English report was built successfully with five real process pictures:
+`curated_v0_progress/report.html`. It currently reports the two certified items.
