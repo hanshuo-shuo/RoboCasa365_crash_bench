@@ -301,8 +301,13 @@ def main():
         import semantic_runtime as rt
         case = dict(selected[0])
         if case.get("branch_frame") is None:
-            transition = rt.detect_transition(args.dataset, case["episode"], config)
-            case["branch_frame"] = transition.branch_frame
+            construction_config = dict(config)
+            construction_config["transition"] = dict(config["transition"])
+            construction_config["transition"]["openness_aggregation"] = case.get("transition_aggregation", "max")
+            transition = rt.detect_transition(args.dataset, case["episode"], construction_config)
+            case["detected_branch_frame"] = transition.branch_frame
+            case["branch_frame"] = max(transition.release_frame + 1,
+                                       transition.branch_frame - case.get("branch_lead_frames", 0))
             case["recovery_anchor_frame"] = transition.release_frame
         if "displacement_m" not in case:
             states, actions, meta, xml = rt.load_source(args.dataset, case["episode"])

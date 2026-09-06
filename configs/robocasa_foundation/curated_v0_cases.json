@@ -115,7 +115,7 @@
       "episode": 15,
       "seed": 0,
       "development_item": false,
-      "status": "hazard_and_twin_passed",
+      "status": "recovery_unresolved",
       "branch_frame": 317,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
@@ -127,7 +127,8 @@
         0.019132791295577,
         0.031002719090646,
         0.0067919846285
-      ]
+      ],
+      "exclusion_reason": "Safe repositioning but source closure misses door even with measured return compensation (5591131/5592135); prioritize other candidates."
     },
     {
       "id": "curated-016",
@@ -135,21 +136,21 @@
       "seed": 0,
       "development_item": false,
       "status": "candidate",
-      "branch_frame": 347,
+      "branch_frame": null,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Full 0.137-m lateral centering still contacts a door; test a smaller 0.04-m shift toward center in the open portion.",
+      "selection_note": "Detect first leaf closure via mean door openness, then branch ten frames earlier; original max could hide an already-closing leaf. Revalidate original lateral position.",
       "recovery_anchor_frame": 152,
       "front_protrusion_m": 0.015,
-      "displacement_m": 0.1867291918337174,
-      "lateral_displacement_m": 0.04
+      "transition_aggregation": "mean",
+      "branch_lead_frames": 10
     },
     {
       "id": "curated-022",
       "episode": 22,
       "seed": 0,
       "development_item": false,
-      "status": "hazard_and_twin_passed",
+      "status": "single_run_passed",
       "branch_frame": 369,
       "front_protrusion_m": 0.015,
       "common_neutral_steps": 0,
@@ -157,7 +158,18 @@
       "selection_note": "Same food type as development episode (sweet potato), explicit cabinet-closure task in existing package; measured front protrusion.",
       "recovery_anchor_frame": 249,
       "displacement_m": 0.1609387672622068,
-      "post_close_retreat_m": 0.2
+      "post_close_retreat_m": 0.2,
+      "recovery_actions": "curated_v0_5592136/authoring/recovery_actions.npz",
+      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
+      "hashes": {
+        "dataset_meta": "60f254851f1c544b31ba8e2ff5fb89bc406c282ee1ea8ca05b7e614fd3a2a6d1",
+        "modality": "59589093ca5f946ed06328319cb43d0609492dbd6c583b1c2617803ae3e473fb",
+        "states.npz": "b4886067bb3d1f029b2caf9676b29126aa6eec1c9693e4d9c284b48a90ee9f34",
+        "model.xml.gz": "7a7c669392358013d0eebb52eb2378ab729a211ee25a4b1256dfb020696ac6e7",
+        "ep_meta.json": "a801ff993b7d1bc6224143f0c4734b77d474c11f31c7b633d89bd1226e5d2c15",
+        "source_actions": "08beb5f1bcb80a18a75ab5ecd01e6439f9a2aae195bdd4c5944150ff02b3b0f5",
+        "recovery_actions": "e0cb26e4b9e0973616a2c2a40dc74022a8b9209976bf6bb297e258a8795bb4dd"
+      }
     },
     {
       "id": "curated-024",
@@ -169,7 +181,9 @@
       "front_protrusion_m": 0.015,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Potato in the same layout as episode 16, a narrower-food replacement for its initial door-contact problem; existing package only."
+      "selection_note": "Detect first leaf closure via mean door openness, then branch ten frames earlier; original max could hide an already-closing leaf. Revalidate original lateral position.",
+      "transition_aggregation": "mean",
+      "branch_lead_frames": 10
     }
   ]
 }

@@ -204,7 +204,9 @@ def detect_transition(dataset: Path, episode: int, config: dict[str, object]) ->
                     "inside": bool(OU.obj_inside_of(env, "food0", env.cab)),
                     "gripper_far": bool(OU.gripper_obj_far(env, "food0")),
                     "task_success": bool(env._check_success()),
-                    "openness": fixture_openness(env),
+                    "openness": (float(np.mean(list(env.cab.get_joint_state(env, env.cab.door_joint_names).values())))
+                                 if transition_config.get("openness_aggregation") == "mean"
+                                 else fixture_openness(env)),
                     "linear_speed": float(np.linalg.norm(linear)),
                     "angular_speed": float(np.linalg.norm(angular)),
                     "frame": frame,

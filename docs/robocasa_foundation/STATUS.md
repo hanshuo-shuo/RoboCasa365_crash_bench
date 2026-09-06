@@ -34,7 +34,7 @@ videos stay there, outside Git. Certified case/action hashes are in
 | Episode | Current construction / evidence | Next action |
 | --- | --- | --- |
 | 15, apple | Frame 317, displacement 0.08879626039957993 m; measured front gap + 15 mm; bad and safe twin pass in `5590545` | `5591131` repositions safely but misses door closure; test measured return-position compensation |
-| 22, sweet potato | Frame 369, displacement 0.1609387672622068 m; bad catastrophe and safe twin pass in `5590547` | `5591132` closes safely but gripper is not far enough; add physical outward retreat |
+| 22, sweet potato | Frame 369, displacement 0.1609387672622068 m; bad catastrophe and safe twin pass in `5590547` | `5592136` completes original goal after physical retreat; pinned for final validation |
 | 16, pear | Frame 347; 0.60 extent is safe. Front gap + 15 mm at original lateral position collides with open door at start (`5590546`) | Full centering still initially contacts a door (`5591133`); test smaller 4-cm lateral shift |
 | 2, mango | 0.60 extent gives valid hazard/twin. Recovery repositions safely but leaves door open at frames 325 and 300; 20 extra demonstrated closing actions still do not finish | Deprioritized; no certified recovery |
 | 6, bell pepper | 20 public neutral steps repair start speed but break nominal safe-twin closure (`5589454`) | Excluded construction; do not repeat ten times |
@@ -157,3 +157,19 @@ test a smaller 0.04-m shift toward the cabinet center.
 Added episode 24 (potato, same layout as 16) as a narrower-food replacement
 candidate, using the same measured-front construction. Distinct episodes, not
 layouts, are the counting unit.
+
+## Third complete candidate and first-leaf branch timing
+
+At `3bfcdfa`, `5592136` independently replays episode 22 recovery successfully
+(691 robot actions, 34.55 s). Pinned its artifact and source hashes for final
+validation. Episode 15 compensation (`5592135`) still misses closure; deprioritize
+rather than increasing timeout. Episode 16's 4-cm shift (`5592137`) remains an
+invalid initial contact. Episode 24 (`5592138`) also has an invalid moving/contact
+start at the detected late branch.
+
+The old candidate detector uses maximum door openness, which can hide one leaf
+closing while the other stays open. Episodes 16/24 will use mean leaf openness
+for candidate detection and branch ten frames earlier, with the original lateral
+position. This option affects only unresolved candidate construction; fixed
+certified branch frames, replay and scoring remain unchanged. Existing max-based
+historical detection remains the default.
