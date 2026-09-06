@@ -57,8 +57,8 @@ stayed open.
 
 ## Remaining work
 
-Episode 16 now has a valid unsafe path and a safe twin; its robot recovery is
-next. Episode 27 is a new sweet-potato candidate from the same downloaded data.
+Episode 16 has passed a single run of all three paths and is ready for ten-run
+validation. Episode 29 is a new boxed-food candidate from the same downloaded data.
 Other failed constructions are kept in the run log. They do not count as ready.
 See [STATUS.md](STATUS.md) for exact jobs, versions and failure details.
 

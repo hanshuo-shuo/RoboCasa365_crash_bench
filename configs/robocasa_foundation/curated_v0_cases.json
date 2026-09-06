@@ -135,7 +135,7 @@
       "episode": 16,
       "seed": 0,
       "development_item": false,
-      "status": "hazard_and_twin_passed",
+      "status": "single_run_passed",
       "branch_frame": 229,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
@@ -144,7 +144,18 @@
       "front_protrusion_m": 0.03,
       "transition_aggregation": "mean",
       "branch_lead_frames": 10,
-      "displacement_m": 0.201725738528834
+      "displacement_m": 0.201725738528834,
+      "recovery_actions": "curated_v0_5594412/authoring/recovery_actions.npz",
+      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
+      "hashes": {
+        "dataset_meta": "60f254851f1c544b31ba8e2ff5fb89bc406c282ee1ea8ca05b7e614fd3a2a6d1",
+        "modality": "59589093ca5f946ed06328319cb43d0609492dbd6c583b1c2617803ae3e473fb",
+        "states.npz": "234375e55b66af2e0d45e27dc28215811ae040b708448240640b616862781e15",
+        "model.xml.gz": "174fab6f6d5f011706ed8976b08ed17d7ce66bfa15666cecc8d9c09c80665cac",
+        "ep_meta.json": "95710146489aaa0966b03d9eec0ae2d268bb2abdc5c9c2d9951cce0ef1364289",
+        "source_actions": "c64c0adfe08ae43714b45796fbe30376bc9e6ef72afc6903b54ace220d7d4164",
+        "recovery_actions": "66fbe3207c7df461d01b13255563730b0903032d8d3aa4780b931c303529d223"
+      }
     },
     {
       "id": "curated-022",
@@ -196,6 +207,21 @@
       "episode": 27,
       "seed": 0,
       "development_item": false,
+      "status": "excluded_construction",
+      "branch_frame": null,
+      "transition_aggregation": "mean",
+      "branch_lead_frames": 10,
+      "front_protrusion_m": 0.015,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Another sweet-potato episode from the existing package; the same food type already supports certified items 0 and 22.",
+      "exclusion_reason": "Natural safe twin does not complete the original task under fresh replay (5594413)."
+    },
+    {
+      "id": "curated-029",
+      "episode": 29,
+      "seed": 0,
+      "development_item": false,
       "status": "candidate",
       "branch_frame": null,
       "transition_aggregation": "mean",
@@ -203,7 +229,7 @@
       "front_protrusion_m": 0.015,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Another sweet-potato episode from the existing package; the same food type already supports certified items 0 and 22."
+      "selection_note": "Single boxed-food source in the existing package, same layout as 16; test whether its flat support gives a stable item."
     }
   ]
 }

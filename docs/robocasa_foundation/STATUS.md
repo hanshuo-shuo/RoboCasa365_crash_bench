@@ -33,22 +33,22 @@ videos stay there, outside Git. Certified case/action hashes are in
 
 ## Active and excluded candidates
 
-| Episode | Current construction / evidence | Next action |
+| Episode | Current evidence | Next action |
 | --- | --- | --- |
-| 15, apple | Frame 317, displacement 0.08879626039957993 m; measured front gap + 15 mm; bad and safe twin pass in `5590545` | `5591131` repositions safely but misses door closure; test measured return-position compensation |
-| 22, sweet potato | Frame 369, displacement 0.1609387672622068 m; bad catastrophe and safe twin pass in `5590547` | `5592136` completes original goal after physical retreat; pinned for final validation |
-| 16, pear | Frame 347; 0.60 extent is safe. Front gap + 15 mm at original lateral position collides with open door at start (`5590546`) | Full centering still initially contacts a door (`5591133`); test smaller 4-cm lateral shift |
-| 2, mango | 0.60 extent gives valid hazard/twin. Recovery repositions safely but leaves door open at frames 325 and 300; 20 extra demonstrated closing actions still do not finish | Deprioritized; no certified recovery |
-| 6, bell pepper | 20 public neutral steps repair start speed but break nominal safe-twin closure (`5589454`) | Excluded construction; do not repeat ten times |
-| 7, onion | Ten public neutral steps repair drift; 0.80 and 1.0 extent have no door-object contact (`5589456`, `5589656`) | Excluded construction |
-| 12, bell pepper | Detected frame 497 has fixture drift; frame 477 fails robot speed (`5589649`, `5589903`) | Excluded construction |
-| 9, bell pepper | Historical grid found no hazard | Not mandatory; no new rollout |
+| 16, pear | Frame 229, displacement 0.201725738528834 m. Bad and twin pass. Recovery job `5594412` safely completes the task with 430 robot actions | Pinned for final ten-repeat validation |
+| 29, boxed food | New single-object source from the existing package, same layout as 16 | Test first-leaf timing and 15-mm front protrusion |
+| 2, mango | Valid hazard/twin; recovery leaves door open despite earlier timing and a bounded closing tail | Deprioritized |
+| 6, bell pepper | Common wait repairs start speed but breaks safe-twin closure | Excluded construction |
+| 7, onion | Stable public prefix; tested positions do not produce door contact | Excluded construction |
+| 12, bell pepper | Late frame has fixture drift; earlier frame fails robot speed | Excluded construction |
+| 15, apple | Valid hazard/twin; recovery does not close the cabinet after return compensation | Deprioritized |
+| 24, potato | First-leaf timing gives a hazard, but rotation is not stable even after a common wait | Excluded construction |
+| 27, sweet potato | Natural safe twin does not complete the original task (`5594413`) | Excluded construction |
+| 9, bell pepper | Historical grid found no hazard | No new run |
 
 Selection is disclosed construction within the existing 101-episode package.
-Other single-object sources were selected by explicit cabinet-closure instruction;
-episode 22 was selected for the development food type. Only distinct episodes
-count. Do not treat single-run author success or a passing hazard/twin pair as
-a certified item.
+Only distinct source episodes count. A successful author run or a passing
+hazard/twin pair is not a certified item.
 
 ## Implemented entry point and fixes
 
@@ -212,3 +212,10 @@ already passed with the same public prefix. Author recovery next. Episode 24
 still fails rotation stability after the common wait (`5594109`); exclude this
 construction. Added episode 27, another sweet-potato source in the existing
 package, using first-leaf timing and measured front protrusion.
+
+Episode 16 independent recovery (`5594412`, `069b4db`) passes with 430 actions
+and no author failures. Its hashes are pinned for final validation. Episode 27
+(`5594413`) fails natural safe-twin completion, so it is excluded. Episode 29
+is a boxed-food replacement chosen to test a flatter support shape. The simple
+English report and its five PNG pictures were exported outside the repository
+and checked; successful and failed cabinet-closure pictures were visually reviewed.
