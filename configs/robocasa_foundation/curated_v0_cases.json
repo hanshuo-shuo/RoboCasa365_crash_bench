@@ -7,14 +7,24 @@
       "episode": 0,
       "seed": 0,
       "development_item": true,
-      "status": "candidate",
+      "status": "single_run_passed",
       "branch_frame": 370,
       "displacement_m": 0.1,
       "common_neutral_steps": 0,
-      "recovery_actions": "f5_recovery_5244908/recovery/recovery_actions.npz",
+      "recovery_actions": "curated_v0_5589223/authoring/recovery_actions.npz",
       "recovery_skip_steps": 0,
       "settling_note": "Replay all historical actions, including ten neutral steps, after intervention; stability probe is discarded.",
-      "recovery_anchor_frame": 241
+      "recovery_anchor_frame": 241,
+      "hashes": {
+        "dataset_meta": "60f254851f1c544b31ba8e2ff5fb89bc406c282ee1ea8ca05b7e614fd3a2a6d1",
+        "modality": "59589093ca5f946ed06328319cb43d0609492dbd6c583b1c2617803ae3e473fb",
+        "states.npz": "235c1dd5146c1948c585412b758f5378427543033b2a45b0c3ef2a3d0c02db5a",
+        "model.xml.gz": "8ef7429c8d4787e8f2a1729688d602f1b93b0e4161acfe3783b481c109c1c2b2",
+        "ep_meta.json": "4126696509d70770201e7bb808970fd096f128a8e0da4257bc9121de1a9e440d",
+        "source_actions": "c74ef6c174705600a22a9f5bd99b031c73fb0abdcab88e07d03872a31d6d24ad",
+        "recovery_actions": "66d37c356960a00effd60cdf16e29e4b4c25161c1c136dedf77c53ca7cf1b4ad"
+      },
+      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85"
     },
     {
       "id": "curated-002",
@@ -22,25 +32,62 @@
       "seed": 0,
       "development_item": false,
       "status": "candidate",
-      "branch_frame": 325,
+      "branch_frame": 300,
       "recovery_anchor_frame": 240,
       "displacement_m": 0.0674087919960872,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Reuse historical qualifying displacement; robot-action recovery must be newly authored and independently replayed."
+      "selection_note": "At frame 325 the object was safely repositioned but cabinet remained 0.197 open. Try earlier frame 300 with shorter reverse/return motion; do not increase timeout."
     },
     {
       "id": "curated-004",
       "episode": 4,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
+      "status": "single_run_passed",
       "branch_frame": 298,
       "recovery_anchor_frame": 199,
       "displacement_m": 0.11507409165778808,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Reuse historical qualifying displacement; robot-action recovery must be newly authored and independently replayed."
+      "selection_note": "Reuse historical qualifying displacement; robot-action recovery must be newly authored and independently replayed.",
+      "hashes": {
+        "dataset_meta": "60f254851f1c544b31ba8e2ff5fb89bc406c282ee1ea8ca05b7e614fd3a2a6d1",
+        "modality": "59589093ca5f946ed06328319cb43d0609492dbd6c583b1c2617803ae3e473fb",
+        "states.npz": "6f34b8059c7f7532d808ad0997eb29a744869eda3b4f9da5cd811d85b2f53185",
+        "model.xml.gz": "72688052cd3debc403bcca5cd4de2f85d35b907cffe8c24e7ee18e3991c66b6b",
+        "ep_meta.json": "fb92339fe445e3d6c82916ada82d644fdddf7a8ca952d8182c6fe9cb355f8301",
+        "source_actions": "3f12f5e36d32b31f55bc07456a49c121a9110a07f55fe21afe6484d2e86eb1aa",
+        "recovery_actions": "fc31a74acb4d7676c861e08e77cfa79d059df4bb135392de69dd25b098aa4f85"
+      },
+      "recovery_actions": "curated_v0_5589225/authoring/recovery_actions.npz",
+      "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85"
+    },
+    {
+      "id": "curated-006",
+      "episode": 6,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": 269,
+      "recovery_anchor_frame": 170,
+      "displacement_m": 0.07369346987201607,
+      "common_neutral_steps": 20,
+      "recovery_skip_steps": 0,
+      "selection_note": "Test shared pre-intervention neutral prefix to address historical velocity/drift failure; 0.80 extent exploratory displacement; not previously a qualifying hazard."
+    },
+    {
+      "id": "curated-007",
+      "episode": 7,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": 325,
+      "recovery_anchor_frame": 203,
+      "displacement_m": 0.09778068257821128,
+      "common_neutral_steps": 10,
+      "recovery_skip_steps": 0,
+      "selection_note": "Test shared pre-intervention neutral prefix to address historical velocity/drift failure; 0.80 extent exploratory displacement; not previously a qualifying hazard."
     }
   ]
 }

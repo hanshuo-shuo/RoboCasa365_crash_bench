@@ -60,7 +60,7 @@ def main() -> int:
         use_camera_obs=False,
     )
     if args.fresh_prefix:
-        kwargs["seed"] = 0
+        kwargs["seed"] = int(config.get("seed", 0))
     env = robosuite.make(**kwargs)
     low_level_actions: list[np.ndarray] = []
     replay_states: list[np.ndarray] = []
@@ -229,6 +229,8 @@ def main() -> int:
         if args.fresh_prefix:
             for action in nominal_actions[:branch_frame]:
                 env.step(action)
+            for _ in range(int(config.get("common_neutral_steps", 0))):
+                env.step(neutral())
         else:
             env.sim.set_state_from_flattened(canonical_state)
             env.sim.forward()

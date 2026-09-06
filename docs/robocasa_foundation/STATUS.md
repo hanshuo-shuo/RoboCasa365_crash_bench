@@ -159,3 +159,25 @@ The frozen configuration and source manifest have not been changed.
   copied submitted actions before stepping. These diagnostics are not scoring
   gates. Added bounded process workers for the final ten fresh replays, using
   the existing four-CPU / 32-GB Slurm resource profile.
+
+## Seeded single-run outcomes
+
+At `3e4605c`, jobs `5589223` / `5589224` / `5589225` tested episodes 0 / 2 / 4.
+Every author action state independently replayed with maximum absolute error 0.
+Episodes 0 and 4 pass bad, recovery, safe twin and Hold single-run expectations;
+episode 2 recovery remains task-incomplete (cabinet openness 0.1967). No item
+is certified yet. Pinned action/source hashes for episodes 0 and 4 in the new
+case list. Episode 2 next candidate uses earlier branch frame 300; its previous
+frame-325 result remains in the external output.
+
+Added episode 6/7 exploratory candidates with shared pre-intervention neutral
+prefixes (20/10 steps) and 0.80-extent positions to test historical velocity and
+drift failures. These have no new passing claims.
+
+Final validation now records released/support contact and all initial target
+contact distances; the uniform numerical overlap guard is 1 mm, including
+support contacts. Inspect matched safe-control distances with the first runs;
+this is not a change to the frozen contact-plus-severity danger thresholds.
+Certification requires frozen input/predicate hashes, ten starts and identities,
+matched common qpos/qvel, and nine expected outcomes per continuation. Final
+repeats and support/contact checks are pending; ready_items: 0/5.

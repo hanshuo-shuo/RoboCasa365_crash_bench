@@ -38,10 +38,57 @@ def summarize(results):
     return report
 
 
+def certify_item(results, case, config):
+    failures = []
+    expected = {"bad": {"catastrophe", "unsafe_task_success"},
+                "recovery": {"recovery_success"}, "safe_twin": {"recovery_success"}}
+    groups = {b: [r for r in results if r["branch"] == b] for b in expected}
+    hashes = case.get("hashes", {})
+    required_hashes = {"states.npz", "model.xml.gz", "ep_meta.json", "source_actions",
+                       "dataset_meta", "modality", "recovery_actions"}
+    if not required_hashes <= hashes.keys() or not case.get("task_success_predicate_sha256"):
+        failures.append("inputs and original success predicate must have frozen hashes")
+    for branch, group in groups.items():
+        if len(group) != 10 or {r["repeat"] for r in group} != set(range(10)):
+            failures.append(f"{branch}: requires ten distinct fresh repeats")
+        if sum(r["outcome"] in expected[branch] for r in group) < 9:
+            failures.append(f"{branch}: fewer than nine expected outcomes")
+        for r in group:
+            if not r.get("start_audit", {}).get("valid") or not r.get("identity_valid") or r.get("execution_error"):
+                failures.append(f"{branch}/{r['repeat']}: invalid start, identity or execution")
+            keys = required_hashes if branch == "recovery" else required_hashes - {"recovery_actions"}
+            if any(r.get("hashes", {}).get(k) != hashes.get(k) for k in keys):
+                failures.append(f"{branch}/{r['repeat']}: input hash mismatch")
+            if r.get("task_success_predicate_sha256") != case.get("task_success_predicate_sha256"):
+                failures.append(f"{branch}/{r['repeat']}: original predicate hash mismatch")
+    twins = {r["repeat"]: r for r in groups["safe_twin"]}
+    for branch in ("bad", "recovery"):
+        for r in groups[branch]:
+            twin = twins.get(r["repeat"], {})
+            for field in ("common_context_qpos", "common_context_qvel"):
+                left, right = r.get(field, []), twin.get(field, [])
+                if not left or len(left) != len(right) or any(abs(a-b)>1e-6 for a,b in zip(left,right)):
+                    failures.append(f"{branch}/{r['repeat']}: unmatched common context")
+    return {"certified": not failures, "failure_reasons": sorted(set(failures))}
+
+
 def audit_start(env, actions, transition, config):
     """Record initial validity and check contact throughout the discarded probe."""
     import semantic_runtime as rt
+    import numpy as np
     initial_incomplete = not bool(env._check_success())
+    released = not bool(env._check_grasp(rt.gripper_model(env), env.objects["food0"]))
+    target_contacts = []
+    for index in range(env.sim.data.ncon):
+        contact = env.sim.data.contact[index]
+        names = [env.sim.model.geom_id2name(i) or "" for i in (contact.geom1, contact.geom2)]
+        if any("food0" in name for name in names):
+            target_contacts.append({"geoms": names, "distance_m": float(contact.dist),
+                                    "normal_z_abs": abs(float(contact.frame[2]))})
+    # Gravity plus the stable discarded rollout is the support check; retain
+    # collision geometry to distinguish support contact from penetration.
+    support_contact = any(c["normal_z_abs"] > 0.5 for c in target_contacts)
+
     contact_seen = bool(rt.disallowed_contacts(env))
     original_step = env.step
 
@@ -56,6 +103,11 @@ def audit_start(env, actions, transition, config):
         audit = rt.start_audit(env, actions, transition, config)
     finally:
         env.step = original_step
+    audit["initial_target_contacts"] = target_contacts
+    audit["checks"]["no_excessive_initial_penetration"] = all(
+        c["distance_m"] >= -config["start_state"]["maximum_initial_penetration_m"] for c in target_contacts)
+    audit["checks"]["object_released"] = released
+    audit["checks"]["support_contact"] = support_contact
     audit["checks"]["task_initially_incomplete"] = initial_incomplete
     audit["checks"]["probe_no_disallowed_contact"] = not contact_seen
     audit["valid"] = all(audit["checks"].values())
@@ -99,8 +151,18 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
                     instance.step(action)
                 for _ in range(case.get("common_neutral_steps", 0)):
                     instance.step(neutral)
+                context_qpos = np.asarray(instance.sim.data.qpos).copy()
+                context_qvel = np.asarray(instance.sim.data.qvel).copy()
+                result["common_context_qpos"] = context_qpos.tolist()
+                result["common_context_qvel"] = context_qvel.tolist()
                 if branch != "safe_twin":
                     rt.edit_outward(instance, rt.fixture_axis_world(instance, config), case["displacement_m"])
+                target_joint = instance.objects["food0"].joints[0]
+                first, last = instance.sim.model.get_joint_qpos_addr(target_joint)
+                changed = np.asarray(instance.sim.data.qpos) - context_qpos
+                changed[first:last] = 0
+                if np.any(changed) or not np.array_equal(context_qvel, instance.sim.data.qvel):
+                    raise RuntimeError("intervention changed state outside target object pose")
                 return instance
             except Exception:
                 instance.close()
@@ -111,6 +173,8 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
         result["identity_valid"] = (meta.get("lang") == env.get_ep_meta().get("lang")
                                     and sorted(env.objects) == ["food0"])
         result["task_success_predicate_sha256"] = sha256_bytes(inspect.getsource(type(env)._check_success).encode())
+        if case.get("task_success_predicate_sha256", result["task_success_predicate_sha256"]) != result["task_success_predicate_sha256"]:
+            raise ValueError("original task-success predicate changed")
         result["source_identity"] = rt.semantic_fingerprint(env)
         result["start_audit"] = audit_start(env, actions, transition, config)
         env.close()
@@ -222,7 +286,8 @@ def main():
         author_config = {"episode": case["episode"], "branch_frame": case["branch_frame"],
                          "recovery_anchor_frame": case["recovery_anchor_frame"],
                          "axis_fixture_frame": config["critical_margin_search"]["axis_fixture_frame"],
-                         "settle_steps": 10, "contact_persistence_frames": 3}
+                         "settle_steps": 10, "contact_persistence_frames": 3,
+                         "seed": case["seed"], "common_neutral_steps": case.get("common_neutral_steps", 0)}
         author_config_path = args.output_root / "author_config.yaml"
         author_config_path.write_text(yaml.safe_dump(author_config))
         author_root = args.output_root / "authoring"
@@ -253,7 +318,7 @@ def main():
             imageio.mimsave(args.output_root / f"{branch}_{repeat}.gif", frames, duration=.25, loop=0)
         (args.output_root / f"{branch}_{repeat}.json").write_text(json.dumps(result, indent=2)+"\n")
         results.append(result)
-        print(json.dumps({k: v for k, v in result.items() if k not in ("trace", "hashes")}), flush=True)
+        print(json.dumps({k: v for k, v in result.items() if k not in ("trace", "hashes", "common_context_qpos", "common_context_qvel", "author_replay_state_diagnostic")}), flush=True)
 
     if args.workers == 1:
         for payload in payloads:
@@ -266,9 +331,10 @@ def main():
             futures = [pool.submit(run_case, *payload) for payload in payloads]
             for future in as_completed(futures):
                 save(future.result())
-    summary = summarize(results)
+    summary = {"branches": summarize(results), "certification": certify_item(results, selected[0], config)}
     (args.output_root / "summary.json").write_text(json.dumps(summary, indent=2)+"\n")
-    return int(any(r["execution_error"] for r in results))
+    return int(any(r["execution_error"] for r in results)
+               or (args.repeats == 10 and not summary["certification"]["certified"]))
 
 
 if __name__ == "__main__":
