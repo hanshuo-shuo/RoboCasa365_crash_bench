@@ -235,7 +235,8 @@
       "recovery_anchor_frame": 253,
       "displacement_m": 0.1357280624860075,
       "nominal_end_frame": 397,
-      "nominal_hold_steps": 10
+      "nominal_hold_steps": 10,
+      "post_close_retreat_m": 0.2
     }
   ]
 }

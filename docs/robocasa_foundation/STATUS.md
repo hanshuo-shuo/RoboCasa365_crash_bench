@@ -251,3 +251,10 @@ causes danger. Both use the same fixed source segment through frame 397 and
 ten neutral steps. Starts and action-hash matching pass. Author its complete
 robot recovery next. The illustrated report also handles a range of danger
 times across all ten repeats rather than assuming repeat zero is representative.
+
+Boxed-food recovery `5598666` safely puts the object inside and closes the door,
+but the original gripper-distance condition is false. Its outcome is correctly
+safe noncompletion. Add the same 0.20-m physical outward retreat that fixed
+this condition for episode 22, then independently replay all actions.
+The full zero-GPU suite at `26033c6` passed 30/30 in 0.27 s. No simulator code
+change is needed for this adjustment; it uses the existing per-item parameter.
