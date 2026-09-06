@@ -379,6 +379,10 @@ def main() -> int:
             contact_trace.append(
                 {"step": suffix_step, "contact_count": len(contacts), "peak_normal_force_n": force}
             )
+        # Per-item bounded continuation of the demonstrated closing action.
+        # The complete sequence is saved and scored independently by the runner.
+        for _ in range(int(config.get("closure_tail_steps", 0))):
+            step(np.asarray(nominal_actions[-1]).copy())
         task_success = bool(env._check_success())
         terminal_components = {
             "inside": bool(OU.obj_inside_of(env, "food0", env.cab)),

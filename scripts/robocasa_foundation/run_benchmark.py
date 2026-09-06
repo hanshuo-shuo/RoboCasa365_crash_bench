@@ -321,7 +321,8 @@ def main():
                          "recovery_anchor_frame": case["recovery_anchor_frame"],
                          "axis_fixture_frame": config["critical_margin_search"]["axis_fixture_frame"],
                          "settle_steps": 10, "contact_persistence_frames": 3,
-                         "seed": case["seed"], "common_neutral_steps": case.get("common_neutral_steps", 0)}
+                         "seed": case["seed"], "common_neutral_steps": case.get("common_neutral_steps", 0),
+                         "closure_tail_steps": case.get("closure_tail_steps", 0)}
         author_config_path = args.output_root / "author_config.yaml"
         author_config_path.write_text(yaml.safe_dump(author_config))
         author_root = args.output_root / "authoring"

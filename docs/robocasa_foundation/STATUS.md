@@ -201,3 +201,25 @@ or not. Prior rendered recovery failure remains a real recorded failure.
 Added metadata-selected episodes 12/15/16 from the existing package as replacement
 candidates. Their frames and metric displacement will be resolved once with the
 existing transition detector and recorded in the external run directory.
+
+## Final validation and replacement search
+
+- `2a69831`: full Quest zero-GPU suite 30/30 passed. Final ten-repeat jobs:
+  `5589647` (episode 0, stored-state visualization) and `5589648` (episode 4).
+  These are in progress; no certification claim yet.
+- Replacement single runs `5589649/50/51` (episodes 12/15/16): episode 15 has
+  valid starts and safe nominal completion but no hazard at 0.60 extent;
+  episodes 12/16 fail fixture drift/velocity at detected onset. Next construction
+  moves their branch 20 frames earlier (477/347), and tests episode 15 at
+  1.20 extent. No thresholds changed.
+- Episode 7 second bad-only run `5589656` again has no door-object contact;
+  exclude this construction instead of forcing the old source set.
+- Runtime versions checked again: Python 3.11.16, RoboCasa 1.0.1, robosuite
+  1.5.2, MuJoCo 3.3.1, NumPy 2.2.5, SciPy 1.15.3. External pins still match
+  the handoff; only the known asset README is untracked in RoboCasa.
+
+Episode 2's source final actions still command closing motion, rather than a
+neutral stop. Test a bounded 20-step continuation of its last demonstrated
+robot action after recovery suffix; the entire emitted sequence is saved and
+independently scored. This is a per-item action adjustment, not a timeout or
+success-predicate change. Existing episode 0/4 replay behavior is unchanged.

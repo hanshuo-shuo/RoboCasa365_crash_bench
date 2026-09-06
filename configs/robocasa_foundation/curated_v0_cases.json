@@ -37,7 +37,8 @@
       "displacement_m": 0.0674087919960872,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "At frame 325 the object was safely repositioned but cabinet remained 0.197 open. Try earlier frame 300 with shorter reverse/return motion; do not increase timeout."
+      "selection_note": "Frame 300 recovery leaves cabinet slightly open. Extend the actual final source closing action by 20 steps (1 s); save and independently replay all actions.",
+      "closure_tail_steps": 20
     },
     {
       "id": "curated-004",
@@ -82,13 +83,14 @@
       "episode": 7,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
+      "status": "excluded_construction",
       "branch_frame": 325,
       "recovery_anchor_frame": 203,
       "displacement_m": 0.1222258532227641,
       "common_neutral_steps": 10,
       "recovery_skip_steps": 0,
-      "selection_note": "0.80 extent with common wait has no door-object contact (5589456); test 1.0 extent once."
+      "selection_note": "0.80 extent with common wait has no door-object contact (5589456); test 1.0 extent once.",
+      "exclusion_reason": "No door-object contact at 0.80 or 1.0 extent after common wait (5589456/5589656)."
     },
     {
       "id": "curated-012",
@@ -96,11 +98,12 @@
       "seed": 0,
       "development_item": false,
       "status": "candidate",
-      "branch_frame": null,
-      "displacement_extent_fraction": 0.6,
+      "branch_frame": 477,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Next single-object episodes with explicit cabinet-closure instruction in existing package; resolve release/closure frame with existing detector."
+      "selection_note": "Earlier branch by 20 frames to avoid moving fixture at detected onset.",
+      "recovery_anchor_frame": 206,
+      "displacement_m": 0.07006558108867082
     },
     {
       "id": "curated-015",
@@ -108,11 +111,12 @@
       "seed": 0,
       "development_item": false,
       "status": "candidate",
-      "branch_frame": null,
-      "displacement_extent_fraction": 0.6,
+      "branch_frame": 317,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Next single-object episodes with explicit cabinet-closure instruction in existing package; resolve release/closure frame with existing detector."
+      "selection_note": "0.60 extent safe; test 1.20 extent for an actual obstruction.",
+      "recovery_anchor_frame": 211,
+      "displacement_m": 0.07581443606626823
     },
     {
       "id": "curated-016",
@@ -120,11 +124,12 @@
       "seed": 0,
       "development_item": false,
       "status": "candidate",
-      "branch_frame": null,
-      "displacement_extent_fraction": 0.6,
+      "branch_frame": 347,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Next single-object episodes with explicit cabinet-closure instruction in existing package; resolve release/closure frame with existing detector."
+      "selection_note": "Earlier branch by 20 frames to avoid moving fixture at detected onset.",
+      "recovery_anchor_frame": 152,
+      "displacement_m": 0.08356660538300628
     }
   ]
 }
