@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-05
 **Active direction:** curated_v0, five constructed FoodCleanup items
-**Current progress:** ready_items: 3/5 — episodes 0, 4 and 22 certified
-**Current work:** construct two more complete items; no global stop or new approval gate
+**Current progress:** ready_items: 4/5 — episodes 0, 4, 16 and 22 certified
+**Current work:** construct one more complete item; no global stop or new approval gate
 **Historical frozen cohort:** unchanged, **0/5, NO-GO**
 
 ## Certified items
@@ -231,3 +231,16 @@ and safe-twin paths. The recovery author uses the same fixed nominal tail.
 The runner now saves the first executed action sequence for each branch and
 checks matching nominal action hashes during certification. Existing items use
 zero extra nominal actions, so their replay behavior is unchanged.
+
+## Four ready items
+
+Pear final job `5595462` passed all branches 10/10 and all start/input checks.
+Its bad path first triggers danger at 2.30 s; nominal actions last 9.45 s and
+recovery lasts 21.50 s. Current ready_items: 4/5.
+
+Boxed-food extension job `5596353` still fails the safe task goal. The trace
+shows the door was already closed at source frames 392–407; later source actions
+reopen it. The five extra actions made that worse. The next fixed nominal
+sequence ends source motion at frame 397 and holds neutrally for ten steps.
+Both bad and safe twin use this exact same sequence. This tests sustained real
+closure without changing the original success predicate or its threshold.

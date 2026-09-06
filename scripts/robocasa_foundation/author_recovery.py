@@ -39,6 +39,7 @@ def main() -> int:
     extra = args.dataset / "extras" / name
     states = np.load(extra / "states.npz")["states"]
     nominal_actions = load_actions(args.dataset, episode)
+    nominal_end = int(config.get("nominal_end_frame", len(nominal_actions)))
     meta = json.loads((extra / "ep_meta.json").read_text())
     with gzip.open(extra / "model.xml.gz", "rt") as stream:
         xml = stream.read()
@@ -373,7 +374,7 @@ def main() -> int:
         consecutive = 0
         max_consecutive = 0
         peak_force = 0.0
-        for suffix_step, action in enumerate(nominal_actions[branch_frame:]):
+        for suffix_step, action in enumerate(nominal_actions[branch_frame:nominal_end]):
             step(action)
             contacts = disallowed_contacts()
             force = max([item["normal_force_n"] for item in contacts], default=0.0)
@@ -388,7 +389,9 @@ def main() -> int:
         # Per-item bounded continuation of the demonstrated closing action.
         # The complete sequence is saved and scored independently by the runner.
         for _ in range(int(config.get("closure_tail_steps", 0))):
-            step(np.asarray(nominal_actions[-1]).copy())
+            step(np.asarray(nominal_actions[nominal_end-1]).copy())
+        for _ in range(int(config.get("nominal_hold_steps", 0))):
+            step(neutral())
         if config.get("post_close_retreat_m", 0.):
             move_eef_world("retreat_after_closure",
                            np.asarray(controller().ref_pos).copy() + outward * float(config["post_close_retreat_m"]),

@@ -129,6 +129,9 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
         frame = case["branch_frame"]
         if not 0 < frame < len(actions):
             raise ValueError("branch frame outside source")
+        nominal_end = int(case.get("nominal_end_frame", len(actions)))
+        if not frame < nominal_end <= len(actions):
+            raise ValueError("nominal end frame outside source suffix")
         transition = rt.Transition(frame, frame, frame, len(actions))
         neutral = rt.neutral_action(actions, frame)
         extra = dataset / "extras" / f"episode_{case['episode']:06d}"
@@ -205,9 +208,11 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
         elif branch == "hold":
             sequence = np.repeat(neutral[None], config["hold_steps"], axis=0)
         else:
-            sequence = actions[frame:]
+            sequence = actions[frame:nominal_end]
             if case.get("nominal_tail_steps", 0):
-                sequence = np.concatenate((sequence, np.repeat(actions[-1][None], case["nominal_tail_steps"], axis=0)))
+                sequence = np.concatenate((sequence, np.repeat(actions[nominal_end-1][None], case["nominal_tail_steps"], axis=0)))
+            if case.get("nominal_hold_steps", 0):
+                sequence = np.concatenate((sequence, np.repeat(neutral[None], case["nominal_hold_steps"], axis=0)))
         recorded_sequence = np.asarray(sequence, dtype=float).copy()
         result["action_sequence_sha256"] = sha256_bytes(recorded_sequence.astype("<f8").tobytes())
         low, high = env.action_spec
@@ -360,7 +365,7 @@ def main():
                          "seed": case["seed"], "common_neutral_steps": case.get("common_neutral_steps", 0),
                          "closure_tail_steps": case.get("closure_tail_steps", 0) + case.get("nominal_tail_steps", 0),
                          "lateral_displacement_m": case.get("lateral_displacement_m", 0.)}
-        for key in ("post_close_retreat_m", "return_position_offset_world_m"):
+        for key in ("post_close_retreat_m", "return_position_offset_world_m", "nominal_end_frame", "nominal_hold_steps"):
             if key in case:
                 author_config[key] = case[key]
         author_config_path = args.output_root / "author_config.yaml"

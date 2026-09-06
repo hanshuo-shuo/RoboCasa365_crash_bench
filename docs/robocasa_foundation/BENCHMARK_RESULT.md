@@ -1,6 +1,6 @@
 # FoodCleanup benchmark progress
 
-**ready_items: 3/5.** Three items have passed the final check. Two more are still
+**ready_items: 4/5.** Four items have passed the final check. One more is still
 being built. Each item uses a different source episode. The items were selected
 and adjusted during development.
 
@@ -13,6 +13,7 @@ pass the checks. At least nine runs per path must give the expected result.
 | --- | --- | --- | --- | --- |
 | 0, development sweet potato | 10/10 | 10/10 | 10/10 | 2.40 s |
 | 4, corn | 10/10 | 10/10 | 10/10 | 4.20 s |
+| 16, pear | 10/10 | 10/10 | 10/10 | 2.30 s |
 | 22, sweet potato | 10/10 | 10/10 | 10/10 | 3.00 s |
 
 All starts, source identities, file hashes and matched robot/fixture states
@@ -57,8 +58,9 @@ stayed open.
 
 ## Remaining work
 
-Episode 16 has passed a single run of all three paths and is ready for ten-run
-validation. Episode 29 is a new boxed-food candidate from the same downloaded data.
+Episode 29 is a boxed-food candidate from the same downloaded data. Its door
+closes, but later source actions reopen it. We are testing a fixed earlier stop
+followed by a short neutral hold on both matched paths.
 Other failed constructions are kept in the run log. They do not count as ready.
 See [STATUS.md](STATUS.md) for exact jobs, versions and failure details.
 

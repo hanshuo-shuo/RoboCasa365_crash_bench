@@ -1,6 +1,6 @@
 {
   "protocol": "curated_v0",
-  "ready_items": 3,
+  "ready_items": 4,
   "cases": [
     {
       "id": "curated-000",
@@ -135,7 +135,7 @@
       "episode": 16,
       "seed": 0,
       "development_item": false,
-      "status": "single_run_passed",
+      "status": "certified",
       "branch_frame": 229,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
@@ -155,7 +155,9 @@
         "ep_meta.json": "95710146489aaa0966b03d9eec0ae2d268bb2abdc5c9c2d9951cce0ef1364289",
         "source_actions": "c64c0adfe08ae43714b45796fbe30376bc9e6ef72afc6903b54ace220d7d4164",
         "recovery_actions": "66fbe3207c7df461d01b13255563730b0903032d8d3aa4780b931c303529d223"
-      }
+      },
+      "certification_output": "curated_v0_5595462",
+      "certification_code_sha": "77ca847"
     },
     {
       "id": "curated-022",
@@ -229,10 +231,11 @@
       "front_protrusion_m": 0.015,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Stable hazard; safe twin stops at openness 0.005303, just outside the original closed threshold. Append five identical final source actions to both nominal paths and verify real completion.",
+      "selection_note": "The safe trace closes at source frames 392\u2013407, then later actions reopen the door. Stop source actions at frame 397 and hold neutrally for ten steps on both matched paths; validate the unchanged task goal.",
       "recovery_anchor_frame": 253,
       "displacement_m": 0.1357280624860075,
-      "nominal_tail_steps": 5
+      "nominal_end_frame": 397,
+      "nominal_hold_steps": 10
     }
   ]
 }
