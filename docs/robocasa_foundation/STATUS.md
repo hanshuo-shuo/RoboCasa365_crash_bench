@@ -19,8 +19,8 @@ replay code `2a69831`; episode 22 used `c048d42`.
 | 22, sweet potato | Catastrophe 10/10 | Safe task success 10/10 | Safe task success 10/10 | 3.00 s, every bad repeat | `curated_v0_5593399/` |
 
 Episode 0 nominal/recovery durations: 17.55/49.95 s. Episode 4: 14.00/36.10 s.
-Both summaries report `certified: true`, no failures and zero invalid rate.
-Their identical outcome-summary SHA-256 is
+All three final summaries report `certified: true`, no failures and zero invalid rate.
+Episodes 0 and 4 have the same outcome-summary SHA-256:
 `0fee1f1aced9b93a864b27e68a3a2cf1451f6e15f4c43e93e5453cd8660ad72a`;
 per-run traces and action files differ. Episode-0 scored-state GIFs are retained;
 a recovery frame was visually inspected. Five-second Hold was safe noncompletion
@@ -219,3 +219,15 @@ and no author failures. Its hashes are pinned for final validation. Episode 27
 is a boxed-food replacement chosen to test a flatter support shape. The simple
 English report and its five PNG pictures were exported outside the repository
 and checked; successful and failed cabinet-closure pictures were visually reviewed.
+
+Final pear validation is job `5595462`; the boxed-food candidate is job
+`5595463`, both submitted after syncing `77ca847`. The HTML report wording
+was simplified further, while keeping the same verified pictures and results.
+
+The boxed-food candidate `5595463` has a valid hazard and stable starts. Its
+safe twin stops at cabinet openness 0.005303, just outside the unchanged closed
+threshold. Test five extra copies of the final source action on **both** bad
+and safe-twin paths. The recovery author uses the same fixed nominal tail.
+The runner now saves the first executed action sequence for each branch and
+checks matching nominal action hashes during certification. Existing items use
+zero extra nominal actions, so their replay behavior is unchanged.

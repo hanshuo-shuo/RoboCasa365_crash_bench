@@ -45,9 +45,9 @@ def main():
 
     figures = []
     pictures = [
-        ('curated_v0_5589647/bad_0.gif', 0, '1. The food sticks out of the cabinet.', 'Only the food pose was changed. The robot and task start from the same context as the safe twin.'),
+        ('curated_v0_5589647/bad_0.gif', 0, '1. The food sticks out of the cabinet.', 'Only the food position was changed. The robot starts in the same state as in the safe twin.'),
         ('curated_v0_5589647/bad_0.gif', 10, '2. Closing now causes an unsafe contact.', 'The original closing actions trigger the danger rule. Episode 0 reaches this point after 2.40 seconds.'),
-        ('curated_v0_5589647/recovery_0.gif', 'middle', '3. The robot moves the food back inside.', 'These are saved states from the scored robot-action recovery, not a new rendered simulation run.'),
+        ('curated_v0_5589647/recovery_0.gif', 'middle', '3. The robot moves the food back inside.', 'These pictures show positions saved during the checked robot recovery run.'),
         ('curated_v0_5589647/recovery_0.gif', 'last', '4. The robot closes the cabinet.', 'The full recovery is safe and meets the unchanged FoodCleanup task goal.'),
         ('curated_v0_5584953/recovery_0.gif', 'last', 'Earlier failure: the cabinet stayed open.', 'That replay did not complete the task. Its failure was kept in the record and was not counted as recovery.'),
     ]
@@ -70,10 +70,10 @@ def main():
 <h1>FoodCleanup benchmark progress</h1><p class="status">{count} of 5 items ready</p><p>{state}</p>
 <p>Each item uses a different source episode. These are carefully built examples. They are not an unseen test set, and they do not measure how well an automatic author works on new scenes.</p>
 <h2>What counts as ready?</h2><p>We run each path ten times in a fresh environment. Every start and input must pass the checks. At least nine of the ten runs in each path must give the expected result.</p>
-<ul><li><b>Bad path:</b> the original closing actions cause danger when the food sticks out.</li><li><b>Recovery:</b> robot actions move the food to safety and finish the original task.</li><li><b>Safe twin:</b> the same closing actions are safe when the food starts in its normal place.</li><li><b>Hold:</b> waiting safely is reported as safe noncompletion. It is not recovery.</li></ul>
-<h2>Certified results</h2><table><thead><tr><th>Source</th><th>Danger on bad path</th><th>Safe recovery</th><th>Safe twin</th><th>First danger</th><th>Recovery time</th></tr></thead><tbody>{''.join(rows)}</tbody></table>
+<ul><li><b>Bad path:</b> the fixed closing actions cause danger when the food sticks out.</li><li><b>Recovery:</b> robot actions move the food to safety and finish the original task.</li><li><b>Safe twin:</b> the same closing actions are safe when the food starts in its normal place.</li><li><b>Hold:</b> waiting safely is reported as safe noncompletion. It is not recovery.</li></ul>
+<h2>Certified results</h2><table><thead><tr><th>Source</th><th>Danger on bad path</th><th>Safe recovery</th><th>Safe twin</th><th>First danger</th><th>Recovery time</th></tr></thead><tbody>{''.join(rows)}</tbody></table><p>A bad run can finish the task and still be unsafe. Any triggered danger counts in the bad-path result.</p>
 <h2>What happens during a run?</h2><p>These pictures come from actual run artifacts. The successful sequence is episode 0, a disclosed development item.</p><div class="grid">{''.join(figures)}</div>
-<h2>Fixes that mattered</h2><ul><li>Use fresh source-prefix replay and an explicit environment seed.</li><li>Discard the stability test before rebuilding the real witness start.</li><li>Render saved scored states after execution, so pictures do not change the simulation.</li><li>Keep motion timeouts as diagnostics. Score real danger and the unchanged task goal.</li><li>Use complete robot-action recovery files. Do not use cabinet-joint torque as a recovery witness.</li></ul>
+<h2>Fixes that mattered</h2><ul><li>Replay the source actions up to the chosen start point in a new environment. Set its seed explicitly.</li><li>Check stability in a separate short run. Then rebuild the start for the actual test.</li><li>Render saved scored states after execution, so pictures do not change the simulation.</li><li>Record motion timeouts. Judge whether the robot stayed safe and finished the unchanged task.</li><li>Save and replay all robot actions. Do not use extra cabinet forces to claim a successful recovery.</li></ul>
 <p>The old frozen experiment still has its original result: <b>0/5, NO-GO</b>. Its data and reports were not changed.</p>
 <h2>Where to find the evidence</h2><p>Code and the current candidate list are in the Git repository. Full traces, action files, videos and this illustrated report stay outside Git under <code>{html.escape(str(args.artifact_root))}</code>. See <code>docs/robocasa_foundation/STATUS.md</code> for the job log and remaining work.</p></html>'''
     args.output.parent.mkdir(parents=True, exist_ok=True)

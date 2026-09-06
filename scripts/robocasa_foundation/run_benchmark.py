@@ -65,6 +65,8 @@ def certify_item(results, case, config):
     for branch in ("bad", "recovery"):
         for r in groups[branch]:
             twin = twins.get(r["repeat"], {})
+            if branch == "bad" and r.get("action_sequence_sha256") != twin.get("action_sequence_sha256"):
+                failures.append(f"bad/{r['repeat']}: nominal action sequences differ")
             for field in ("common_context_qpos", "common_context_qvel"):
                 left, right = r.get(field, []), twin.get(field, [])
                 if not left or len(left) != len(right) or any(abs(a-b)>1e-6 for a,b in zip(left,right)):
@@ -204,6 +206,10 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
             sequence = np.repeat(neutral[None], config["hold_steps"], axis=0)
         else:
             sequence = actions[frame:]
+            if case.get("nominal_tail_steps", 0):
+                sequence = np.concatenate((sequence, np.repeat(actions[-1][None], case["nominal_tail_steps"], axis=0)))
+        recorded_sequence = np.asarray(sequence, dtype=float).copy()
+        result["action_sequence_sha256"] = sha256_bytes(recorded_sequence.astype("<f8").tobytes())
         low, high = env.action_spec
         if sequence.ndim != 2 or sequence.shape[1] != len(low) or not len(sequence):
             raise ValueError("invalid action shape")
@@ -244,6 +250,8 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
                       metrics=measurement.details, trace=trace,
                       outcome=score(start_valid=result["start_audit"]["valid"], identity_valid=result["identity_valid"],
                                     task_success=success, crash=measurement.value, stable_terminal=stable))
+        if repeat == 0:
+            result["_executed_actions"] = recorded_sequence
         if replay_errors:
             result["author_replay_state_diagnostic"] = {
                 "maximum_absolute_error": max(replay_errors),
@@ -350,7 +358,7 @@ def main():
                          "axis_fixture_frame": config["critical_margin_search"]["axis_fixture_frame"],
                          "settle_steps": 10, "contact_persistence_frames": 3,
                          "seed": case["seed"], "common_neutral_steps": case.get("common_neutral_steps", 0),
-                         "closure_tail_steps": case.get("closure_tail_steps", 0),
+                         "closure_tail_steps": case.get("closure_tail_steps", 0) + case.get("nominal_tail_steps", 0),
                          "lateral_displacement_m": case.get("lateral_displacement_m", 0.)}
         for key in ("post_close_retreat_m", "return_position_offset_world_m"):
             if key in case:
@@ -380,6 +388,10 @@ def main():
     def save(result):
         branch, repeat = result["branch"], result["repeat"]
         frames = result.pop("_frames", None)
+        executed = result.pop("_executed_actions", None)
+        if executed is not None:
+            import numpy as np
+            np.savez_compressed(args.output_root / f"{branch}_actions.npz", actions=executed)
         if frames:
             import imageio.v2 as imageio
             imageio.mimsave(args.output_root / f"{branch}_{repeat}.gif", frames, duration=.25, loop=0)

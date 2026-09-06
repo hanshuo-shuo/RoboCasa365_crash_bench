@@ -28,7 +28,7 @@ The evidence folders are `curated_v0_5589647/`, `curated_v0_5589648/`, and
 
 ## What the four paths mean
 
-- **Bad:** close the cabinet with the original actions while the food sticks out.
+- **Bad:** close the cabinet with a fixed action sequence while the food sticks out.
 - **Recovery:** use robot actions to move the food inside and finish the original task.
 - **Safe twin:** use the same closing actions with the food in its normal safe place.
 - **Hold:** wait for five seconds. Safe waiting without task completion is not recovery.

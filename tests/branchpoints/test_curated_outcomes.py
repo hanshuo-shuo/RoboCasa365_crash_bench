@@ -48,3 +48,6 @@ def test_certification_requires_repeats_hashes_and_matched_context():
     changed = deepcopy(runs)
     changed[0]['start_audit']['valid'] = False
     assert not certify_item(changed, case, {})['certified']
+    changed = deepcopy(runs)
+    changed[0]['action_sequence_sha256'] = 'different nominal sequence'
+    assert not certify_item(changed, case, {})['certified']

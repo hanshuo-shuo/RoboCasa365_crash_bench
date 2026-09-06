@@ -223,13 +223,16 @@
       "seed": 0,
       "development_item": false,
       "status": "candidate",
-      "branch_frame": null,
+      "branch_frame": 340,
       "transition_aggregation": "mean",
       "branch_lead_frames": 10,
       "front_protrusion_m": 0.015,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "Single boxed-food source in the existing package, same layout as 16; test whether its flat support gives a stable item."
+      "selection_note": "Stable hazard; safe twin stops at openness 0.005303, just outside the original closed threshold. Append five identical final source actions to both nominal paths and verify real completion.",
+      "recovery_anchor_frame": 253,
+      "displacement_m": 0.1357280624860075,
+      "nominal_tail_steps": 5
     }
   ]
 }
