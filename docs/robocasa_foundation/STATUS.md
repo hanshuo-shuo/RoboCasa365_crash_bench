@@ -153,3 +153,7 @@ world-position compensation of `[0.0191327913, 0.0310027191, 0.0067919846]` m
 based on measured target minus achieved position. No timeout or task predicate
 is relaxed. Episode 16 full lateral centering (0.137 m) still contacts a door;
 test a smaller 0.04-m shift toward the cabinet center.
+
+Added episode 24 (potato, same layout as 16) as a narrower-food replacement
+candidate, using the same measured-front construction. Distinct episodes, not
+layouts, are the counting unit.

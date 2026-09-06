@@ -158,6 +158,18 @@
       "recovery_anchor_frame": 249,
       "displacement_m": 0.1609387672622068,
       "post_close_retreat_m": 0.2
+    },
+    {
+      "id": "curated-024",
+      "episode": 24,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": null,
+      "front_protrusion_m": 0.015,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Potato in the same layout as episode 16, a narrower-food replacement for its initial door-contact problem; existing package only."
     }
   ]
 }
