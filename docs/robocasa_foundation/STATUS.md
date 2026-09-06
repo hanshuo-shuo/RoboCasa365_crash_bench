@@ -3,7 +3,7 @@
 **Last updated:** 2026-09-06
 **Active direction:** curated_v0, five constructed FoodCleanup items
 **Current progress:** ready_items: 4/5 — episodes 0, 4, 16 and 22 certified
-**Current work:** finish the fifth item after the existing Quest connection is restored
+**Current work:** validate the fifth robot recovery; Quest access is working
 **Historical frozen cohort:** unchanged, **0/5, NO-GO**
 
 ## Certified items
@@ -291,3 +291,12 @@ yet verified. Eight historical inputs/reports were checked byte-for-byte
 against `ce270dc` and remain unchanged. English Markdown updates are pushed to
 GitHub; Quest document synchronization must be checked after reconnection.
 The local illustrated report has four certified results and five real pictures.
+
+## Quest access restored — 2026-09-06
+
+The exact approved SSH command works again. The remote checkout was clean at
+`5f90044` and no new curated job was running. It fast-forwarded to `3b9e778`;
+the targeted tests passed 5/5. The pending lift-then-retreat check is now
+confirmed as job `5600583`. The earlier unacknowledged submission did not add
+a new active job. Current progress remains ready_items: 4/5 until the final
+recovery and ten-repeat validation pass.

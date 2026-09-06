@@ -63,10 +63,9 @@ the food inside and closes the cabinet, but moving the gripper straight back
 reopens the door. The latest change raises the gripper before moving it back.
 That change still needs an independent check and ten-run final validation.
 
-The Quest connection expired before the latest submission could be confirmed.
-The existing `/tmp/quest.sock` must be restored before work can continue on
-Quest. Four certified items remain ready. See [STATUS.md](STATUS.md) for the
-exact checkpoint and safe resume steps.
+Quest access is working again. The lift-then-retreat recovery check is running
+as job `5600583`. Four certified items remain ready. See [STATUS.md](STATUS.md)
+for the exact checkpoint and results.
 
 ## Run an item
 

@@ -241,5 +241,5 @@
     }
   ],
   "last_updated": "2026-09-06",
-  "progress_note": "Four items are certified. The last recovery change has not been verified because the Quest connection expired. Reconnect the existing Quest control socket to finish the fifth item."
+  "progress_note": "Four items are certified. Quest access is working again. The final lift-then-retreat recovery is being checked before final validation."
 }
