@@ -1,260 +1,155 @@
 # RoboCasa benchmark status
 
 **Last updated:** 2026-09-05
-**Active direction:** curated_v0 — five curated FoodCleanup items and a unified replay/scoring entry point
-**Current task:** implementing curated_v0; first action-only replay integration pending
-**Current item count:** ready_items: 2/5 (episodes 0 and 4 certified)
-**Historical frozen-cohort verdict:** unchanged, **0/5, NO-GO**
+**Active direction:** curated_v0, five constructed FoodCleanup items
+**Current progress:** ready_items: 2/5 — episodes 0 and 4 certified
+**Current work:** construct three more complete items; no global stop or new approval gate
+**Historical frozen cohort:** unchanged, **0/5, NO-GO**
 
-## 2026-09-05 implementation
+## Certified items
 
-- Both main worktrees were clean; local main was current at `ce270dc` and
-  Quest main fast-forwarded from `2e4295e` to `ce270dc`.
-- Located `f5_recovery_5244908/recovery/recovery_actions.npz` under the existing
-  external run root. New `run_benchmark.py` replays the complete historical
-  action file (including its ten initial neutral actions), from fresh prefix
-  reconstruction. The separate stability probe is discarded before replay.
-- Added separate curated configuration/case list and a checked-in Slurm wrapper.
-  Initial candidate: episode 0, seed 0, frame 370, outward displacement 0.10 m.
-  This is a development candidate, not a certified item.
-- Scoring checks: three direct Python assertions passed; Python AST and shell
-  syntax checks passed. Both local Python interpreters lack pytest; run related
-  pytest checks in the installed Quest environment before simulation submission.
-- Historical scoring, frozen inputs, and reports remain unchanged. New runner
-  does not invoke the authoring planner or apply fixture torque.
-- Quest tests at `3ca7448`: targeted 3/3 and full suite 28/28 passed.
-- Integration job `5580280`, output `curated_v0_5580280/` under the external
-  run root: bad has a valid start and unsafe task success, violation at 2.40 s;
-  historical recovery is safe but fails the task and terminal stability
-  (`invalid`). Its 999 actions do not close the cabinet after fresh prefix.
-  Safe twin safely completes the original task; 5-second Hold is stable safe
-  noncompletion. All four starts pass. This completes initial interface
-  integration, but recovery still needs repair.
-- Added opt-in fresh-prefix/no-render modes to the existing physical recovery
-  author. `--author-recovery` in the curated runner emits actions then replays
-  them independently; authoring diagnostic failures are never success evidence.
-- Fresh-prefix reauthor/replay job `5584953` at `53e9f76` is running, with
-  `--author-recovery --render`; updated targeted scoring tests pass 4/4.
-- Added candidates episode 2 at frame 325 / displacement 0.0674087919960872 m
-  (the historical 0.60 extent point), and episode 4 at frame 298 /
-  displacement 0.11507409165778808 m. Start with bad and safe-twin single runs.
-- Metadata screening found additional single-object sources in the existing
-  package; no new download. Historical transitions recovered for episodes
-  2/4/6/7/9: branch frames 325/298/269/325/330.
-- Pending: complete four-branch integration, provenance freeze, stronger start and
-  matching validation, additional candidates, final ten-repeat certification.
+Both items passed all 30 fresh starts, identity/input hashes, original predicate
+hash and matched common qpos/qvel checks at replay code `2a69831`.
 
-## What changed in the plan
+| Episode | Bad | Robot recovery | Safe twin | Violation time | Final output |
+| --- | --- | --- | --- | --- | --- |
+| 0, disclosed development sweet potato | Unsafe task success 10/10 | Safe task success 10/10 | Safe task success 10/10 | 2.40 s, every bad repeat | `curated_v0_5589647/` |
+| 4, corn | Unsafe task success 10/10 | Safe task success 10/10 | Safe task success 10/10 | 4.20 s, every bad repeat | `curated_v0_5589648/` |
 
-The user requested a simpler benchmark construction plan on 2026-09-04 and
-will assign implementation to another model. The revised
-[`execution plan`](../../CrashBench_Codex_Foundation_Execution_Plan.md),
-[`AGENTS.md`](../../AGENTS.md), [`charter`](FOUNDATION_CHARTER.md),
-[`setup instructions`](../../setup/README.md) and
-[`Quest workflow`](../../QUEST_WORKFLOW.md) now agree on the current scope.
+Episode 0 nominal/recovery durations: 17.55/49.95 s. Episode 4: 14.00/36.10 s.
+Both summaries report `certified: true`, no failures and zero invalid rate.
+Their identical outcome-summary SHA-256 is
+`0fee1f1aced9b93a864b27e68a3a2cf1451f6e15f4c43e93e5453cd8660ad72a`;
+per-run traces and action files differ. Episode-0 scored-state GIFs are retained;
+a recovery frame was visually inspected. Five-second Hold was safe noncompletion
+in the single-run development checks; it is not counted as recovery.
 
-- Deliver usable curated items; do not require frozen-authoring transfer to
-  preselected new scenes before building the replay/scoring interface.
-- Allow per-item authoring, candidate adjustment/exclusion and disclosed use
-  of episode 0. Select from the existing FoodCleanup package.
-- Search with single runs; use ten repeats per continuation for final items.
-- Treat intermediate alignment timeout and pose-return error as diagnostics.
-  Keep actual safety, original task success, robot-action witness validity,
-  matching and reproducible prefix replay as item requirements.
-- Preserve historical results and frozen inputs. New work will use a separate
-  curated configuration/list and outputs. A failed candidate does not halt
-  development of the remaining items.
+**All output paths below are relative to**
+`/projects/p33100/siosio/robocasa_foundation_runs/`. Raw results, actions and
+videos stay there, outside Git. Certified case/action hashes are in
+`configs/robocasa_foundation/curated_v0_cases.json`.
 
-The old Python entry points and Slurm scripts retain the historical protocol.
-The separate curated entry point is now being implemented; see the current
-implementation record above. No curated item has passed final validation.
+## Active and excluded candidates
 
-## Next implementation action
-
-Start with step A of the execution plan: find the historical episode-0 robot
-recovery action file, adapt it into one item, and run bad/recovery/safe twin once
-through one shared replay/scoring entry point. Record the settling boundary and
-use fresh prefix replay with the declared scoring semantics. Then author the
-remaining items and perform final item validation.
-
-Useful starting candidates:
-
-| Source episode | Existing evidence | Next construction action |
+| Episode | Current construction / evidence | Next action |
 | --- | --- | --- |
-| 0, sweet potato | Early robot-action witness repeated 10/10 under historical semantics | Adapt/replay through new entry point; disclose development use |
-| 4, corn | Newer semantic recovery 10/10, rejected by alignment timeout; closure used fixture torque | Separate outcome scoring from diagnostics and supply full robot-action closure |
-| 2, mango | 0.60 offset qualified; forced 0.65 offset was unstable | Start from 0.60 and author/verify recovery |
-| 6, bell pepper | Rejected by robot joint-velocity bound | Inspect transition frame and public construction prefix |
-| 7, onion | Rejected by fixture drift bound | Inspect settling and transition timing |
-| 9, bell pepper | No unsafe point on the frozen displacement grid | Exclude or choose a different valid construction; do not force it into the set |
+| 15, apple | Frame 317, displacement 0.08879626039957993 m; measured front gap + 15 mm; bad and safe twin pass in `5590545` | `5591131` repositions safely but misses door closure; test measured return-position compensation |
+| 22, sweet potato | Frame 369, displacement 0.1609387672622068 m; bad catastrophe and safe twin pass in `5590547` | `5591132` closes safely but gripper is not far enough; add physical outward retreat |
+| 16, pear | Frame 347; 0.60 extent is safe. Front gap + 15 mm at original lateral position collides with open door at start (`5590546`) | Full centering still initially contacts a door (`5591133`); test smaller 4-cm lateral shift |
+| 2, mango | 0.60 extent gives valid hazard/twin. Recovery repositions safely but leaves door open at frames 325 and 300; 20 extra demonstrated closing actions still do not finish | Deprioritized; no certified recovery |
+| 6, bell pepper | 20 public neutral steps repair start speed but break nominal safe-twin closure (`5589454`) | Excluded construction; do not repeat ten times |
+| 7, onion | Ten public neutral steps repair drift; 0.80 and 1.0 extent have no door-object contact (`5589456`, `5589656`) | Excluded construction |
+| 12, bell pepper | Detected frame 497 has fixture drift; frame 477 fails robot speed (`5589649`, `5589903`) | Excluded construction |
+| 9, bell pepper | Historical grid found no hazard | Not mandatory; no new rollout |
 
-These are candidates, not newly validated items. Distinct layouts and untouched
-source status are not current delivery requirements. Other single-object
-FoodCleanup episodes in the already downloaded 101-episode package may be
-screened without expanding the task family.
+Selection is disclosed construction within the existing 101-episode package.
+Other single-object sources were selected by explicit cabinet-closure instruction;
+episode 22 was selected for the development food type. Only distinct episodes
+count. Do not treat single-run author success or a passing hazard/twin pair as
+a certified item.
 
-## Reusable evidence and infrastructure
+## Implemented entry point and fixes
 
-- Environment: RoboCasa `1.0.1`, robosuite `1.5.2`, MuJoCo `3.3.1`; exact pins,
-  locations and limitations are in `ENVIRONMENT_HANDOFF.md`.
-- Original FoodCleanup goal remains unchanged. Prefix reconstruction, object
-  identity handling, predicates and zero-GPU utilities already exist.
-- Historical source replay passed `10/10` (job `5241364`); the three-mode
-  restart audit passed its tested nominal/identity checks (job `5242278`).
-  These do not establish arbitrary snapshot or new-protocol equivalence.
-- Historical full robot-action recovery: 989 actions, `49.45 s`, versus a
-  `17.55 s` nominal suffix; repeated evidence is in `INITIAL_RESULT.md`
-  (jobs `5244908`, `5245224`).
-- Revised development program: all five historical groups `10/10` in job
-  `5272419`, with auxiliary fixture-joint torque closure. See `DEV_RESULT.md`.
-- Historical zero-GPU suite: `25/25` on Quest after the 2026-09-01 program
-  freeze. This is not a test result for future curated code.
-- The optional LeRobot conversion dependency remains the documented limitation;
-  the existing parquet reader/data package supported the recorded experiments.
+- `scripts/robocasa_foundation/run_benchmark.py`: one item, bad/recovery/safe twin/
+  Hold, fresh prefix, uniform scores and traces, frozen hashes, final certification.
+- `configs/robocasa_foundation/curated_v0.yaml` and `curated_v0_cases.json` are
+  separate from historical frozen inputs.
+- `setup/run_robocasa_benchmark.sbatch` uses the ignored paths file, existing
+  short partition/account, four CPUs, 32 GB, OSMesa and the installed reader.
+- Original physical author gained opt-in fresh-prefix and no-render modes.
+  `--author-recovery` emits its entire robot action sequence and independently
+  replays it. Diagnostic timeouts never replace outcome scoring.
+- Explicit environment seed is passed to RoboCasa's independent
+  `np.random.default_rng(seed)`. All current items use seed 0. Setting only the
+  NumPy global seed was insufficient provenance.
+- Seeded **unrendered** author/replay states matched exactly in `5589223/24/25`.
+  A separate rendered-environment difference was demonstrated in `5589451`.
+  Visualizations now render stored scored states in a separate environment
+  **after** the scored unrendered rollout. No rendered prefix is used for scoring.
+- The stability probe is discarded, then the witness prefix is reconstructed.
+  Recovery files include ten initial neutral actions as part of the continuation;
+  they are not also inserted into the start. Public waits precede object editing
+  and apply equally to hazard and twin.
+- Starts check contact throughout the probe, object release/support, drift,
+  velocity, incompletion, recovery space and numerical initial overlap. Observed
+  cabinet-bottom overlap is about 0.03–0.08 mm, comparable with safe controls;
+  the uniform 1-mm numerical guard includes support contacts. The historical
+  contact-plus-severity danger thresholds are unchanged.
+- Object-only intervention is checked directly on qpos/qvel. Final certification
+  requires 10 fresh repeats per continuation, every start/identity/input valid,
+  matched common context and at least 9/10 expected outcomes. Both catastrophe
+  and unsafe task success count as dangerous continuations.
 
-Historical evidence is under the Quest run root
-`/projects/p33100/siosio/robocasa_foundation_runs/`.
-Detailed artifact locations are in `INITIAL_RESULT.md`, `DEV_RESULT.md` and
-`FOUNDATION_RESULT.md`. No raw results or videos were copied into Git.
+## Commands and validation
 
-## Historical frozen experiment — unchanged
+Use the existing clean Quest main checkout and Git-only synchronization:
+local commit/push, remote `git pull --ff-only`. Both began clean; remote main
+fast-forwarded from `2e4295e` to the plan revision `ce270dc` before implementation.
+No checkout, socket, partition, environment or dataset was added.
 
-Source-freeze job `5262642`, calibration job `5263563`, development recertification
-`5272419`, fresh-source array `5273093`, and final audit `f5_final_audit_5273093`
-remain the first experiment's evidence. The five independent source episodes
-were `2, 4, 6, 7, 9`; none certified under that frozen program. The final audit
-reported `audit_valid=true`, `foundation_go=false`, `certified_source_count=0`.
+The ignored `setup/.robocasa_foundation_paths.sh` was created from its tracked
+example. Example single replay:
 
-`FOUNDATION_RESULT.md` retains its full source-level failure explanations and
-original next-step text as history. Current construction instructions come from
-the revised execution plan, not the historical global-stop paragraph.
-The frozen configuration and source manifest have not been changed.
+```bash
+sbatch --output=/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_%j.log \
+  setup/run_robocasa_benchmark.sbatch --case curated-000 \
+  --branches bad recovery safe_twin
+```
 
-## Plan-refactor verification
+Selected final validation uses `--repeats 10`; optional `--render` saves actual
+scored-state GIFs. Do not rerun certified items when inputs, replay behavior and
+scoring are unchanged. Candidate-only authoring/selection additions after
+`2a69831` have not changed the certified paths.
 
-- Starting local commit: `2e4295e` on clean `main`.
-- `git pull --ff-only`: already up to date.
-- Scope: execution/instruction/status documents only; no Python, YAML/JSON
-  configuration, Slurm script or historical result report changed.
-- Document checks: `git diff --check`; inline Python checks of the six-file
-  scope, eight local Markdown links, balanced code fences and byte equality of
-  nine historical inputs/reports against `HEAD`. Initial whitespace check found
-  Markdown trailing spaces; removed them before the final check. Instruction
-  consistency reviewed against the revised plan.
-- No simulator run, new Quest job or test-suite rerun is needed for these
-  documentation-only changes. Implementation validation remains future work.
+- Full Quest zero-GPU suite at `2a69831`: **30/30 passed** with
+  `PYTHONDONTWRITEBYTECODE=1 python -m pytest -p no:cacheprovider tests -q`.
+- Targeted curated scoring/certification tests at `67136b8`: **5/5 passed**.
+- Local Python AST checks, `bash -n` on the Slurm wrapper, and `git diff --check`
+  passed. Local Python interpreters lack pytest; tests use the installed Quest
+  interpreter rather than adding a new environment.
+- Current environment rechecked: Python 3.11.16, RoboCasa 1.0.1, robosuite 1.5.2,
+  MuJoCo 3.3.1, NumPy 2.2.5, SciPy 1.15.3. RoboCasa and robosuite pins remain
+  `a07e365c958c4216cd6bbd5f30b47f09a65c6f00` and
+  `5ce6643f3092639d08f7b0f90ed1c6a84f50552c`. Only the previously documented asset
+  README is untracked in the external RoboCasa checkout.
 
-## Replay diagnosis follow-up
+## Development output index
 
-- Jobs `5584962` (episode 2) and `5584963` (episode 4), at `a1889ce`,
-  each passed single-run start, bad unsafe-task-success and safe-twin task success.
-- Job `5584953` authoring safely completed the original task, but independent
-  replay did not. Thus episode 0 remains uncertified despite authoring success.
-  Actual scoring GIFs are in that external run directory.
-- Found the environment uses `np.random.default_rng(seed)` independently of
-  `np.random.seed`. New curated construction explicitly passes seed 0 to both
-  author and replay environments. Previous runs did not explicitly seed that
-  generator and are development diagnostics only.
-- Added optional author state traces to locate any remaining replay divergence;
-  copied submitted actions before stepping. These diagnostics are not scoring
-  gates. Added bounded process workers for the final ten fresh replays, using
-  the existing four-CPU / 32-GB Slurm resource profile.
+| Jobs | Code | Purpose / result |
+| --- | --- | --- |
+| `5580280` | `3ca7448` | Initial four-branch interface; old snapshot-authored recovery fails fresh prefix |
+| `5584953` | `53e9f76` | Fresh author succeeds, rendered independent replay fails |
+| `5584962/63` | `a1889ce` | Episodes 2/4 hazard and twin single runs |
+| `5589223/24/25` | `3e4605c` | Seeded unrendered 0/2/4 author/replay; 0/4 succeed, 2 does not finish; state differences zero |
+| `5589451/52/53/54/56` | `532fd21` | Start/contact checks and 0/4/2/6/7 construction; rendering difference confirmed |
+| `5589647/48` | `2a69831` | Final certified 0/4, 10 repeats per branch |
+| `5589649/50/51/56` | `2a69831` | Single candidates 12/15/16/7 |
+| `5589903/04/05/06` | `54785fa` | Earlier 12/16 frames, larger 15 position, bounded 2 closure extension |
+| `5590545/46/47` | `693df9a` | Geometry-based 15/16/22 positions; 15/22 valid hazards, 16 invalid start |
+| `5591131/32/33` | `67136b8` | Active 15/22 recovery and 16 centering checks |
 
-## Seeded single-run outcomes
+Each job uses `curated_v0_JOBID/`; log is `curated_v0_JOBID.log`. The first
+historical recovery file remains at `f5_recovery_5244908/recovery/`. New passing
+recovery action files are in `curated_v0_5589223/authoring/` and
+`curated_v0_5589225/authoring/`. No old result was overwritten.
 
-At `3e4605c`, jobs `5589223` / `5589224` / `5589225` tested episodes 0 / 2 / 4.
-Every author action state independently replayed with maximum absolute error 0.
-Episodes 0 and 4 pass bad, recovery, safe twin and Hold single-run expectations;
-episode 2 recovery remains task-incomplete (cabinet openness 0.1967). No item
-is certified yet. Pinned action/source hashes for episodes 0 and 4 in the new
-case list. Episode 2 next candidate uses earlier branch frame 300; its previous
-frame-325 result remains in the external output.
+## Historical evidence
 
-Added episode 6/7 exploratory candidates with shared pre-intervention neutral
-prefixes (20/10 steps) and 0.80-extent positions to test historical velocity and
-drift failures. These have no new passing claims.
+The revised [execution plan](../../CrashBench_Codex_Foundation_Execution_Plan.md)
+supersedes old transfer gates and global stop rules. The historical cohort,
+source manifest, semantic configuration and reports remain intact, with the
+original **0/5, NO-GO** result. See [FOUNDATION_RESULT.md](FOUNDATION_RESULT.md),
+[INITIAL_RESULT.md](INITIAL_RESULT.md), [DEV_RESULT.md](DEV_RESULT.md) and
+[ENVIRONMENT_HANDOFF.md](ENVIRONMENT_HANDOFF.md). Current release details are
+in [BENCHMARK_RESULT.md](BENCHMARK_RESULT.md).
 
-Final validation now records released/support contact and all initial target
-contact distances; the uniform numerical overlap guard is 1 mm, including
-support contacts. Inspect matched safe-control distances with the first runs;
-this is not a change to the frozen contact-plus-severity danger thresholds.
-Certification requires frozen input/predicate hashes, ten starts and identities,
-matched common qpos/qvel, and nine expected outcomes per continuation. Final
-repeats and support/contact checks are pending; ready_items: 0/5.
+## Current recovery adjustments
 
-## Contact and rendering checks
-
-Jobs `5589451/52/53/54/56` correspond to episodes `0/4/2/6/7` at `532fd21`.
-All start guards passed, including released objects and cabinet-bottom support.
-Initial numerical overlap depths were about 0.03–0.08 mm, comparable to matched
-safe twins and below the uniform 1-mm guard. Episode 4 again passed all three
-branches. Episode 2 frame 300 remained task-incomplete. Episode 6's common wait
-broke nominal safe-twin closure, so exclude that construction. Episode 7 at
-0.80 extent had no door-object contact; next single candidate is 1.0 extent.
-
-Rendering enabled a different prefix trajectory for episode 0 (state divergence
-from the first recovery step). New visual generation uses a separate environment
-and the stored actual scored states after the unrendered rollout has finished.
-The simulator replay path is now identical whether a visualization is requested
-or not. Prior rendered recovery failure remains a real recorded failure.
-
-Added metadata-selected episodes 12/15/16 from the existing package as replacement
-candidates. Their frames and metric displacement will be resolved once with the
-existing transition detector and recorded in the external run directory.
-
-## Final validation and replacement search
-
-- `2a69831`: full Quest zero-GPU suite 30/30 passed. Final ten-repeat jobs:
-  `5589647` (episode 0, stored-state visualization) and `5589648` (episode 4).
-  These are in progress; no certification claim yet.
-- Replacement single runs `5589649/50/51` (episodes 12/15/16): episode 15 has
-  valid starts and safe nominal completion but no hazard at 0.60 extent;
-  episodes 12/16 fail fixture drift/velocity at detected onset. Next construction
-  moves their branch 20 frames earlier (477/347), and tests episode 15 at
-  1.20 extent. No thresholds changed.
-- Episode 7 second bad-only run `5589656` again has no door-object contact;
-  exclude this construction instead of forcing the old source set.
-- Runtime versions checked again: Python 3.11.16, RoboCasa 1.0.1, robosuite
-  1.5.2, MuJoCo 3.3.1, NumPy 2.2.5, SciPy 1.15.3. External pins still match
-  the handoff; only the known asset README is untracked in RoboCasa.
-
-Episode 2's source final actions still command closing motion, rather than a
-neutral stop. Test a bounded 20-step continuation of its last demonstrated
-robot action after recovery suffix; the entire emitted sequence is saved and
-independently scored. This is a per-item action adjustment, not a timeout or
-success-predicate change. Existing episode 0/4 replay behavior is unchanged.
-
-## First certified item
-
-`curated_v0_5589647` at `2a69831`: episode 0 bad/recovery/safe twin each 10/10
-expected outcomes, all starts and identities valid, hashes and common states
-matched. `summary.json` reports certified=true. Actual scored-state GIFs retained.
-Episode 4 final job remains pending at this update.
-
-Follow-up jobs `5589903/04/05/06` tested episodes 12/15/16/2. Episode 12's earlier
-frame fails robot speed; exclude that construction. Episodes 15/16 are safe at
-their tested displacements; next candidates use the actual cabinet-front gap
-plus 15 mm protrusion rather than arbitrary larger extent multiples. Episode 2
-bounded closure extension remains incomplete; leave it uncertified and work on
-other sources. Add episode 22 (sweet potato, matching the development food type)
-from the existing package with the same measured-front construction.
-
-Episode 4 final job `5589648` also certified: bad/recovery/safe twin each 10/10,
-all start, identity, hash and matching checks passed. Current ready_items: 2/5.
-Geometry-resolved candidates 15/16/22 single-run jobs `5590545/46/47` are running
-at `693df9a`; only unresolved candidate construction changes, not certified
-item replay or scoring behavior.
-
-Geometry runs: episode 15 (`5590545`, displacement 0.08879626039957993 m) has
-valid unsafe-task-success bad and safe task-success twin; episode 22 (`5590547`,
-frame 369, displacement 0.1609387672622068 m) has valid catastrophe bad and safe
-task-success twin. Author their robot recovery next. Episode 16 (`5590546`)
-initially hits the open door and is invalid; test object-only lateral centering
-inside the cabinet while preserving the same front protrusion.
-
-Certified durations: episode 0 bad/twin 17.55 s, recovery 49.95 s, violation
-2.40 s in all bad repeats; episode 4 bad/twin 14.00 s, recovery 36.10 s,
-violation 4.20 s in all bad repeats. Both summary hashes are
-`0fee1f1aced9b93a864b27e68a3a2cf1451f6e15f4c43e93e5453cd8660ad72a`
-(the identical outcome summaries are expected; per-run traces differ).
-Visually inspected a frame from the actual episode-0 scored recovery GIF.
+Episode 22 recovery (`5591132`) is stable safe noncompletion: cabinet closed,
+object inside, but original gripper-far condition false. Add 0.20 m of actual
+outward EEF retreat after closure, then independently replay. Episode 15
+(`5591131`) misses the door after a 3.7-cm return-position error; test a per-item
+world-position compensation of `[0.0191327913, 0.0310027191, 0.0067919846]` m
+based on measured target minus achieved position. No timeout or task predicate
+is relaxed. Episode 16 full lateral centering (0.137 m) still contacts a door;
+test a smaller 0.04-m shift toward the cabinet center.

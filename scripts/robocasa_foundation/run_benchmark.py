@@ -347,6 +347,9 @@ def main():
                          "seed": case["seed"], "common_neutral_steps": case.get("common_neutral_steps", 0),
                          "closure_tail_steps": case.get("closure_tail_steps", 0),
                          "lateral_displacement_m": case.get("lateral_displacement_m", 0.)}
+        for key in ("post_close_retreat_m", "return_position_offset_world_m"):
+            if key in case:
+                author_config[key] = case[key]
         author_config_path = args.output_root / "author_config.yaml"
         author_config_path.write_text(yaml.safe_dump(author_config))
         author_root = args.output_root / "authoring"

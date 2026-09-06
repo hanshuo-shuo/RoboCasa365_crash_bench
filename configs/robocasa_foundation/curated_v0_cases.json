@@ -122,7 +122,12 @@
       "selection_note": "Prior extent-fraction position stayed safe; use measured cabinet-front clearance plus 15 mm protrusion, then validate once.",
       "recovery_anchor_frame": 211,
       "front_protrusion_m": 0.015,
-      "displacement_m": 0.08879626039957993
+      "displacement_m": 0.08879626039957993,
+      "return_position_offset_world_m": [
+        0.019132791295577,
+        0.031002719090646,
+        0.0067919846285
+      ]
     },
     {
       "id": "curated-016",
@@ -133,10 +138,11 @@
       "branch_frame": 347,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
-      "selection_note": "15-mm front protrusion initially contacts open door at original lateral position (5590546); center target laterally inside cabinet, then revalidate.",
+      "selection_note": "Full 0.137-m lateral centering still contacts a door; test a smaller 0.04-m shift toward center in the open portion.",
       "recovery_anchor_frame": 152,
       "front_protrusion_m": 0.015,
-      "center_lateral": true
+      "displacement_m": 0.1867291918337174,
+      "lateral_displacement_m": 0.04
     },
     {
       "id": "curated-022",
@@ -150,7 +156,8 @@
       "recovery_skip_steps": 0,
       "selection_note": "Same food type as development episode (sweet potato), explicit cabinet-closure task in existing package; measured front protrusion.",
       "recovery_anchor_frame": 249,
-      "displacement_m": 0.1609387672622068
+      "displacement_m": 0.1609387672622068,
+      "post_close_retreat_m": 0.2
     }
   ]
 }

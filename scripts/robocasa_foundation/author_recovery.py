@@ -356,9 +356,12 @@ def main() -> int:
             }
         )
         base_record = move_base_to_pose(branch_base_pos, branch_base_ori, branch_torso)
+        return_target = branch_eef_pos.copy()
+        if "return_position_offset_world_m" in config:
+            return_target += np.asarray(config["return_position_offset_world_m"], dtype=float)
         retract_record = move_eef_world(
             "return_to_branch_eef_pose",
-            branch_eef_pos,
+            return_target,
             max_steps=300,
             tolerance=0.005,
             target_world_ori=branch_eef_ori,
@@ -386,6 +389,10 @@ def main() -> int:
         # The complete sequence is saved and scored independently by the runner.
         for _ in range(int(config.get("closure_tail_steps", 0))):
             step(np.asarray(nominal_actions[-1]).copy())
+        if config.get("post_close_retreat_m", 0.):
+            move_eef_world("retreat_after_closure",
+                           np.asarray(controller().ref_pos).copy() + outward * float(config["post_close_retreat_m"]),
+                           max_steps=120, tolerance=0.02)
         task_success = bool(env._check_success())
         terminal_components = {
             "inside": bool(OU.obj_inside_of(env, "food0", env.cab)),
