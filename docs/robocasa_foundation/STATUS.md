@@ -22,7 +22,19 @@
   pytest checks in the installed Quest environment before simulation submission.
 - Historical scoring, frozen inputs, and reports remain unchanged. New runner
   does not invoke the authoring planner or apply fixture torque.
-- Pending: real four-branch integration, provenance freeze, stronger start and
+- Quest tests at `3ca7448`: targeted 3/3 and full suite 28/28 passed.
+- Integration job `5580280`, output `curated_v0_5580280/` under the external
+  run root: bad has a valid start and unsafe task success, violation at 2.40 s;
+  historical recovery is safe but fails the task and terminal stability
+  (`invalid`). Its 999 actions do not close the cabinet after fresh prefix.
+  Other branches are still running at this update.
+- Added opt-in fresh-prefix/no-render modes to the existing physical recovery
+  author. `--author-recovery` in the curated runner emits actions then replays
+  them independently; authoring diagnostic failures are never success evidence.
+- Metadata screening found additional single-object sources in the existing
+  package; no new download. Historical transitions recovered for episodes
+  2/4/6/7/9: branch frames 325/298/269/325/330.
+- Pending: complete four-branch integration, provenance freeze, stronger start and
   matching validation, additional candidates, final ten-repeat certification.
 
 ## What changed in the plan

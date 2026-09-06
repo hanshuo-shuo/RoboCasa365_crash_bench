@@ -5,11 +5,13 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 import json
+import inspect
 from pathlib import Path
 import subprocess
+import sys
 
 from crashbench.branchpoints.certification import classify_outcome
-from crashbench.branchpoints.io import sha256_file
+from crashbench.branchpoints.io import sha256_file, sha256_bytes
 
 
 def score(*, start_valid, identity_valid, task_success, crash, stable_terminal,
@@ -18,6 +20,46 @@ def score(*, start_valid, identity_valid, task_success, crash, stable_terminal,
     if execution_error or not start_valid or not identity_valid:
         return "invalid"
     return classify_outcome(task_success, crash, stable_terminal).value
+
+
+def summarize(results):
+    report = {}
+    for branch in sorted({r["branch"] for r in results}):
+        group = [r for r in results if r["branch"] == branch]
+        counts = Counter(r["outcome"] for r in group)
+        report[branch] = {
+            "runs": len(group), "counts": dict(counts),
+            "crash_rate": sum(counts[k] for k in ("catastrophe", "unsafe_task_success")) / len(group),
+            "safe_task_success_rate": counts["recovery_success"] / len(group),
+            "safe_noncompletion_rate": counts["safe_noncompletion"] / len(group),
+            "unsafe_task_success_rate": counts["unsafe_task_success"] / len(group),
+            "invalid_rate": counts["invalid"] / len(group),
+        }
+    return report
+
+
+def audit_start(env, actions, transition, config):
+    """Record initial validity and check contact throughout the discarded probe."""
+    import semantic_runtime as rt
+    initial_incomplete = not bool(env._check_success())
+    contact_seen = bool(rt.disallowed_contacts(env))
+    original_step = env.step
+
+    def probe_step(action):
+        nonlocal contact_seen
+        value = original_step(action)
+        contact_seen = contact_seen or bool(rt.disallowed_contacts(env))
+        return value
+
+    env.step = probe_step
+    try:
+        audit = rt.start_audit(env, actions, transition, config)
+    finally:
+        env.step = original_step
+    audit["checks"]["task_initially_incomplete"] = initial_incomplete
+    audit["checks"]["probe_no_disallowed_contact"] = not contact_seen
+    audit["valid"] = all(audit["checks"].values())
+    return audit
 
 
 def run_case(dataset, artifact_root, case, config, branch, repeat, render=False):
@@ -68,9 +110,19 @@ def run_case(dataset, artifact_root, case, config, branch, repeat, render=False)
         result["instruction"] = meta.get("lang")
         result["identity_valid"] = (meta.get("lang") == env.get_ep_meta().get("lang")
                                     and sorted(env.objects) == ["food0"])
-        result["start_audit"] = rt.start_audit(env, actions, transition, config)
+        result["task_success_predicate_sha256"] = sha256_bytes(inspect.getsource(type(env)._check_success).encode())
+        result["source_identity"] = rt.semantic_fingerprint(env)
+        result["start_audit"] = audit_start(env, actions, transition, config)
         env.close()
         env = build(render)
+        result["replay_identity"] = rt.semantic_fingerprint(env)
+        difference = rt.fingerprint_difference(result["source_identity"], result["replay_identity"])
+        result["reconstruction_difference"] = difference
+        tolerance = config["reconstruction"]
+        result["identity_valid"] = (result["identity_valid"] and difference["categorical_match"]
+            and difference["object_position_error_m"] <= tolerance["object_position_m"]
+            and difference["object_rotation_error_rad"] <= tolerance["object_rotation_rad"]
+            and difference["fixture_openness_error"] <= tolerance["fixture_openness"])
         # The probe above is discarded; witness starts from a fresh full prefix.
         if branch == "recovery":
             sequence = np.load(files["recovery_actions"])["actions"][case.get("recovery_skip_steps", 0):]
@@ -135,6 +187,8 @@ def main():
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--render", action="store_true")
+    parser.add_argument("--author-recovery", action="store_true",
+                        help="Emit fresh-prefix robot actions using the existing author, then independently replay")
     args = parser.parse_args()
     import yaml
     if args.repeats < 1:
@@ -149,6 +203,29 @@ def main():
                   "config_sha256": sha256_file(args.config), "cases_sha256": sha256_file(args.cases),
                   "protocol": "curated_v0", "case": selected[0]}
     (args.output_root / "provenance.json").write_text(json.dumps(provenance, indent=2)+"\n")
+    if args.author_recovery:
+        case = dict(selected[0])
+        author_config = {"episode": case["episode"], "branch_frame": case["branch_frame"],
+                         "recovery_anchor_frame": case["recovery_anchor_frame"],
+                         "axis_fixture_frame": config["critical_margin_search"]["axis_fixture_frame"],
+                         "settle_steps": 10, "contact_persistence_frames": 3}
+        author_config_path = args.output_root / "author_config.yaml"
+        author_config_path.write_text(yaml.safe_dump(author_config))
+        author_root = args.output_root / "authoring"
+        command = [sys.executable, str(Path(__file__).with_name("author_recovery.py")),
+                   "--config", str(author_config_path), "--dataset", str(args.dataset),
+                   "--distance", str(case["displacement_m"]), "--output-root", str(author_root),
+                   "--fresh-prefix", "--no-render"]
+        # An authoring timeout may still emit a usable action witness; only the
+        # independent replay below can decide whether it completes the task safely.
+        author = subprocess.run(command, check=False)
+        if not (author_root / "recovery_actions.npz").is_file():
+            raise RuntimeError(f"author emitted no action file (exit {author.returncode})")
+        case["recovery_actions"] = str((author_root / "recovery_actions.npz").resolve().relative_to(args.artifact_root.resolve()))
+        case["recovery_skip_steps"] = 0
+        case.get("hashes", {}).pop("recovery_actions", None)
+        (args.output_root / "authored_case.json").write_text(json.dumps(case, indent=2)+"\n")
+        selected = [case]
     results = []
     for branch in args.branches:
         for repeat in range(args.repeats):
@@ -160,7 +237,7 @@ def main():
             (args.output_root / f"{branch}_{repeat}.json").write_text(json.dumps(result, indent=2)+"\n")
             results.append(result)
             print(json.dumps({k: v for k, v in result.items() if k not in ("trace", "hashes")}), flush=True)
-    summary = {branch: dict(Counter(r["outcome"] for r in results if r["branch"] == branch)) for branch in args.branches}
+    summary = summarize(results)
     (args.output_root / "summary.json").write_text(json.dumps(summary, indent=2)+"\n")
     return int(any(r["execution_error"] for r in results))
 

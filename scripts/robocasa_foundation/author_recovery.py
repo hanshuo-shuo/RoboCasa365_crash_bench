@@ -15,6 +15,9 @@ def main() -> int:
     parser.add_argument("--dataset", type=Path, required=True)
     parser.add_argument("--distance", type=float, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument("--fresh-prefix", action="store_true",
+                        help="Author from live prefix controller state for curated replay")
+    parser.add_argument("--no-render", action="store_true")
     args = parser.parse_args()
     import imageio.v2 as imageio
     import mujoco
@@ -26,6 +29,8 @@ def main() -> int:
 
     from replay_source_demo import create_env, load_actions, reset_to
 
+    if args.fresh_prefix:
+        np.random.seed(0)
     config = yaml.safe_load(args.config.read_text())
     args.output_root.mkdir(parents=True, exist_ok=False)
     episode = int(config["episode"])
@@ -38,19 +43,20 @@ def main() -> int:
     with gzip.open(extra / "model.xml.gz", "rt") as stream:
         xml = stream.read()
 
-    canonical = create_env(args.dataset)
-    reset_to(canonical, states[0], xml, meta)
-    for action in nominal_actions[:branch_frame]:
-        canonical.step(action)
-    canonical_state = np.asarray(canonical.sim.get_state().flatten()).copy()
-    canonical.close()
+    if not args.fresh_prefix:
+        canonical = create_env(args.dataset)
+        reset_to(canonical, states[0], xml, meta)
+        for action in nominal_actions[:branch_frame]:
+            canonical.step(action)
+        canonical_state = np.asarray(canonical.sim.get_state().flatten()).copy()
+        canonical.close()
 
     metadata = json.loads((args.dataset / "extras/dataset_meta.json").read_text())["env_args"]
     kwargs = dict(metadata["env_kwargs"])
     kwargs.update(
         env_name=metadata["env_name"],
         has_renderer=False,
-        has_offscreen_renderer=True,
+        has_offscreen_renderer=not args.no_render,
         use_camera_obs=False,
     )
     env = robosuite.make(**kwargs)
@@ -59,7 +65,7 @@ def main() -> int:
     frames = []
 
     def capture(force=False):
-        if force or len(low_level_actions) % 3 == 0:
+        if not args.no_render and (force or len(low_level_actions) % 3 == 0):
             frames.append(env.sim.render(512, 512, camera_name="robot0_agentview_left")[::-1])
 
     def controller():
@@ -214,8 +220,12 @@ def main() -> int:
     failures: list[str] = []
     try:
         reset_to(env, states[0], xml, meta)
-        env.sim.set_state_from_flattened(canonical_state)
-        env.sim.forward()
+        if args.fresh_prefix:
+            for action in nominal_actions[:branch_frame]:
+                env.step(action)
+        else:
+            env.sim.set_state_from_flattened(canonical_state)
+            env.sim.forward()
         target = env.objects["food0"]
         joint = target.joints[0]
         qpos = np.asarray(env.sim.data.get_joint_qpos(joint)).copy()
@@ -393,9 +403,12 @@ def main() -> int:
             args.output_root / "recovery_actions.npz",
             actions=np.asarray(low_level_actions),
         )
-        imageio.mimsave(args.output_root / "recovery_witness.gif", frames, duration=0.12, loop=0)
+        if frames:
+            imageio.mimsave(args.output_root / "recovery_witness.gif", frames, duration=0.12, loop=0)
         report = {
             "schema_version": "0.1.0",
+            "restart": "fresh_prefix" if args.fresh_prefix else "historical_snapshot",
+            "scoring_note": "Authoring diagnostics only; certify using independent curated action replay.",
             "hazard_distance_m": args.distance,
             "hazard_object_pos": hazard_object_pos.tolist(),
             "post_push_object_pos": post_push_object_pos.tolist(),

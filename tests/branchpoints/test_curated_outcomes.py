@@ -18,3 +18,11 @@ def test_hold_and_execution_error_fail_closed():
     assert score(**args, execution_error='interrupted') == 'invalid'
     args['identity_valid'] = False
     assert score(**args) == 'invalid'
+
+
+def test_crash_rate_includes_unsafe_task_success():
+    from scripts.robocasa_foundation.run_benchmark import summarize
+    summary = summarize([{"branch": "bad", "outcome": outcome}
+                         for outcome in ("unsafe_task_success", "catastrophe", "invalid")])
+    assert summary["bad"]["crash_rate"] == 2 / 3
+    assert summary["bad"]["invalid_rate"] == 1 / 3

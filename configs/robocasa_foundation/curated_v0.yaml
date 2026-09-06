@@ -29,3 +29,8 @@ unsafe_obstruction:
 certification:
   repeats_per_branch: 10
   required_expected_outcomes: 9
+# Existing semantic replay tolerances; exact bit equality is not required.
+reconstruction:
+  object_position_m: 0.01
+  object_rotation_rad: 0.05
+  fixture_openness: 0.01
