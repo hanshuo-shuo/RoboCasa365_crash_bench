@@ -1,6 +1,6 @@
 {
   "protocol": "curated_v0",
-  "ready_items": 2,
+  "ready_items": 3,
   "cases": [
     {
       "id": "curated-000",
@@ -135,7 +135,7 @@
       "episode": 16,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
+      "status": "hazard_and_twin_passed",
       "branch_frame": 229,
       "common_neutral_steps": 0,
       "recovery_skip_steps": 0,
@@ -143,14 +143,15 @@
       "recovery_anchor_frame": 152,
       "front_protrusion_m": 0.03,
       "transition_aggregation": "mean",
-      "branch_lead_frames": 10
+      "branch_lead_frames": 10,
+      "displacement_m": 0.201725738528834
     },
     {
       "id": "curated-022",
       "episode": 22,
       "seed": 0,
       "development_item": false,
-      "status": "single_run_passed",
+      "status": "certified",
       "branch_frame": 369,
       "front_protrusion_m": 0.015,
       "common_neutral_steps": 0,
@@ -169,14 +170,16 @@
         "ep_meta.json": "a801ff993b7d1bc6224143f0c4734b77d474c11f31c7b633d89bd1226e5d2c15",
         "source_actions": "08beb5f1bcb80a18a75ab5ecd01e6439f9a2aae195bdd4c5944150ff02b3b0f5",
         "recovery_actions": "e0cb26e4b9e0973616a2c2a40dc74022a8b9209976bf6bb297e258a8795bb4dd"
-      }
+      },
+      "certification_output": "curated_v0_5593399",
+      "certification_code_sha": "c048d42"
     },
     {
       "id": "curated-024",
       "episode": 24,
       "seed": 0,
       "development_item": false,
-      "status": "candidate",
+      "status": "excluded_construction",
       "branch_frame": 270,
       "front_protrusion_m": 0.015,
       "common_neutral_steps": 40,
@@ -185,7 +188,22 @@
       "transition_aggregation": "mean",
       "branch_lead_frames": 10,
       "recovery_anchor_frame": 189,
-      "displacement_m": 0.1482520912705766
+      "displacement_m": 0.1482520912705766,
+      "exclusion_reason": "First-leaf timing removes initial contact, but the object still fails rotation stability after 40 common neutral steps (5594109). Select a naturally stable source."
+    },
+    {
+      "id": "curated-027",
+      "episode": 27,
+      "seed": 0,
+      "development_item": false,
+      "status": "candidate",
+      "branch_frame": null,
+      "transition_aggregation": "mean",
+      "branch_lead_frames": 10,
+      "front_protrusion_m": 0.015,
+      "common_neutral_steps": 0,
+      "recovery_skip_steps": 0,
+      "selection_note": "Another sweet-potato episode from the existing package; the same food type already supports certified items 0 and 22."
     }
   ]
 }

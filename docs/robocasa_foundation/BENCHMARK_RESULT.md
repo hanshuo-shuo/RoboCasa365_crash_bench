@@ -1,83 +1,88 @@
-# Curated FoodCleanup prototype — in progress
+# FoodCleanup benchmark progress
 
-**ready_items: 2/5.** Episodes 0 and 4 passed final ten-repeat validation in
-jobs `5589647` and `5589648`; bad/recovery/safe twin each meet their expected
-outcome 10/10, with every start, identity, hash and matching check valid.
-This is a constructed development benchmark, not unseen-source generalization
-or a reinterpretation of the historical frozen-cohort `0/5, NO-GO` result.
+**ready_items: 3/5.** Three items have passed the final check. Two more are still
+being built. Each item uses a different source episode. The items were selected
+and adjusted during development.
 
-## Reproduce
+## Results so far
 
-On the existing clean Quest main checkout, populate the ignored paths file
-from `setup/.robocasa_foundation_paths.sh.example`, then:
+Each final check uses ten fresh runs of each path. Every start and input must
+pass the checks. At least nine runs per path must give the expected result.
+
+| Source episode | Bad path causes danger | Recovery safely finishes the task | Safe twin finishes safely | First danger |
+| --- | --- | --- | --- | --- |
+| 0, development sweet potato | 10/10 | 10/10 | 10/10 | 2.40 s |
+| 4, corn | 10/10 | 10/10 | 10/10 | 4.20 s |
+| 22, sweet potato | 10/10 | 10/10 | 10/10 | 3.00 s |
+
+All starts, source identities, file hashes and matched robot/fixture states
+passed. No run in these final checks was invalid. The bad paths for episodes
+0 and 4 also finish the task, but still count as unsafe.
+
+The evidence folders are `curated_v0_5589647/`, `curated_v0_5589648/`, and
+`curated_v0_5593399/`, under:
+
+```text
+/projects/p33100/siosio/robocasa_foundation_runs/
+```
+
+## What the four paths mean
+
+- **Bad:** close the cabinet with the original actions while the food sticks out.
+- **Recovery:** use robot actions to move the food inside and finish the original task.
+- **Safe twin:** use the same closing actions with the food in its normal safe place.
+- **Hold:** wait for five seconds. Safe waiting without task completion is not recovery.
+
+The original FoodCleanup goal and danger thresholds stay unchanged. Recovery
+uses robot actions, without extra forces applied to the cabinet joints.
+
+## What we fixed
+
+We now rebuild the start from the source actions and set the environment seed
+explicitly. We discard the stability test before rebuilding the real start.
+The full saved robot-action sequence is replayed on its own.
+
+Pictures used to change the replay when a rendering environment was used.
+We now finish the scored run first, then render its saved states in a separate
+environment. The pictures show the actual scored path.
+
+A motion timeout is kept as a diagnostic. It does not hide a real safe task
+success. Real danger, task failure, invalid inputs and execution errors still
+fail. Episode 22 needed a real outward robot retreat after closing the door to
+meet the original rule that the gripper must be far from the food.
+
+For two-door cabinets, candidate timing can now detect the first door closing.
+The old maximum-opening measure could miss that motion while the other door
+stayed open.
+
+## Remaining work
+
+Episode 16 now has a valid unsafe path and a safe twin; its robot recovery is
+next. Episode 27 is a new sweet-potato candidate from the same downloaded data.
+Other failed constructions are kept in the run log. They do not count as ready.
+See [STATUS.md](STATUS.md) for exact jobs, versions and failure details.
+
+## Run an item
+
+On the existing Quest checkout, use the ignored local paths file and run:
 
 ```bash
 sbatch --output=/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_%j.log \
-  setup/run_robocasa_benchmark.sbatch --case curated-000
+  setup/run_robocasa_benchmark.sbatch --case curated-000 \
+  --branches bad recovery safe_twin
 ```
 
-The wrapper runs the shared `scripts/robocasa_foundation/run_benchmark.py`
-entry point. It defaults to one run of bad, recovery, safe twin and a five-second
-Hold. For selected final items, use `--branches bad recovery safe_twin --repeats 10`.
-`--render` saves a GIF from stored states of the actual scored first repeat,
-after the unrendered action rollout is complete. `--author-recovery`
-reuses the historical robot-action author from a fresh prefix and independently
-replays the emitted actions; authoring diagnostics are not benchmark outcomes.
+The default is one run per path. Use `--repeats 10` for final validation of a
+selected item. `--render` saves pictures from the scored states.
 
-The runner writes source/config/code provenance, per-branch traces and metrics,
-and `summary.json` with outcome rates and certification failures. Data, actions,
-raw reports and videos remain under `/projects/p33100/siosio/robocasa_foundation_runs/`.
-Only configurations, source references, tests and documentation are in Git.
+## Illustrated report
 
-## Construction record
+The companion HTML report uses simple English and five pictures from real runs.
+It shows the unsafe start, closing contact, physical recovery, successful
+closure, and an earlier failed replay. Images and the HTML report stay outside
+Git, together with the other run artifacts.
 
-| Episode | Construction | Evidence / status |
-| --- | --- | --- |
-| 0, development | Frame 370, outward 0.10 m; fresh-prefix reauthored robot recovery | `curated_v0_5589647`: certified, three branches each 10/10; Hold development run safe noncompletion |
-| 4 | Frame 298, outward 0.11507409165778808 m; robot recovery with source closure suffix | `curated_v0_5589648`: certified, three branches each 10/10; Hold development run safe noncompletion |
-| 2 | Original frame 325, outward 0.0674087919960872 m (0.60 extent) | `curated_v0_5589224`: valid hazard and twin; recovery safely repositions but cabinet remains open; testing frame 300 |
-| 6 | Frame 269, 20 common neutral steps before intervention, 0.80 extent | Testing repair for historical robot-speed failure |
-| 7 | Frame 325, 10 common neutral steps before intervention, 0.80 extent | Testing repair for historical fixture drift |
-
-Distinct source episodes count toward five; variants or repeated rollouts do
-not. The already downloaded 101-episode package remains the candidate pool.
-Episode 9's old grid found no hazard; it is not mandatory for the new set.
-
-## Verified fixes and limits
-
-The first unified run (`5580280`) showed that the old stored recovery did not
-complete the task under fresh prefix replay. Reauthoring alone (`5584953`)
-still failed independent replay. The simulator owns an independent
-`np.random.default_rng(seed)`; setting only NumPy's global seed did not seed it.
-Explicitly seeded, unrendered author and replay matched exactly in jobs
-`5589223`–`5589225`. A separate rendering-induced difference was subsequently
-confirmed; visualizations now render stored scored states after execution.
-
-Episode 0's author still reports a branch-pose return timeout, while its emitted
-robot actions safely complete the original task. Outcome scoring preserves that
-success and separately retains the diagnostic. Episode 2's real noncompletion
-still fails. Dangerous task success is counted in crash rate, and Hold is safe
-noncompletion rather than recovery. No fixture-joint torque is used by these
-witnesses.
-
-The start probe is discarded and a new prefix reconstructed before each witness.
-The ten initial neutral actions in the recovery file remain part of the scored
-continuation; they are not also inserted into its start. Any common neutral
-prefix is applied before the target-object pose intervention for every branch.
-
-Final input/predicate hashes, all start and identity checks, matched common
-states and at least 9/10 expected outcomes per branch are required. Support
-contact and numerical contact overlap are being checked before final validation.
-No five-item completion claim is made. See [STATUS.md](STATUS.md) for current
-commits, commands, tests and jobs.
-
-## Illustrated progress report
-
-The companion HTML report uses simple English and pictures from real runs.
-It shows the unsafe start, the unsafe closing path, the robot recovery, and an
-earlier failed replay. The pictures and HTML file stay outside Git.
-
-On Quest, after loading the ignored paths file, build it with:
+After loading the ignored paths file, build the report with:
 
 ```bash
 "$ROBOCASA_FOUNDATION_ENV/bin/python" scripts/robocasa_foundation/build_progress_report.py \
@@ -85,5 +90,7 @@ On Quest, after loading the ignored paths file, build it with:
   --output "$ROBOCASA_RUN_ROOT/curated_v0_progress/report.html"
 ```
 
-The report reads the current certified item list and checks the saved results.
-It does not run the simulator or change any scores.
+This only reads saved results and images. It does not run the simulator.
+
+The old frozen experiment remains **0/5, NO-GO**. Its inputs and reports have
+not been changed. This curated prototype is a separate result.

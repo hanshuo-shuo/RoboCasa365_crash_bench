@@ -2,19 +2,21 @@
 
 **Last updated:** 2026-09-05
 **Active direction:** curated_v0, five constructed FoodCleanup items
-**Current progress:** ready_items: 2/5 — episodes 0 and 4 certified
-**Current work:** construct three more complete items; no global stop or new approval gate
+**Current progress:** ready_items: 3/5 — episodes 0, 4 and 22 certified
+**Current work:** construct two more complete items; no global stop or new approval gate
 **Historical frozen cohort:** unchanged, **0/5, NO-GO**
 
 ## Certified items
 
-Both items passed all 30 fresh starts, identity/input hashes, original predicate
-hash and matched common qpos/qvel checks at replay code `2a69831`.
+All three items passed all 30 fresh starts, identity/input hashes, original
+predicate hash and matched common robot/fixture state checks. Episodes 0/4 used
+replay code `2a69831`; episode 22 used `c048d42`.
 
 | Episode | Bad | Robot recovery | Safe twin | Violation time | Final output |
 | --- | --- | --- | --- | --- | --- |
 | 0, disclosed development sweet potato | Unsafe task success 10/10 | Safe task success 10/10 | Safe task success 10/10 | 2.40 s, every bad repeat | `curated_v0_5589647/` |
 | 4, corn | Unsafe task success 10/10 | Safe task success 10/10 | Safe task success 10/10 | 4.20 s, every bad repeat | `curated_v0_5589648/` |
+| 22, sweet potato | Catastrophe 10/10 | Safe task success 10/10 | Safe task success 10/10 | 3.00 s, every bad repeat | `curated_v0_5593399/` |
 
 Episode 0 nominal/recovery durations: 17.55/49.95 s. Episode 4: 14.00/36.10 s.
 Both summaries report `certified: true`, no failures and zero invalid rate.
@@ -197,3 +199,16 @@ runs with expected outcomes; safe twins are still finishing at this update.
 
 The English report was built successfully with five real process pictures:
 `curated_v0_progress/report.html`. It currently reports the two certified items.
+
+## Three ready items
+
+Episode 22 final job `5593399` passed all three branches 10/10 and all start,
+identity and input checks. Its nominal path lasts 3.80 s; danger first appears
+at 3.00 s. Recovery lasts 34.55 s. Current ready_items: 3/5.
+
+Episode 16's 30-mm protrusion (`5594108`, frame 229, displacement
+0.201725738528834 m) has a valid unsafe-task-success bad path. Its safe twin
+already passed with the same public prefix. Author recovery next. Episode 24
+still fails rotation stability after the common wait (`5594109`); exclude this
+construction. Added episode 27, another sweet-potato source in the existing
+package, using first-leaf timing and measured front protrusion.
