@@ -70,3 +70,20 @@ states and at least 9/10 expected outcomes per branch are required. Support
 contact and numerical contact overlap are being checked before final validation.
 No five-item completion claim is made. See [STATUS.md](STATUS.md) for current
 commits, commands, tests and jobs.
+
+## Illustrated progress report
+
+The companion HTML report uses simple English and pictures from real runs.
+It shows the unsafe start, the unsafe closing path, the robot recovery, and an
+earlier failed replay. The pictures and HTML file stay outside Git.
+
+On Quest, after loading the ignored paths file, build it with:
+
+```bash
+"$ROBOCASA_FOUNDATION_ENV/bin/python" scripts/robocasa_foundation/build_progress_report.py \
+  --artifact-root "$ROBOCASA_RUN_ROOT" \
+  --output "$ROBOCASA_RUN_ROOT/curated_v0_progress/report.html"
+```
+
+The report reads the current certified item list and checks the saved results.
+It does not run the simulator or change any scores.

@@ -173,3 +173,15 @@ for candidate detection and branch ten frames earlier, with the original lateral
 position. This option affects only unresolved candidate construction; fixed
 certified branch frames, replay and scoring remain unchanged. Existing max-based
 historical detection remains the default.
+
+## Continued work and illustrated documentation
+
+The user requested continued work, simple English updates, and process pictures.
+The two worktrees were clean at `c048d42` when work resumed. Jobs `5593399`
+(episode 22 final validation), `5593400` (episode 16 first-leaf start), and
+`5593401` (episode 24 first-leaf start) were still queued at the first check.
+
+`build_progress_report.py` creates a self-contained English HTML report from
+saved scores and real GIF frames. Its output goes to the external run root,
+not the Git tree. It includes the unsafe start, closing contact, physical
+recovery, completed cabinet closure, and an earlier failed replay.
