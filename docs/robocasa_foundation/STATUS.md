@@ -62,6 +62,17 @@ not classify this routine saturation as execution failure. No benchmark inputs
 or scoring changed. Failed traces stay at
 `/projects/p33100/siosio/robocasa_foundation_runs/pi05_pilot_v1_5693189`.
 
+The saturation regression checks passed **5/5** (12.65 s), including equivalence
+to the installed Controller.scale_action. Retry **5693376** was canceled just
+after startup, before rollout, after the saved initial observations exposed a
+small timestamp mismatch: identical robot qpos but up to 0.000269 difference in
+derived proprioception. The risk pose edit forwards kinematics; the safe start
+retains the simulator's final-step derived poses. Observations now recompute
+the official sensors on the same synchronized visual simulator as the images,
+without forwarding or changing the scored simulator. This is an observation
+adapter fix; it does not modify frozen states or scores. A fresh interface run
+will verify matched robot input and unchanged physics before full evaluation.
+
 ## Final evidence
 
 All five items passed ten fresh runs of bad, recovery and safe twin: **150

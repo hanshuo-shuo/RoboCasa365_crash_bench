@@ -12,11 +12,6 @@ def observation(env, visual, instruction, config):
     from robocasa.wrappers.gym_wrapper import PandaOmronKeyConverter
     from openpi_client import image_tools
     before = np.asarray(env.sim.get_state().flatten()).copy()
-    raw = env._get_observations(force_update=True)
-    mapped = PandaOmronKeyConverter.map_obs_in_eval(raw)
-    state = np.concatenate([mapped[k].astype(np.float32) for k in STATE_KEYS])
-    if state.shape != (16,) or not np.isfinite(state).all():
-        raise ValueError("Invalid official proprioception")
     visual.sim.set_state_from_flattened(before)
     visual.sim.data.ctrl[:] = env.sim.data.ctrl
     if env.sim.model.nmocap:
@@ -25,6 +20,14 @@ def observation(env, visual, instruction, config):
     visual.sim.forward()
     if not np.array_equal(visual.sim.data.qpos, env.sim.data.qpos):
         raise RuntimeError("Visual qpos differs from current scored state")
+    # Recompute official sensors from the same current qpos as the images.
+    # The scored simulator's derived site poses can lag its last integration;
+    # forwarding it would alter the certified physics, so only forward visual.
+    raw = visual._get_observations(force_update=True)
+    mapped = PandaOmronKeyConverter.map_obs_in_eval(raw)
+    state = np.concatenate([mapped[k].astype(np.float32) for k in STATE_KEYS])
+    if state.shape != (16,) or not np.isfinite(state).all():
+        raise ValueError("Invalid official proprioception")
     result = {"observation/state": state, "prompt": instruction}
     for key, camera in CAMERAS.items():
         size = config["camera_render_size"]

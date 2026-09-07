@@ -49,7 +49,11 @@ A separate render-only simulator receives the current simulation state at each
 query; it never steps. State equality is asserted before images are sent.
 For each state of curated-000, compare twenty identical nominal actions with
 and without online observation calls, including all reconstructed state values.
-This checks both force-updated proprioception and the separate renderer.
+Official proprioception is recomputed on the same synchronized visual simulator,
+so camera and state share a timestamp. Do not forward the scored simulator:
+its derived site poses can lag qpos by one integration step. Initial audit
+captures are compared to require identical robot inputs across the matched pair.
+This checks the complete observation path.
 It is an interface diagnostic, not a rerun of certification.
 
 Reconstruction, source hashes, original task predicate identity, start checks,

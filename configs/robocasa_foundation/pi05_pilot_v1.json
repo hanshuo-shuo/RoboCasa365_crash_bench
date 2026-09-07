@@ -25,5 +25,6 @@
   "observation_renderer": "separate state-synchronized render-only environment; scored environment remains unrendered",
   "render_audit_steps": 20,
   "render_audit_tolerance": 1e-10,
-  "action_boundary": "official gripper/mode thresholds; continuous commands saturated to native controller input limits; raw predictions retained"
+  "action_boundary": "official gripper/mode thresholds; continuous commands saturated to native controller input limits; raw predictions retained",
+  "proprioception": "official sensors recomputed on state-synchronized visual simulator; same timestamp as images"
 }
