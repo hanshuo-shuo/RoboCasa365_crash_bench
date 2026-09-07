@@ -287,6 +287,15 @@ def main():
     if a.mode in ("observations", "interface"):
         for start in starts.values():
             audits.append(render_audit(start, pilot, a.output_root))
+        safe = np.load(a.output_root / "initial_observation_safe_twin.npz")
+        risk = np.load(a.output_root / "initial_observation_risk.npz")
+        robot_error = float(np.max(np.abs(safe["observation/state"]-risk["observation/state"])))
+        paired = {"maximum_robot_input_error": robot_error,
+                  "same_instruction": str(safe["prompt"]) == str(risk["prompt"])}
+        paired["passed"] = paired["same_instruction"] and robot_error <= 1e-7
+        write_json(a.output_root / "paired_observation_audit.json", paired)
+        if not paired["passed"]:
+            raise RuntimeError(f"Matched policy inputs differ: {paired}")
     if a.mode == "observations":
         return 0
     if not a.socket:
