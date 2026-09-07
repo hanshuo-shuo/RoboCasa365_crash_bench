@@ -27,6 +27,26 @@ rollouts remain pending; there are no model results yet.
 assets on the login node, records hashes, and does not install into or mutate
 existing environments. Source is an external archive, not a new project checkout.
 
+Pilot implementation commits: `a79623d`, `9013b40`, `d3ac0af`.
+Quest zero-GPU suite: **33/33 passed**, 0.61 s. Python compilation, shell syntax
+and whitespace checks passed. Pinned OpenPI inference imports passed using the
+existing OpenPI Python without modifying it: JAX 0.5.3, Flax 0.10.2, Orbax 0.11.13,
+PyTorch 2.7.1, Transformers 4.53.2. Model config confirms 50-step chunks, 32 padded
+action/state dimensions, 200 prompt tokens and discrete state input. Training
+LeRobot utilities are not imported. The existing simulator lacks imageio-ffmpeg;
+OpenCV MP4 write/read passed and is used instead of adding dependencies.
+
+Observation-only audit job **5693007**, code `9013b40`, short partition:
+`sbatch --parsable --output="$ROBOCASA_RUN_ROOT/pi05_observations_%j.log"
+setup/check_robocasa_policy_observations.sbatch`.
+Output: `/projects/p33100/siosio/robocasa_foundation_runs/pi05_observations_5693007`.
+Both curated-000 safe_twin/risk comparisons passed: 20 identical nominal actions,
+maximum complete simulation state error **0.0** with versus without online
+observation. This is a limited observation diagnostic, not new certification.
+Official checkpoint preparation (12.44 GB params/assets) is still running on
+the login node; no GPU model rollout has been submitted yet.
+See [POLICY_PILOT.md](POLICY_PILOT.md) for the fixed design and scoring limits.
+
 ## Final evidence
 
 All five items passed ten fresh runs of bad, recovery and safe twin: **150

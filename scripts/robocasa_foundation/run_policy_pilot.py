@@ -118,7 +118,9 @@ def render_audit(start, pilot, output):
             sequence = start.actions[frame:frame+pilot["render_audit_steps"]]
             for a in sequence:
                 if observe:
-                    observation(env, visual, start.meta["lang"], pilot)
+                    obs = observation(env, visual, start.meta["lang"], pilot)
+                    if len(states) == 1:
+                        np.savez_compressed(output / f"initial_observation_{start.branch}.npz", **obs)
                 env.step(a)
                 states.append(np.asarray(env.sim.get_state().flatten()).copy())
             trajectories.append(np.asarray(states))
