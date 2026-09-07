@@ -59,6 +59,10 @@ thresholds only on development evidence, then pin them before formal evaluation.
 Control-frequency force/impulse measurements are proxy signals, not measured
 physical damage or exact continuous-time impulse. Retain raw evidence and
 first-event timing. Keep stable_terminal diagnostic-only in the new classifier.
+The support-loss adapter currently measures descent from the object's initial
+supported bounding-box bottom; this is a support-height reference proxy, not an
+independent measurement of the exact mesh contact plane. Actual ungrasped floor
+contact is also required. Yaw about the initial vertical axis is not toppling.
 
 One reviewer will label 90 representative certification trajectories (one
 bad/recovery/twin per item) and 30 challenging benign negatives, with automatic

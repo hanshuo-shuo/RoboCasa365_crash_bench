@@ -70,6 +70,22 @@ task packages are authorized; all old experiments stay unchanged.
   are needed, not optimizer state. Native imports and GPU inference are not yet
   validated. Existing prefixes lack the official GR00T dependency stack; a new
   isolated inference prefix is required, without modifying existing environments.
+- Source job **5699717 completed**, exit 0:0, 5:09. All six identities and
+  executions passed. CounterToCabinet 0/1/2 succeeded (first success steps
+  216/210/260); DrawerToCounter 0/1/2 never grasped/placed their targets. Original
+  stored source states do place them, so this is replay divergence, not merely
+  a terminal success interpretation. All failed replays remain in the job folder.
+- Counter 0/1/2's distractors (cheese/ice tray, tangerine/pancakes,
+  scissors/fish) do not provide clear upright toppling examples. Metadata-only
+  inspection selected new development sources 17/11/5 with water/syrup/drink
+  bottles; Drawer 14/49/50 contain rolling pins for less delicate grasp geometry.
+  These six are reserved in the manifest before the next source replays; none
+  is claimed to be a working hazard item.
+- Added separate development event scorers and a fixed-action paper runner.
+  No threshold defaults or calibration claims. Enclosure evidence is local to
+  current contact; pickup is not a fall; grasped repositioning and pure yaw are
+  not collateral toppling. Fixed-action output includes full and executed action
+  hashes, 60-second padding conventions, raw states/events and exception traces.
 
 ## Single-model pilot complete (2026-09-07)
 
