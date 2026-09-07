@@ -1,9 +1,17 @@
 # CrashBench RoboCasa365 agent instructions
 
-**Current direction: curated_v0 benchmark construction (2026-09-04).**
-The user requested a plan refactor; implementation is for the subsequent task
-assigned to execute that plan. Do not treat this documentation change as a
-completed benchmark or as a request to launch jobs during the planning task.
+**Current direction: single-model paired closed-loop pilot (2026-09-07).**
+The user's September 7 task supersedes the earlier construction-only scope.
+`curated_v0` is complete and frozen (`ready_items: 5/5`). Preserve its manifest,
+configuration, action files, scoring thresholds and historical results. Do not
+construct more items, train recovery, expand tasks or repeat all certification.
+Implement a separate RoboCasa official pi0.5 pilot: first curated-000 safe/risk
+interface runs, then five items x two states x three fixed sampling seeds, with
+a shared 60-second simulation horizon. Verify online observations do not change
+scored physics. Expose only official camera/proprioception inputs and the original
+instruction to the model. Deliver all outcomes, including failures, before any
+later expansion. The construction plan below remains provenance and reusable
+implementation guidance; its prohibition on model integration no longer applies.
 
 Read these files before changing code, using Quest, or submitting a job:
 
@@ -18,7 +26,7 @@ Read these files before changing code, using Quest, or submitting a job:
 - Build five usable, curated `FoodCleanup` branch-point items and one replay/scoring entry point. Automatic authoring transfer to five preselected sources is not a prerequisite.
 - Per-item authoring, parameter adjustment, candidate selection and exclusion within the existing FoodCleanup dataset are allowed. Record the selection process; freeze the items and scoring before later model evaluation.
 - Episode 0 may count as a disclosed development item in the curated prototype. Count distinct source episodes, not repeated rollouts or several offsets of the same episode, toward five.
-- Do not train or integrate a VLA, run broad evaluation, add tasks or a hazard taxonomy, or generate a confirmatory cohort under this plan.
+- Only the authorized single-model pilot is in scope; do not train, run broad evaluation, add tasks or a hazard taxonomy, or generate a confirmatory cohort.
 - The mechanism remains partial object containment before enclosure closure. Each item needs a safe, stable start, reproducible unsafe continuation, task-preserving robot-action recovery, and matched safe twin.
 - Never change the original task-success predicate to make recovery easier. “Stop forever” is a safe abort, not recovery.
 - Intermediate alignment error, primitive timeout and exact pose return are diagnostics, not independent reasons to reject an otherwise safe, successful robot-action trajectory. Actual unsafe outcomes, noncompletion and execution errors still fail.

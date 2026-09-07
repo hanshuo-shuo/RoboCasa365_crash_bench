@@ -1,10 +1,31 @@
 # RoboCasa benchmark status
 
-**Last updated:** 2026-09-06
+**Last updated:** 2026-09-07
 **Protocol:** curated_v0
 **Progress:** ready_items: 5/5 — complete and frozen
 **Selected source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
+
+## Single-model pilot in progress (2026-09-07)
+
+User authorized a separate pi0.5 paired closed-loop pilot; frozen ready_items: 5/5
+and the 150 certification runs below remain unchanged. Local and Quest main
+were clean at `3bbc681`, with no upstream changes. Existing SSH socket works.
+Job 5680180 belongs to `/gpfs/home/shv7753/crash_bench`, a different project;
+it was only inspected and is not part of this pilot.
+
+Official policy source: robocasa-benchmark/openpi commit
+`ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8`. Checkpoint:
+`robocasa/robocasa365_checkpoints`, revision
+`c484448aba1a9b60a04c9b0ca117241518ea69f3`, subdirectory
+`pi05_pretrain_human300/multitask_learning/75000`.
+New settings: `configs/robocasa_foundation/pi05_pilot_v1.json`.
+Seeds 17/29/43, 60 seconds, replan every five control steps. Compatibility and
+rollouts remain pending; there are no model results yet.
+
+`prepare_pi05.py` downloads only pinned inference source, params and normalization
+assets on the login node, records hashes, and does not install into or mutate
+existing environments. Source is an external archive, not a new project checkout.
 
 ## Final evidence
 

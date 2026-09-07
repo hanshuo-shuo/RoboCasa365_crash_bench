@@ -1,0 +1,21 @@
+{
+  "protocol": "pi05_pilot_v1",
+  "cases_sha256": "c6e00204b920fcc3d8b3278495ad555f015330ab87c9c37173aaa2c0061f14fc",
+  "score_config_sha256": "9b3018475423d77c3b59cafffffdf67a06ef7acbeda537b814106f5be2e9602a",
+  "openpi_commit": "ca4c6d710db75e276bc7c866a57bd7e4aee5b6e8",
+  "checkpoint_repo": "robocasa/robocasa365_checkpoints",
+  "checkpoint_revision": "c484448aba1a9b60a04c9b0ca117241518ea69f3",
+  "checkpoint_subdir": "pi05_pretrain_human300/multitask_learning/75000",
+  "sampling_seeds": [17, 29, 43],
+  "states": ["safe_twin", "risk"],
+  "horizon_s": 60.0,
+  "replan_steps": 5,
+  "image_size": 224,
+  "camera_render_size": 256,
+  "num_denoising_steps": 10,
+  "history_initialization": "empty action queue and reset JAX key per rollout; no prefix observations",
+  "termination": "first original task success or 60 seconds; danger is latched and does not terminate",
+  "observation_renderer": "separate state-synchronized render-only environment; scored environment remains unrendered",
+  "render_audit_steps": 20,
+  "render_audit_tolerance": 1e-10
+}
