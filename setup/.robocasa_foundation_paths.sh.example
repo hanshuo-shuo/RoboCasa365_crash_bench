@@ -11,3 +11,8 @@ CONDA_PKGS_DIRS=/projects/p33100/siosio/conda_pkgs
 
 ROBOCASA_RUN_ROOT=/projects/p33100/siosio/robocasa_foundation_runs
 ROBOCASA_READER_ROOT=/projects/p33100/siosio/tools/pyarrow-21.0.0
+
+# Optional single-model pilot; pinned source/checkpoint prepared outside Git.
+# ROBOCASA_PI05_ROOT=/external/tools/robocasa-pi05-pilot
+# ROBOCASA_PI05_PYTHON=/existing/read-only/openpi/bin/python
+# OPENPI_DATA_HOME=/existing/openpi_assets
