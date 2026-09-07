@@ -95,3 +95,11 @@ timing and a policy-view MP4. Results CSV and summary include every attempted
 rollout, including exceptions. Model files have pinned revisions and SHA-256
 provenance. The full pilot has its own directory and does not overwrite interface
 results. Actual commands, checks, failures and job IDs belong in STATUS.md.
+
+After the full pilot, `build_policy_report.py` audits all 30 saved results,
+trajectory lengths, action bounds, query schedules, source hashes, paired common
+contexts and score/trace agreement without simulation. It writes an item table,
+CSV-linked Markdown/HTML report and audit JSON under the run output. The optional
+report Slurm wrapper uses the existing OpenPI environment's bundled FFmpeg to
+produce browser-compatible H.264 copies of the ten seed-17 representative videos;
+original MP4 and full traces remain intact. No video package is installed.
