@@ -22,6 +22,19 @@ These output paths must be new. The preparer verifies existing FoodCleanup and
 downloads only the two approved atomic task packages; it refuses a Slurm job.
 The audit preserves all old scores and reports diagnostic evidence separately.
 
+For the second official policy, set `ROBOCASA_GR00T_ROOT` and the new sibling
+`ROBOCASA_GR00T_ENV` (basename `robocasa-gr00t-paper`) in the ignored paths file.
+The dedicated installer rejects existing environments without task ownership:
+
+```bash
+"$ROBOCASA_FOUNDATION_ENV/bin/python" scripts/robocasa_foundation/prepare_gr00t.py \
+  --root "$ROBOCASA_GR00T_ROOT" --config configs/robocasa_foundation/gr00t_paper_v1.json
+bash setup/install_robocasa_gr00t_inference.sh
+```
+
+Run both commands on the login node. They do not establish GPU inference or
+paired policy performance; those require the subsequent checked-in GPU check.
+
 The Quest environment has already been created. Do not reinstall it unless the
 environment handoff explicitly says it is broken.
 
