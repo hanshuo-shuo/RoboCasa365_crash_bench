@@ -43,6 +43,19 @@ task packages are authorized; all old experiments stay unchanged.
   reusing the original task factory/replay. Source-screen results are feasibility
   evidence, not hazard certification. Its checked-in CPU wrapper is
   `setup/screen_robocasa_paper_sources.sbatch`.
+- Corrected download run at `ffc37eb` **passed**. DrawerToCounter has 103
+  episodes / 31,819 frames / 729 files; CounterToCabinet has 108 episodes /
+  24,225 frames / 764 files. Both are 20-Hz PandaOmron with all three official
+  cameras. Report: `/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_dataset_prepare_ffc37eb.json`.
+  Archive SHA-256s are `04346aaa9030d86114d097f420240bc6df5e8e606bd01042aa81f433a86bbb49`
+  and `505319a18432c186f6f7d20b1e75771c84b2019a5efd7c2c5de6446f4c54fe78`.
+- Full local suite at `ffc37eb`: **95 passed, 1 skipped, 66 subtests**, 0.56 s;
+  the skipped controller-saturation comparison requires installed robosuite.
+  No local packages were installed. Episodes 0/1/2 of each new task are declared
+  development sources before source replay, and excluded from evaluation.
+- Added an anonymous pilot inspection-pack builder using only saved model
+  queries around flagged events. Seven focused tests pass. Its CSV contains
+  blank human labels, and sparse query images do not establish contact causation.
 
 ## Single-model pilot complete (2026-09-07)
 
