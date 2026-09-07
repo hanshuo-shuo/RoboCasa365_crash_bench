@@ -25,7 +25,9 @@
     {"dataset_key": "counter_to_cabinet", "episode": 5},
     {"dataset_key": "drawer_to_counter", "episode": 14},
     {"dataset_key": "drawer_to_counter", "episode": 49},
-    {"dataset_key": "drawer_to_counter", "episode": 50}
+    {"dataset_key": "drawer_to_counter", "episode": 50},
+    {"dataset_key": "drawer_to_counter", "episode": 57},
+    {"dataset_key": "drawer_to_counter", "episode": 8}
   ],
-  "notes": "Twelve prior FoodCleanup attempts excluded. New-task 0/1/2 screened first; Drawer targets missed grasp and Counter distractors lack clear upright toppling geometry. Metadata-selected bottles (Counter17/11/5) and rolling pins (Drawer14/49/50) reserved as development before the next replay."
+  "notes": "Twelve prior FoodCleanup attempts excluded. New-task 0/1/2 screened first; Drawer targets missed grasp and Counter distractors lack upright geometry. Next replay: Counter17/11/5 bottles and Drawer57/14/8 (two rolling-pin assets and a measuring cup), chosen from metadata before replay. Drawer49/50 remain reserved, unrun backups."
 }
