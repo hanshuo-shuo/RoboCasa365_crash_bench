@@ -56,7 +56,10 @@ def extract_archive(archive: Path, target: Path) -> None:
     with tarfile.open(archive, "r:*") as bundle:
         for member in bundle:
             relative = relative_path(member.name)
-            if relative.parts[0] != "lerobot" or not (member.isdir() or member.isfile()):
+            # The actual official task archives also contain a top-level README.
+            # Keep that inert provenance document, without admitting arbitrary roots.
+            readme = relative.as_posix() == "README.md" and member.isfile()
+            if (relative.parts[0] != "lerobot" and not readme) or not (member.isdir() or member.isfile()):
                 raise ValueError(f"unexpected archive member: {member.name}")
             name = str(relative)
             if name in seen:

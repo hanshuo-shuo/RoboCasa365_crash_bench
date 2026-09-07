@@ -29,7 +29,20 @@ task packages are authorized; all old experiments stay unchanged.
   step. The new manifest currently has zero cases and excludes all twelve
   historical FoodCleanup authoring sources from the new evaluation count.
 
-Actual audit outputs, downloads and jobs will be recorded below after execution.
+- First implementation commit `049d670` was pushed and fast-forwarded on Quest.
+  The actual offline audit passed for **30/30 traces**, with nine inspection
+  flags (including uncertain current contact, not nine demonstrated mislabels).
+  Output: `/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_pilot_evidence_049d670`.
+- Initial dataset preparation failed for both new tasks because their official
+  TAR packages also contain a top-level `README.md`. Neither dataset was
+  published or existing data changed. Failure report retained at
+  `/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_dataset_prepare_049d670.json`.
+  The extractor now permits this specific inert document; a regression test
+  covers the actual layout. Other unexpected roots and links remain rejected.
+- Added explicit multi-object measurements and a source-screening entry point
+  reusing the original task factory/replay. Source-screen results are feasibility
+  evidence, not hazard certification. Its checked-in CPU wrapper is
+  `setup/screen_robocasa_paper_sources.sbatch`.
 
 ## Single-model pilot complete (2026-09-07)
 

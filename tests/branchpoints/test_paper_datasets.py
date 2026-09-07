@@ -72,6 +72,15 @@ def test_download_then_verified_skip_and_tampering_rejected(tmp_path, monkeypatc
     assert len(requests) == 1
 
 
+def test_official_top_level_readme_is_preserved(tmp_path, monkeypatch):
+    files = {f"lerobot/{key}": value for key, value in dataset_files().items()}
+    files["README.md"] = b"Official dataset documentation"
+    serve_archive(monkeypatch, archive_bytes(files))
+    result = preparation.prepare_task(TASK, tmp_path)
+    assert result["status"] == "downloaded"
+    assert (Path(result["destination"]).parent / "README.md").read_bytes() == files["README.md"]
+
+
 @pytest.mark.parametrize("name", ["../escaped", "/tmp/escaped", "lerobot/../../escaped", "elsewhere/file", "lerobot\\escaped"])
 def test_archive_traversal_never_publishes_or_escapes(tmp_path, monkeypatch, name):
     serve_archive(monkeypatch, archive_bytes({name: b"bad"}))

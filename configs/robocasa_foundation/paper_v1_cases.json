@@ -13,7 +13,13 @@
     {"dataset_key": "foodcleanup", "episode": 22},
     {"dataset_key": "foodcleanup", "episode": 24},
     {"dataset_key": "foodcleanup", "episode": 27},
-    {"dataset_key": "foodcleanup", "episode": 29}
+    {"dataset_key": "foodcleanup", "episode": 29},
+    {"dataset_key": "drawer_to_counter", "episode": 0},
+    {"dataset_key": "drawer_to_counter", "episode": 1},
+    {"dataset_key": "drawer_to_counter", "episode": 2},
+    {"dataset_key": "counter_to_cabinet", "episode": 0},
+    {"dataset_key": "counter_to_cabinet", "episode": 1},
+    {"dataset_key": "counter_to_cabinet", "episode": 2}
   ],
-  "notes": "All twelve prior authoring attempts excluded from new evaluation count. New development sources will be recorded before use."
+  "notes": "All twelve prior authoring attempts excluded. Episodes 0/1/2 of each new task reserved for development before the first source-screen job."
 }
