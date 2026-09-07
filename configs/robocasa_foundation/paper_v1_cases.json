@@ -1,0 +1,19 @@
+{
+  "protocol": "paper_v1",
+  "cases": [],
+  "development_sources": [
+    {"dataset_key": "foodcleanup", "episode": 0},
+    {"dataset_key": "foodcleanup", "episode": 2},
+    {"dataset_key": "foodcleanup", "episode": 4},
+    {"dataset_key": "foodcleanup", "episode": 6},
+    {"dataset_key": "foodcleanup", "episode": 7},
+    {"dataset_key": "foodcleanup", "episode": 12},
+    {"dataset_key": "foodcleanup", "episode": 15},
+    {"dataset_key": "foodcleanup", "episode": 16},
+    {"dataset_key": "foodcleanup", "episode": 22},
+    {"dataset_key": "foodcleanup", "episode": 24},
+    {"dataset_key": "foodcleanup", "episode": 27},
+    {"dataset_key": "foodcleanup", "episode": 29}
+  ],
+  "notes": "All twelve prior authoring attempts excluded from new evaluation count. New development sources will be recorded before use."
+}

@@ -1,10 +1,35 @@
 # RoboCasa benchmark status
 
 **Last updated:** 2026-09-07
-**Protocol:** curated_v0 (frozen); pi05_pilot_v1 (complete)
-**Progress:** ready_items: 5/5 — complete and frozen
+**Protocol:** paper_v1 (development); curated_v0 and pi05_pilot_v1 (frozen)
+**Progress:** paper_v1 ready_items: 0/30; curated_v0 ready_items: 5/5
 **Selected source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
+
+## Paper implementation started (2026-09-07)
+
+The user approved the [paper_v1 protocol](PAPER_V1.md) and requested execution.
+Three mechanisms, thirty new source episodes, official pi05 plus GR00T N1.5,
+no training, scripted/curated construction, and one human reviewer. The two new
+task packages are authorized; all old experiments stay unchanged.
+
+- Both clean main checkouts were at `55381c7`; local `git fetch origin` found
+  no divergence. Existing Quest connection `/tmp/quest.sock` works.
+- All 30 formal pilot traces are present. Data root initially contains only
+  FoodCleanup; PickPlaceDrawerToCounter and PickPlaceCounterToCabinet are absent.
+  Project storage had 709 GB available. Existing environment Python is 3.11.16.
+- Implemented separate offline hazard audit, paper protocol/case checks and a
+  login-node task-package preparer. No new case, calibrated scorer, human label,
+  second-model interface or model result is claimed yet.
+- First focused local test run: **45 passed, 58 subtests**, 0.38 s, using the
+  existing `/private/tmp/crashbench-repair-venv/bin/python` (pytest 9.1.1,
+  NumPy 2.5.3, PyYAML 6.0.3). Command:
+  `PYTHONDONTWRITEBYTECODE=1 /private/tmp/crashbench-repair-venv/bin/python -m pytest -p no:cacheprovider tests/branchpoints/test_hazard_evidence.py tests/branchpoints/test_paper_protocol.py tests/branchpoints/test_paper_datasets.py -q`.
+- Source replay/measurements for the two new tasks are the next integration
+  step. The new manifest currently has zero cases and excludes all twelve
+  historical FoodCleanup authoring sources from the new evaluation count.
+
+Actual audit outputs, downloads and jobs will be recorded below after execution.
 
 ## Single-model pilot complete (2026-09-07)
 

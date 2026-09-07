@@ -1,17 +1,19 @@
 # CrashBench RoboCasa365 agent instructions
 
-**Current direction: single-model paired closed-loop pilot (2026-09-07).**
-The user's September 7 task supersedes the earlier construction-only scope.
-`curated_v0` is complete and frozen (`ready_items: 5/5`). Preserve its manifest,
-configuration, action files, scoring thresholds and historical results. Do not
-construct more items, train recovery, expand tasks or repeat all certification.
-Implement a separate RoboCasa official pi0.5 pilot: first curated-000 safe/risk
-interface runs, then five items x two states x three fixed sampling seeds, with
-a shared 60-second simulation horizon. Verify online observations do not change
-scored physics. Expose only official camera/proprioception inputs and the original
-instruction to the model. Deliver all outcomes, including failures, before any
-later expansion. The construction plan below remains provenance and reusable
-implementation guidance; its prohibition on model integration no longer applies.
+**Current direction: paper_v1 implementation (2026-09-07).**
+The user approved and requested implementation of the paper plan after the
+completed pi05 pilot. This supersedes the earlier five-item/single-model limits.
+Follow `docs/robocasa_foundation/PAPER_V1.md`: audit old hazard evidence first;
+build a separate 30-item, three-mechanism benchmark using FoodCleanup,
+PickPlaceDrawerToCounter and PickPlaceCounterToCabinet; evaluate official pi05
+and GR00T N1.5 without training. The user chose scripted/curated construction,
+a 4–6 week effort, and one human reviewer. Downloads of these two new task
+packages and the official second model are authorized on the login node.
+`curated_v0` (ready_items: 5/5) and pi05_pilot_v1 are complete and frozen.
+Preserve their manifests, configurations, action files, scoring and historical
+results. New scoring and experiments use separate files and output directories;
+do not repeat unaffected old certification. Only official camera/proprioception
+and the original instruction reach a model; observation must not change physics.
 
 Read these files before changing code, using Quest, or submitting a job:
 
@@ -20,14 +22,20 @@ Read these files before changing code, using Quest, or submitting a job:
 3. `QUEST_WORKFLOW.md`
 4. `setup/README.md`
 5. `docs/robocasa_foundation/STATUS.md`
+6. `docs/robocasa_foundation/PAPER_V1.md`
 
 ## Scope and scientific guardrails
 
-- Build five usable, curated `FoodCleanup` branch-point items and one replay/scoring entry point. Automatic authoring transfer to five preselected sources is not a prerequisite.
-- Per-item authoring, parameter adjustment, candidate selection and exclusion within the existing FoodCleanup dataset are allowed. Record the selection process; freeze the items and scoring before later model evaluation.
-- Episode 0 may count as a disclosed development item in the curated prototype. Count distinct source episodes, not repeated rollouts or several offsets of the same episode, toward five.
-- Only the authorized single-model pilot is in scope; do not train, run broad evaluation, add tasks or a hazard taxonomy, or generate a confirmatory cohort.
-- The mechanism remains partial object containment before enclosure closure. Each item needs a safe, stable start, reproducible unsafe continuation, task-preserving robot-action recovery, and matched safe twin.
+- Build ten new independent source episodes for each of enclosure obstruction,
+  support loss and collateral toppling. Existing authoring attempts remain
+  disclosed development sources, not new evaluation items.
+- Per-item scripts, adjustments and exclusions are allowed. Freeze scoring and
+  cases before model evaluation; never select cases by tested model outcomes.
+- Count dataset/source episodes, not sampling seeds or offsets, as sample units.
+- Only paper_v1's three tasks, two official models and declared replanning
+  ablation are authorized. Do not train recovery or build a general framework.
+- Each item needs a safe, stable start, reproducible unsafe continuation,
+  task-preserving robot-action recovery within 60 seconds, and matched safe twin.
 - Never change the original task-success predicate to make recovery easier. “Stop forever” is a safe abort, not recovery.
 - Intermediate alignment error, primitive timeout and exact pose return are diagnostics, not independent reasons to reject an otherwise safe, successful robot-action trajectory. Actual unsafe outcomes, noncompletion and execution errors still fail.
 - Direct cabinet-joint torque is an auxiliary diagnostic, not a recovery witness in the robot action space. Reuse the historical robot-action witness before building another general controller.
@@ -74,8 +82,8 @@ in progress, not a reason to repeatedly stop.
 - Use an ignored local paths file based on
   `setup/.robocasa_foundation_paths.sh.example`; never commit machine-specific
   paths.
-- Reuse the installed environment, source data, prefix replay, metrics and
-  witness code. Start with one real item through one entry point, then grow to five.
+- Reuse the installed environment, source data, prefix replay and witness code.
+  Start with real development items before expanding to thirty new items.
 - Development search defaults to one rollout per candidate. Final item
   validation uses ten fresh replays per continuation; combine start/identity
   checks with these runs. Do not re-audit every restart mode.
@@ -86,5 +94,6 @@ in progress, not a reason to repeatedly stop.
 - Missing provenance, unknown identity, inconsistent XML or failed replay
   leaves the affected item uncertified. Fix or exclude it and continue with
   other candidates; a failed item does not stop the entire project.
-- Use `ready_items: N/5` for current progress. Keep incomplete work explicit;
+- Report `paper_v1 ready_items: N/30` separately from frozen `curated_v0: 5/5`.
+  Keep incomplete work explicit;
   do not add new stage approvals, research prerequisites or generic frameworks.

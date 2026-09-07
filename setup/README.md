@@ -1,5 +1,27 @@
 # RoboCasa365 foundation environment
 
+## Current paper_v1 work
+
+The approved [paper protocol](../docs/robocasa_foundation/PAPER_V1.md) extends
+coverage separately from the frozen five-item benchmark. New cases and scoring
+are under development; see [STATUS.md](../docs/robocasa_foundation/STATUS.md).
+
+On the Quest login node, after the usual clean-main Git synchronization:
+
+```bash
+source setup/.robocasa_foundation_paths.sh
+"$ROBOCASA_FOUNDATION_ENV/bin/python" scripts/robocasa_foundation/audit_hazard_evidence.py \
+  --root "$ROBOCASA_RUN_ROOT/pi05_pilot_v1_5694278/evaluation" \
+  --output-root "$ROBOCASA_RUN_ROOT/paper_v1_pilot_evidence"
+"$ROBOCASA_FOUNDATION_ENV/bin/python" scripts/robocasa_foundation/prepare_paper_datasets.py \
+  --data-root "$ROBOCASA_DATA_ROOT" \
+  --output "$ROBOCASA_RUN_ROOT/paper_v1_dataset_prepare.json"
+```
+
+These output paths must be new. The preparer verifies existing FoodCleanup and
+downloads only the two approved atomic task packages; it refuses a Slurm job.
+The audit preserves all old scores and reports diagnostic evidence separately.
+
 The Quest environment has already been created. Do not reinstall it unless the
 environment handoff explicitly says it is broken.
 

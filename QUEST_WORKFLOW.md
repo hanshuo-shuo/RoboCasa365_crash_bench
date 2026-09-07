@@ -67,9 +67,10 @@ login node.
 - Do not redownload the 23 GB asset directory merely because an import emits
   optional-component warnings.
 - The FoodCleanup package has already been downloaded and contains 101
-  episodes (see `docs/robocasa_foundation/TASK_SCREEN.md`). Curated authoring may
-  screen and select episodes within that package. Do not download more tasks
-  or the full RoboCasa dataset under the current plan.
+  episodes. The approved paper_v1 expansion also permits the registered
+  pretrain human packages for PickPlaceDrawerToCounter and
+  PickPlaceCounterToCabinet, plus the official GR00T N1.5 checkpoint. Download
+  only those required packages on a login node; do not download the full dataset.
 - Do not use a compute node for installation or downloading. GPU rendering and
   later simulator integration tests require a documented Slurm job script.
 - During implementation, adapt the existing checked-in job resources/modules
