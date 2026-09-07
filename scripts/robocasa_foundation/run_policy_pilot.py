@@ -168,14 +168,18 @@ def rollout(start, pilot, seed, conn, output):
         pos, quat = rt.object_pose(env)
         predicate.reset({"fixture_openness": rt.fixture_openness(env), "object_position": pos,
                          "object_quaternion_wxyz": quat})
-        import imageio.v2 as imageio
-        writer = imageio.get_writer(output / "policy_view.mp4", fps=freq/pilot["replan_steps"])
+        import cv2
+        size = pilot["image_size"]
+        writer = cv2.VideoWriter(str(output / "policy_view.mp4"), cv2.VideoWriter_fourcc(*"mp4v"),
+                                 freq/pilot["replan_steps"], (size, size))
+        if not writer.isOpened():
+            raise RuntimeError("Existing OpenCV cannot open MP4 writer")
         queue = []
         states.append(np.asarray(env.sim.get_state().flatten()).copy())
         for step in range(count):
             if not queue:
                 obs = observation(env, visual, start.meta["lang"], pilot)
-                writer.append_data(obs["observation/image"])
+                writer.write(obs["observation/image"][:, :, ::-1])
                 before = time.monotonic()
                 answer = rpc(conn, {"op": "infer", "observation": obs})
                 chunk = np.asarray(answer["actions"])
@@ -219,7 +223,7 @@ def rollout(start, pilot, seed, conn, output):
         result["execution_error"] = traceback.format_exc()
     finally:
         if writer is not None:
-            writer.close()
+            writer.release()
         if visual is not None:
             visual.close()
         if env is not None:
