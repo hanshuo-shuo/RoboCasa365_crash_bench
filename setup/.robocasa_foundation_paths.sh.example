@@ -16,3 +16,8 @@ ROBOCASA_READER_ROOT=/projects/p33100/siosio/tools/pyarrow-21.0.0
 # ROBOCASA_PI05_ROOT=/external/tools/robocasa-pi05-pilot
 # ROBOCASA_PI05_PYTHON=/existing/read-only/openpi/bin/python
 # OPENPI_DATA_HOME=/existing/openpi_assets
+
+# Optional paper_v1 second policy. Use a new isolated inference prefix;
+# never install its dependencies into existing model/simulator environments.
+# ROBOCASA_GR00T_ROOT=/external/tools/robocasa-gr00t-paper
+# ROBOCASA_GR00T_ENV=/external/envs/robocasa-gr00t-paper

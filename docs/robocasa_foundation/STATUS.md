@@ -56,6 +56,20 @@ task packages are authorized; all old experiments stay unchanged.
 - Added an anonymous pilot inspection-pack builder using only saved model
   queries around flagged events. Seven focused tests pass. Its CSV contains
   blank human labels, and sparse query images do not establish contact causation.
+- Quest full zero-GPU suite at `ffc37eb`: **96/96 passed**, 66 subtests,
+  16.39 s, including the native controller comparison. Source replay submitted
+  as job **5699717** with episodes 0/1/2 for both new tasks; running on qnode0102.
+  Early DrawerToCounter 0/1 records have no execution error but no final task
+  success; these are not certified samples. Inspect earlier success and physical
+  trajectory before deciding whether these sources can be used.
+- Nine anonymous actual-query inspection sheets were generated at
+  `/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_pilot_review_86652d5`.
+  `human_review.csv` is blank; the reviewer key is separate. Human review is pending.
+- GR00T official source/checkpoint pins and pure-NumPy input/action mapping are
+  implemented with 25 focused tests passing. Only five inference files (7.586 GB)
+  are needed, not optimizer state. Native imports and GPU inference are not yet
+  validated. Existing prefixes lack the official GR00T dependency stack; a new
+  isolated inference prefix is required, without modifying existing environments.
 
 ## Single-model pilot complete (2026-09-07)
 

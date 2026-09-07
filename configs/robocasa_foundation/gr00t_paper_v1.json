@@ -1,0 +1,10 @@
+{
+  "groot_commit": "9d7d7a9eb7ad30bd8ce30448d9ab53a918b45b10",
+  "checkpoint_repo": "robocasa/robocasa365_checkpoints",
+  "checkpoint_revision": "c484448aba1a9b60a04c9b0ca117241518ea69f3",
+  "checkpoint_subdir": "gr00t_n1-5/multitask_learning/checkpoint-120000",
+  "num_denoising_steps": 4,
+  "image_size": 256,
+  "camera_render_size": 256,
+  "notes": "Native 95-percent center crop and resize are performed by official GR00T transforms. No native import or inference validation claimed yet."
+}
