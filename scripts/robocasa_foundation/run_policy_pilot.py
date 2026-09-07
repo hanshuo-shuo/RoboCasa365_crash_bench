@@ -248,8 +248,8 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--dataset", type=Path, required=True)
     p.add_argument("--output-root", type=Path, required=True)
-    p.add_argument("--socket", required=True)
-    p.add_argument("--mode", choices=["interface", "full"], required=True)
+    p.add_argument("--socket")
+    p.add_argument("--mode", choices=["observations", "interface", "full"], required=True)
     p.add_argument("--interface-evidence", type=Path)
     p.add_argument("--config", type=Path, default=Path("configs/robocasa_foundation/pi05_pilot_v1.json"))
     a = p.parse_args()
@@ -262,7 +262,7 @@ def main():
     config = yaml.safe_load(score_path.read_text())
     selected = [c for c in manifest["cases"] if c["id"] in manifest["benchmark_case_ids"]]
     seeds = pilot["sampling_seeds"]
-    if a.mode == "interface":
+    if a.mode in ("observations", "interface"):
         selected = [c for c in selected if c["id"] == "curated-000"]
         seeds = seeds[:1]
     else:
@@ -278,9 +278,13 @@ def main():
         "cases_sha256": sha256_file(cases_path), "score_sha256": sha256_file(score_path)})
     starts = {(c["id"], b): Start(a.dataset, c, config, b) for c in selected for b in pilot["states"]}
     audits = []
-    if a.mode == "interface":
+    if a.mode in ("observations", "interface"):
         for start in starts.values():
             audits.append(render_audit(start, pilot, a.output_root))
+    if a.mode == "observations":
+        return 0
+    if not a.socket:
+        p.error("closed-loop evaluation requires --socket")
     conn = Client(a.socket, family="AF_UNIX", authkey=b"crashbench-local-pilot")
     results = []
     try:
@@ -293,7 +297,7 @@ def main():
     finally:
         conn.send({"op": "close"})
         conn.close()
-    if a.mode == "interface":
+    if a.mode in ("observations", "interface"):
         passed = len(results) == 2 and all(not r.get("execution_error") and r.get("identity_valid")
                     and r.get("query_count", 0) > 0 for r in results)
         # Matched common context and empty histories are required for the pair.
