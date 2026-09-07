@@ -3,6 +3,7 @@
 import argparse
 from collections import Counter
 import html
+import hashlib
 import json
 import subprocess
 from pathlib import Path
@@ -87,8 +88,11 @@ def main():
     p.add_argument('--ffmpeg', type=Path)
     a = p.parse_args()
     provenance = json.loads((a.root / 'provenance.json').read_text())
-    manifest = json.loads(Path('configs/robocasa_foundation/curated_v0_cases.json').read_text())
+    manifest_path = Path('configs/robocasa_foundation/curated_v0_cases.json')
+    manifest = json.loads(manifest_path.read_text())
     pilot = provenance['pilot']
+    if hashlib.sha256(manifest_path.read_bytes()).hexdigest() != pilot['cases_sha256']:
+        raise ValueError('Frozen manifest changed before reporting')
     results, issues = audit(a.root, manifest, pilot)
     audit_result = {'complete': len(results)==30, 'runs': len(results), 'issues': issues,
                     'passed': len(results)==30 and not issues}
@@ -115,7 +119,7 @@ def main():
                      f"{r.get('duration_s','—')} | {r.get('time_to_violation_s','—')} | [video]({name}/policy_view.mp4) |")
         if r['sampling_seed']==pilot['sampling_seeds'][0]:
             video_path = f'{name}/policy_view.mp4'
-            if a.ffmpeg and audit_result['passed']:
+            if a.ffmpeg and audit_result['passed'] and not r.get('execution_error'):
                 target = a.root/name/'policy_view_h264.mp4'
                 if not target.exists():
                     subprocess.run([str(a.ffmpeg), '-v', 'error', '-n', '-i', str(a.root/video_path),
