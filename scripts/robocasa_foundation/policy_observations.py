@@ -59,6 +59,16 @@ def robot_action(env, prediction):
         raise ValueError(f"Unprocessed action parts: {list(parts)}")
     action = np.concatenate(actions)
     low, high = env.action_spec
-    if action.shape != low.shape or np.any(action < low-1e-6) or np.any(action > high+1e-6):
-        raise ValueError("Converted action outside robot action specification")
-    return action
+    return bounded_action(action, low, high)
+
+
+def bounded_action(action, low, high):
+    """Canonical bounded command, equivalent to native Controller.scale_action.
+
+    The pinned fixed OSC/base/torso controllers clip input to these limits before
+    scaling. Keep raw model output separately; an overshoot is not an exception.
+    """
+    action = np.asarray(action)
+    if action.shape != low.shape or not np.isfinite(action).all():
+        raise ValueError("Invalid converted robot action")
+    return np.clip(action, low, high)

@@ -22,8 +22,11 @@ A rollout ends on first original FoodCleanup success or after 60 simulated
 seconds (1200 controls at 20 Hz). Danger latches and never stops execution.
 The model generates its official full chunk (default horizon 50); execute five
 controls and replan at 4 Hz simulated time. Store actual returned chunk lengths,
-query steps and wall-clock latency. No model output clipping is added; invalid
-shape, nonfinite values or converted actions outside action_spec fail execution.
+query steps and wall-clock latency. The adapter applies the native controller input saturation to continuous actions
+before execution, retaining all unsaturated predictions. This is equivalent to
+the pinned controllers' scale_action behavior. Invalid shapes/nonfinite values
+fail execution. The first interface attempt incorrectly rejected a -1.0176
+normalized command; that integration error and its partial traces are retained.
 
 The worker loads the pinned official model and transforms directly without
 importing training dataset utilities. This matches `pi05_pretrain_human300`:

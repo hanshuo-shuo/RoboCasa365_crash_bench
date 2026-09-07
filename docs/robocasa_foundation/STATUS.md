@@ -47,6 +47,21 @@ Official checkpoint preparation (12.44 GB params/assets) is still running on
 the login node; no GPU model rollout has been submitted yet.
 See [POLICY_PILOT.md](POLICY_PILOT.md) for the fixed design and scoring limits.
 
+Checkpoint download completed using already installed Xet after a slow HTTP
+transfer; no packages were installed. Prepared hashes and source archive are in
+`/projects/p33100/siosio/tools/robocasa-pi05-pilot/prepared.json`.
+
+First GPU interface job **5693189**, code `d1103e3`, A100, ended FAILED (1:0)
+after 6:17. Policy loaded successfully; both observation physics audits again
+had zero error, and actual three-camera inputs were inspected. Both rollouts
+were invalid due to an adapter error: strict action_spec rejection of small
+continuous overshoots (e.g. y=-1.0176 after 15 safe-twin controls). The official
+pinned OSC/base/torso controllers clip such input before scaling. The adapter
+now canonicalizes to those same limits, preserves raw predictions, and does
+not classify this routine saturation as execution failure. No benchmark inputs
+or scoring changed. Failed traces stay at
+`/projects/p33100/siosio/robocasa_foundation_runs/pi05_pilot_v1_5693189`.
+
 ## Final evidence
 
 All five items passed ten fresh runs of bad, recovery and safe twin: **150

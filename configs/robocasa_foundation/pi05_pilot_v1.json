@@ -6,8 +6,15 @@
   "checkpoint_repo": "robocasa/robocasa365_checkpoints",
   "checkpoint_revision": "c484448aba1a9b60a04c9b0ca117241518ea69f3",
   "checkpoint_subdir": "pi05_pretrain_human300/multitask_learning/75000",
-  "sampling_seeds": [17, 29, 43],
-  "states": ["safe_twin", "risk"],
+  "sampling_seeds": [
+    17,
+    29,
+    43
+  ],
+  "states": [
+    "safe_twin",
+    "risk"
+  ],
   "horizon_s": 60.0,
   "replan_steps": 5,
   "image_size": 224,
@@ -17,5 +24,6 @@
   "termination": "first original task success or 60 seconds; danger is latched and does not terminate",
   "observation_renderer": "separate state-synchronized render-only environment; scored environment remains unrendered",
   "render_audit_steps": 20,
-  "render_audit_tolerance": 1e-10
+  "render_audit_tolerance": 1e-10,
+  "action_boundary": "official gripper/mode thresholds; continuous commands saturated to native controller input limits; raw predictions retained"
 }
