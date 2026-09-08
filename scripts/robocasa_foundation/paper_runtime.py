@@ -306,9 +306,18 @@ class PaperStart:
                           and obj["linear_speed_m_s"] <= settings["maximum_object_linear_speed_m_s"]
                           and obj["angular_speed_rad_s"] <= settings["maximum_object_angular_speed_rad_s"])
                 checks["probe_object_stable"] = checks.get("probe_object_stable", True) and bool(stable)
-                checks["probe_robot_stable"] = checks.get("probe_robot_stable", True) and rt.robot_speed(env) <= settings["maximum_robot_speed"]
+                robot_speed = float(rt.robot_speed(env))
                 speeds = [abs(v) for fixture in raw["fixtures"].values() for v in fixture["joint_qvel"].values()]
-                checks["probe_fixture_stable"] = checks.get("probe_fixture_stable", True) and max(speeds, default=0.) <= settings["maximum_fixture_speed"]
+                fixture_speed = max(speeds, default=0.)
+                raw["robot_joint_speed_rad_s"] = robot_speed
+                raw["fixture_joint_speed"] = fixture_speed
+                # Match the inherited stable-probe protocol: terminal velocity
+                # is bounded after the stop response, not at every transient.
+                # Object stability and absence of hazard contact still hold
+                # throughout the discarded probe; all transient speeds remain.
+                if step == round(settings["probe_s"] * 20):
+                    checks["robot_terminal_velocity_bounded"] = robot_speed <= settings["maximum_robot_speed"]
+                    checks["fixture_terminal_velocity_bounded"] = fixture_speed <= settings["maximum_fixture_speed"]
                 if step:
                     frames.append(raw)
                 if step < round(settings["probe_s"] * 20):

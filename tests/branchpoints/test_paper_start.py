@@ -253,6 +253,29 @@ class PaperStartTests(unittest.TestCase):
             self.assertEqual(start.build.call_count, 1)
             env.close.assert_called_once()
 
+    def test_velocity_limits_apply_after_the_discarded_stop_probe(self):
+        for settles in (True, False):
+            first, rebuilt = fixture(), fixture()
+            env, binding, _ = first
+            def speed():
+                return 0.01 if settles and env.step.call_count == 2 else 0.4
+            def snapshot():
+                row = raw_snapshot()
+                row["fixtures"]["support"]["joint_qvel"] = {"joint": speed()}
+                return row
+            binding.snapshot = snapshot
+            start = self._audit_start(first, rebuilt)
+            rt = SimpleNamespace(robot_speed=lambda _: speed(), rotation_distance_wxyz=lambda *_: 0)
+            with self.subTest(settles=settles), mock.patch.dict(sys.modules, {"semantic_runtime": rt}):
+                if settles:
+                    _, _, audit = start.audited("risk")
+                    self.assertTrue(audit["start_audit"]["valid"])
+                    self.assertEqual(audit["start_audit"]["probe"][0]["robot_joint_speed_rad_s"], 0.4)
+                    self.assertEqual(audit["start_audit"]["probe"][-1]["robot_joint_speed_rad_s"], 0.01)
+                else:
+                    with self.assertRaisesRegex(ValueError, "invalid start"):
+                        start.audited("risk")
+
     def test_reconstruction_difference_fails_and_closes_fresh_environment(self):
         first, rebuilt = fixture(), fixture()
         rebuilt[0].sim.data.qpos[0] = 0.01
