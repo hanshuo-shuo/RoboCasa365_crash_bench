@@ -17,6 +17,8 @@ def main():
     p.add_argument('--artifact-root',type=Path)
     p.add_argument('--data-root',type=Path,help='verify original source files and source-suffix nominal actions without simulation')
     p.add_argument('--audit-only',action='store_true',help='export verified plot inputs without plotting dependencies')
+    p.add_argument('--integrity-only',action='store_true',help='keep outcome expectations separate for ten-replay aggregation')
+    p.add_argument('--export-nominal',action='store_true',help='save the audited full nominal sequence as a portable action reference')
     p.add_argument('--plot-input',type=Path,help='render a previously audited plot-data JSON locally')
     p.add_argument('--output-root',type=Path,required=True)
     a=p.parse_args()
@@ -45,6 +47,7 @@ def main():
     results,traces,states={}, {}, {}
     checks={}
     source_start=None
+    nominal_sequence=None
     if a.data_root is not None:
         from paper_runtime import PaperStart
         config=json.loads((repo/'configs/robocasa_foundation/paper_v1.json').read_text())
@@ -77,24 +80,33 @@ def main():
         checks[branch+'_full_hash']=action_hash(sequence)==r['action_sequence_sha256']
         count=min(len(sequence),len(actions))
         checks[branch+'_fixed_prefix']=np.array_equal(actions[:count],sequence[:count])
+        checks[branch+'_padding']=len(actions)<=len(sequence) or np.all(actions[len(sequence):]==np.asarray(r['padding_action']))
+        if kind=='nominal':nominal_sequence=np.asarray(sequence).copy()
         results[branch],traces[branch]=r,trace
     checks['same_risk_start']=np.array_equal(states['bad'][0],states['recovery'][0])
     checks['same_nominal']=results['bad']['action_sequence_sha256']==results['safe_twin']['action_sequence_sha256']
     checks['same_common_context']=all(np.array_equal(results['bad'][key],results[b][key])
         for key in ('common_context_qpos','common_context_qvel') for b in ('recovery','safe_twin'))
-    checks['expected_outcomes']=(results['bad']['outcome'] in ('catastrophe','unsafe_task_success')
+    expected_outcomes=(results['bad']['outcome'] in ('catastrophe','unsafe_task_success')
         and all(results[b]['outcome']=='recovery_success' for b in ('recovery','safe_twin')))
+    if not a.integrity_only:checks['expected_outcomes']=expected_outcomes
     out.mkdir(parents=True)
     audit={'checks':{k:bool(v) for k,v in checks.items()},'passed':bool(all(checks.values())),
-           'new_certified_items':0,'human_review_complete':False,'scoring_calibrated':False,
+           'new_certified_items':0,'human_review_complete':False,'calibration_assessed':False,
+           'integrity_only':a.integrity_only,'outcome_expectation_met':expected_outcomes,
            'case_sha256':sha256_file(root/'development_case.json'),
            'trajectory_sha256':{b:sha256_file(root/b/'trajectory.npz') for b in results},
            'results':{b:{k:r.get(k) for k in ('outcome','duration_s','time_to_violation_s','action_count')} for b,r in results.items()}}
     write_json(out/'audit.json',audit)
     if not audit['passed']:
         raise ValueError(f'failed artifact checks: {checks}')
+    if a.export_nominal:
+        path=out/'nominal_actions.npz';np.savez_compressed(path,actions=nominal_sequence)
+        write_json(out/'nominal_reference.json',{'actions':str(path.relative_to(a.artifact_root.resolve())),
+            'actions_sha256':sha256_file(path),'action_sequence_sha256':action_hash(nominal_sequence)})
     write_json(out/'plot_data.json',{'source_run':str(root),'audit':audit,'results':results,
-        'traces':{b:[{'input':row['input']} for row in trace] for b,trace in traces.items()}})
+        'traces':{b:[{'input':{k:v for k,v in row['input'].items() if k!='physics_substep_contacts'}}
+                     for row in trace] for b,trace in traces.items()}})
     if not a.audit_only:
         render(out,root,results,traces)
     print(json.dumps({'output':str(out),'audit_passed':True,'new_certified_items':0}))

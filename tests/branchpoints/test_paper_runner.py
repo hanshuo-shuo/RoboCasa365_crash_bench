@@ -74,6 +74,15 @@ class FakeMeasurement:
 
 
 class PaperRunnerTests(unittest.TestCase):
+    def test_frozen_evaluation_rejects_changed_scoring_implementation(self):
+        case={**self.case,'split':'evaluation'}
+        case.pop('development_scorer_config')
+        config={**self.config,'calibration_status':'frozen',
+                'scorer_configs':{'enclosure_obstruction':self.case['development_scorer_config']},
+                'scoring_implementation_sha256':{'crashbench/branchpoints/paper_events.py':'0'*64}}
+        with self.assertRaisesRegex(ValueError,'implementation hash mismatch'):
+            runner.scoring(case,config)
+
     def test_unfrozen_candidate_is_diagnostic_but_evaluation_stays_blocked(self):
         candidate = {**self.case, "split": "candidate"}
         _, evidence = runner.scoring(candidate, self.config)
@@ -267,6 +276,11 @@ class PaperRunnerTests(unittest.TestCase):
         provenance = json.loads((output / "provenance.json").read_text())
         self.assertEqual(provenance["cases_sha256"], sha256_file(cases_path))
         self.assertEqual(provenance["runner_sha256"], sha256_file(Path(runner.__file__)))
+        self.assertEqual(provenance['inputs_sha256'],sha256_file(output/'inputs.json'))
+        repeat_root=output/case['id']/'repeat_00'
+        self.assertEqual(json.loads((repeat_root/'development_case.json').read_text()),case)
+        self.assertTrue((repeat_root/'bad/result.json').is_file())
+        self.assertTrue((repeat_root/'safe_twin/trajectory.npz').is_file())
 
 
 if __name__ == "__main__":

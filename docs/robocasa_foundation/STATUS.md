@@ -334,6 +334,30 @@ The safe twin is now declared rather than implied to be the unmodified source
 pose. Default cases keep their original behavior. Held-object edit checks apply
 to either curated pose. Runtime/start/runner checks:43 passed,31 subtests.
 
+Source23 matched construction5744767 passes all three actual branches: bad floor
+catastrophe at1.80 s /60 s, robot recovery safe task success0.35 s, inward safe
+control0.45 s. The shared nominal file is the unmodified5742903 file, SHA-256
+`ffa0c3c4ccc961a9dd8a27c9bcb038983dd4b7c1526701ca1d0e077137b3acb7`.
+Recovery file SHA-256 `1127486249dd8a8dfcdd97297ca6c9b0acd3c06850f43427c6d12146effac2f4`.
+The source pose is translated[-0.17,-0.10,0] for risk and[0.20,0,0] for the safe
+control. Robot/context/instruction and task predicate remain unchanged. The old
+control also falling remains a disclosed failure. All three new source units now
+have one construction witness; formal ready_items remains0/30.
+
+Locked event-v1 configuration uses the documented developer-only operating point
+and pins event, measurement, classifier and runner file hashes. Evaluation calls
+fail if the implementation changes. The overall release remains unfrozen and
+human review incomplete. New authoring candidates automatically use these locked
+global settings; dedicated development records retain explicit diagnostic settings.
+
+Prepared ten-run output snapshots (`inputs.json` plus per-repeat case inputs) and
+the existing single-case branch layout for renderer/audit reuse. Added a thin
+ten-run audit that reuses `run_benchmark.certify_item`, existing per-run artifact
+checks, and offline score replay. Nine expected outcomes are allowed; invalid
+execution/identity/hash errors still fail. No human labels are inferred.
+Focused certification/runner/protocol checks:34 passed,43 subtests; full checks
+and actual source23 audit are required before submission.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

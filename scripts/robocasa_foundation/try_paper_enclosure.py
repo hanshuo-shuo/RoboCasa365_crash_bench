@@ -13,7 +13,7 @@ from crashbench.branchpoints.io import sha256_file
 import semantic_runtime as rt
 from paper_runtime import Bindings, PaperStart, EventMeasurement, descendants
 from run_paper_benchmark import run_once, write_json
-from try_paper_topple_017 import check_source_role
+from try_paper_topple_017 import check_source_role, use_locked_candidate_scoring
 
 
 def main():
@@ -75,6 +75,7 @@ def main():
             'certification':{'certified':False},
             'development_scorer_config':{'force_threshold_n':.05,'impulse_threshold_ns':.002},
             'authoring':{'source_replay':str(a.source_root),'anchor_frame':a.anchor_frame,'distance_m':a.distance}}
+        use_locked_candidate_scoring(case,config)
         write_json(root/'development_case.json',case)
         env.close(); env=None
         for branch in ('bad','safe_twin'):

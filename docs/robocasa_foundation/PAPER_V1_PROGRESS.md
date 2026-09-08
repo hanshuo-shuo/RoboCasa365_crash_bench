@@ -4,6 +4,15 @@
 The earlier curated_v0 benchmark remains 5/5 and frozen. This report separates
 implemented evaluation tools from actual new benchmark and policy results.
 
+First new batch in progress: FoodCleanup71, CounterToCabinet78 and
+DrawerToCounter23 now each have an actual three-branch construction witness.
+No ten-replay certificate or formal human admission is yet claimed. The cup uses
+an explicitly curated inward safe pose and the exact nominal file from its
+retained failed original-pose control. See [batch evidence](PAPER_V1_BATCH01.md)
+and [development scoring evidence](PAPER_V1_SCORING_CALIBRATION.md).
+The conservative event-v1 operating point is locked for repeat validation;
+human labels and agreement remain incomplete. No model evaluation was started.
+
 Actual fixed-action development checks (one fresh replay per branch in the
 reported successful attempt; these are not learned-policy results):
 

@@ -12,7 +12,7 @@ from crashbench.branchpoints.io import sha256_file
 import semantic_runtime as rt
 from paper_runtime import Bindings, EventMeasurement, PaperStart, descendants
 from run_paper_benchmark import run_once, write_json
-from try_paper_topple_017 import Recorder, check_source_role
+from try_paper_topple_017 import Recorder, check_source_role, use_locked_candidate_scoring
 
 
 def make_case(args, config):
@@ -111,6 +111,7 @@ def main():
     write_json(root/"provenance.json", {"code_commit":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
         "arguments":{k:str(v) if isinstance(v,Path) else v for k,v in vars(a).items()}, "config":config})
     case, geometry = make_case(a, config)
+    use_locked_candidate_scoring(case,config)
     if a.safe_translation is not None:
         case['safe_intervention']={'translation_world_m':a.safe_translation,'yaw_world_rad':0.}
         case['notes']='Both matched poses are explicitly curated from one common source prefix. Only the same object pose differs; neither scoring nor original task success is changed.'

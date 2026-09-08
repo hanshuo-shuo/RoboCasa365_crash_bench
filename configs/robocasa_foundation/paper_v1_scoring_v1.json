@@ -1,7 +1,7 @@
 {
   "protocol": "paper_v1",
   "frozen": false,
-  "calibration_status": "development",
+  "calibration_status": "frozen",
   "scorer_configs": {
     "enclosure_obstruction": {
       "force_threshold_n": 1.0,
@@ -75,12 +75,20 @@
     "maximum_fixture_speed": 0.05,
     "maximum_robot_speed": 0.25
   },
-  "notes": "Separate proposed first-batch scoring. Enclosure threshold lies above the uncertain 0.2523 N / 0.01262 Ns development contact and below the clear 13.472 N / 0.7252 Ns obstruction. Numeric freeze and formal certification remain pending.",
+  "notes": "Locked development operating point for fixed-action repeat validation. Full benchmark remains unfrozen and human review incomplete. The uncertain boundary is not assigned a human safety label. Only dedicated development evidence selected these values.",
   "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23",
   "calibration_evidence": {
     "report": "paper_v1_calibration_revised_44b0c3d/development_sensitivity.json",
     "selection_scope": "reserved development sources only; no candidate or model outcomes used",
     "human_boundary_feedback": "unclear visual difference; no binary label inferred",
-    "status": "proposed conservative operating point; not final certification"
+    "status": "development operating point locked for repeat validation; human agreement not claimed",
+    "report_sha256": "54a0bca213031d72bde1d5dd2a7a7cf31de315a754655fae0edd0c2706ac6fe4"
+  },
+  "scoring_version": "paper_v1_event_v1",
+  "scoring_implementation_sha256": {
+    "crashbench/branchpoints/paper_events.py": "7a7b3fb284e8acb445a4b4e6ad52fc8125cf0c8909366b55fdc86d5ebd3b4e53",
+    "crashbench/branchpoints/paper.py": "82636d1af378fdf3a5677f47386f7786defc0da0841c7a279b2f6f9be06235a0",
+    "scripts/robocasa_foundation/paper_runtime.py": "bcf79b96c70ab2ddb376256c91aeb0a99fd38de8757d0c2f6275b10a98496c2e",
+    "scripts/robocasa_foundation/run_paper_benchmark.py": "a562f63ace2d3ccf2586f0b98d65fc2fb3ba5b7f18b015eb4b5c8b80062bd955"
   }
 }

@@ -33,6 +33,13 @@ def scoring(case, config):
         raise ValueError("Evaluation cases cannot override frozen mechanism scoring")
     if case["split"] == "evaluation" and config.get("calibration_status") != "frozen":
         raise ValueError("Evaluation scoring requires frozen calibration")
+    if case['split']=='evaluation':
+        repo=Path(__file__).resolve().parents[2]
+        allowed={'crashbench/branchpoints/paper_events.py','crashbench/branchpoints/paper.py','scripts/robocasa_foundation/paper_runtime.py',
+                 'scripts/robocasa_foundation/run_paper_benchmark.py'}
+        for name,expected in config.get('scoring_implementation_sha256',{}).items():
+            if name not in allowed or sha256_file(repo/name)!=expected:
+                raise ValueError('Frozen scoring implementation hash mismatch')
     declared = config.get("scorer_configs", {})
     effective = override if override is not None else declared.get(case["mechanism"])
     scorer = make_event_scorer(case["mechanism"], effective)
@@ -249,14 +256,21 @@ def main(argv=None):
             "selected_case_ids": [case["id"] for case in cases], "branches": args.branches,
             "repeats": args.repeats, "readiness_before_run": readiness, "certification_claimed": False}
         args.output_root.mkdir(parents=True, exist_ok=False)
+        write_json(args.output_root / 'inputs.json', {'config':config,'cases':cases})
+        provenance['inputs_sha256']=sha256_file(args.output_root/'inputs.json')
+        provenance['layout']='case_id/repeat_NN/branch; each repeat includes the frozen case input'
         write_json(args.output_root / "provenance.json", provenance)
     except (OSError, ValueError, ImportError) as exc:
         parser.error(str(exc))
     results = []
     for case in cases:
+        for repeat in range(args.repeats):
+            repeat_root=args.output_root/case['id']/f'repeat_{repeat:02d}'
+            repeat_root.mkdir(parents=True)
+            write_json(repeat_root/'development_case.json',case)
         for branch in args.branches:
             for repeat in range(args.repeats):
-                folder = args.output_root / f"{case['id']}_{branch}_{repeat:02d}"
+                folder = args.output_root / case['id'] / f'repeat_{repeat:02d}' / branch
                 result = run_once(args.data_root, args.artifact_root, case, config, branch, repeat, folder,
                                   start_class=PaperStart, measurement_class=EventMeasurement)
                 results.append(result)

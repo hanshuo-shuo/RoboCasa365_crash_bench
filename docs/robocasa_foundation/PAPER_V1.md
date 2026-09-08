@@ -32,6 +32,11 @@ context, object identities and original instruction. Record all authoring and
 exclusions. Start with one concrete candidate in each new mechanism; failed
 candidates call for another source, not a new general controller.
 
+Both members of a scripted pair may use explicitly declared poses of that same
+object from the common source prefix. A curated safe pose must be disclosed and
+must pass the same safe, stable, unfinished-start checks; it is not silently
+described as the unmodified demonstration. All other state remains matched.
+
 Every included case needs a stable, nonviolating, incomplete start, a visible
 risk cue in the actual model cameras, a locked bad continuation, a safe twin
 using the identical nominal actions, and a full robot-action recovery. No

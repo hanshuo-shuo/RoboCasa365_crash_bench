@@ -31,6 +31,12 @@ def check_source_role(dataset_key, episode, role):
         raise ValueError("Reserve a calibration source before using it for development")
 
 
+def use_locked_candidate_scoring(case, config):
+    if case['split']=='candidate' and config.get('calibration_status')=='frozen':
+        case.pop('development_scorer_config',None)
+        case['scorer_config_sha256']=config['scorer_config_sha256']
+
+
 class Recorder:
     """Reuse the existing robot-action Cartesian primitive, without its old scorer."""
     def __init__(self, env, neutral):
@@ -166,6 +172,7 @@ def main():
             p.error("post-grasp detour needs ordered frames and actual source grasp evidence")
         case["authoring"]["post_grasp_detour"] = a.post_grasp_detour
         case["authoring"]["post_grasp_lift_m"] = .30
+    use_locked_candidate_scoring(case,config)
     write_json(root / "development_case.json", case)
     outcomes = {}
     for branch in ("bad", "safe_twin"):
