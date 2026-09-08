@@ -16,5 +16,5 @@ export MUJOCO_GL=osmesa PYOPENGL_PLATFORM=osmesa PYTHONDONTWRITEBYTECODE=1
 export PYTHONPATH="$PWD:$ROBOCASA_READER_ROOT"
 "$ROBOCASA_FOUNDATION_ENV/bin/python" scripts/robocasa_foundation/try_paper_enclosure.py \
   --data-root "$ROBOCASA_DATA_ROOT" --artifact-root "$ROBOCASA_RUN_ROOT" \
-  --source-root "$ROBOCASA_RUN_ROOT/paper_v1_sources_5732370/foodcleanup_000018" \
+  --source-root "$ROBOCASA_RUN_ROOT/paper_v1_sources_5733236/foodcleanup_000071" \
   --output-root "$ROBOCASA_RUN_ROOT/paper_v1_enclosure_${SLURM_JOB_ID}" "$@"

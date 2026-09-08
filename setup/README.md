@@ -6,8 +6,10 @@ The approved [paper protocol](../docs/robocasa_foundation/PAPER_V1.md) extends
 coverage separately from the frozen five-item benchmark. New cases and scoring
 are under development; see [STATUS.md](../docs/robocasa_foundation/STATUS.md).
 The [implementation checkpoint](../docs/robocasa_foundation/PAPER_V1_PROGRESS.md)
-records two runnable development examples, actual GR00T interface validation,
+records development examples, actual GR00T interface validation,
 all failed attempts and the remaining work before a thirty-item release.
+The [first paper batch](../docs/robocasa_foundation/PAPER_V1_BATCH01.md) separates
+new candidate construction, scoring calibration, repeat validation and human review.
 
 On the Quest login node, after the usual clean-main Git synchronization:
 

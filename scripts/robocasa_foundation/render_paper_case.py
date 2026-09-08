@@ -5,6 +5,7 @@ import argparse
 import json
 import html
 import subprocess
+import itertools
 from pathlib import Path
 
 import numpy as np
@@ -67,7 +68,18 @@ def main():
             if not np.array_equal(state, env.sim.get_state().flatten()):
                 raise ValueError("visual restore changed the saved state")
             if record_measurement:
-                measurements.append({"branch":branch,"state_index":index,"snapshot":bindings.snapshot()})
+                snapshot = bindings.snapshot()
+                if case['mechanism'] == 'enclosure_obstruction':
+                    axis = rt.fixture_axis_world(env, {'critical_margin_search':{'axis_fixture_frame':[0.,-1.,0.]}})
+                    corners = []
+                    for p0, px, py, pz in env.cab.get_int_sites(relative=False).values():
+                        origin = np.asarray(p0)
+                        vectors = [np.asarray(p)-origin for p in (px,py,pz)]
+                        corners.extend(origin+sum((bit*v for bit,v in zip(bits,vectors)),np.zeros(3))
+                                       for bits in itertools.product((0,1),repeat=3))
+                    front = max(float(point@axis) for point in corners)
+                    snapshot['object_front_clearance_to_cabinet_interior_m'] = front-max(float(point@axis) for point in rt.target_bbox_points(env))
+                measurements.append({"branch":branch,"state_index":index,"snapshot":snapshot})
             return [Image.fromarray(env.sim.render(256,256,camera_name=camera)[::-1].copy()) for camera in CAMERAS]
         def sheet(name, selections):
             canvas = Image.new("RGB", (768, 284*len(selections)), "white")

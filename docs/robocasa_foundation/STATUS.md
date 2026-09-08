@@ -236,6 +236,22 @@ by risk/twin. Recovery still starts from the original matched open-gripper state
 Boundary-contact developer video5738423 is being produced for independent human
 judgment; no human labels are filled from program results.
 
+User feedback on the boundary contact says the two branches look similar and
+asks whether the risk placement is deeper inside. Preserve this as uncertainty,
+not a binary safe/unsafe label. Verbatim feedback is in the external local review
+pack; human label fields remain blank. Added a display-only 2× crop of the same
+official right-camera image (no bitmap alteration or invented detail). The next
+saved-state render also measures object-front clearance to the cabinet interior
+to verify the stated direction independently of the visual impression.
+The active enclosure wrapper now defaults to the retained source71, not retired18.
+
+Closed empty-gripper cup attempt5738762 (lower approach by0.02 m) still safely
+completes both branches,8.65/7.20 s. Saved position diagnostics show nudging and
+tilting near the edge, not a recorded floor fall. Preserve its actions and traces.
+The contact-observation equality report is now saved at
+`paper_v1_contact_observation_check_5735954/audit.json`, with hashes of both
+identical trajectory files and the new trace/result. No human/ready count changes.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
