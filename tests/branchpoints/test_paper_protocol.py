@@ -1,6 +1,8 @@
 """Protocol regressions runnable with either unittest or pytest, without simulation."""
 
 from copy import deepcopy
+import json
+from pathlib import Path
 import unittest
 
 from crashbench.branchpoints.certification import classify_outcome
@@ -66,6 +68,16 @@ def frozen_config():
 
 
 class PaperProtocolTests(unittest.TestCase):
+    def test_checked_in_exclusions_cover_historical_frozen_sources(self):
+        root = Path(__file__).resolve().parents[2] / "configs/robocasa_foundation"
+        current = json.loads((root / "paper_v1_cases.json").read_text())
+        historical = json.loads((root / "foodcleanup_sources.json").read_text())
+        excluded = {(row["dataset_key"], row["episode"])
+                    for row in current["development_sources"]}
+        for row in [historical["development_source"], *historical["fresh_sources"]]:
+            with self.subTest(episode=row["episode"]):
+                self.assertIn(("foodcleanup", row["episode"]), excluded)
+
     def test_empty_development_tracks_target_separately(self):
         value = validate_cases(manifest(), config())
         self.assertEqual(value["target_items"], 30)

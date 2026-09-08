@@ -6,6 +6,25 @@
 **Frozen curated source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
 
+## First paper batch in progress (2026-09-08)
+
+See [batch evidence and handoff](PAPER_V1_BATCH01.md). Both checkouts initially
+clean at `0e3ff37`, local origin fetched without divergence. The designated SSH
+socket was initially missing (ordinary SSH fallback disclosed in the batch log);
+the user restored it and explicit control check now passes, master PID 72485.
+Historical dependency-waiting jobs 3973984/85/86 remain untouched.
+
+Added missing historical FoodCleanup episode 9 to the new paper exclusion list,
+without editing frozen inputs. The source-separation regression compares against
+the historical source manifest. Local focused protocol checks: 14 passed, 32
+subtests; `git diff --check` passed. Command: `PYTHONDONTWRITEBYTECODE=1
+/private/tmp/crashbench-repair-venv/bin/python -m pytest -p no:cacheprovider
+tests/branchpoints/test_paper_protocol.py -q`.
+
+First metadata-selected new sources are FoodCleanup 18, DrawerToCounter 59 and
+CounterToCabinet 78. No model outcomes were used. Development calibration remains
+incomplete; three new candidates have not yet passed any branch or certification.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
