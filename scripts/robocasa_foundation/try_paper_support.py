@@ -56,7 +56,7 @@ def make_case(args, config):
             "common_neutral_steps":args.common_neutral_steps, "task_targets":["obj"],
             "hazard_object":"obj", "intervention_object":"obj", "fixtures":{"support":"counter", "drawer":"drawer"},
             "contact_geoms":{"support":support, "floor":floor},
-            "intervention":{"translation_world_m":args.translation}, "hashes":source["hashes"],
+            "intervention":{"translation_world_m":args.translation, "yaw_world_rad":float(np.deg2rad(args.yaw_degrees))}, "hashes":source["hashes"],
             "task_success_predicate_sha256":source["task_success_predicate_sha256"],
             "certification":{"certified":False}, "development_scorer_config":{"min_drop_m":0.3},
             "authoring":{"source_replay":str(args.source_root), "recovery_lift_m":args.lift,
@@ -77,6 +77,7 @@ def main():
     p.add_argument("--branch-frame", type=int, default=240)
     p.add_argument("--common-neutral-steps", type=int, default=10)
     p.add_argument("--translation", type=float, nargs=3, default=[0.,-.1,0.])
+    p.add_argument("--yaw-degrees", type=float, default=0.,help='initial hazard-object yaw only; safe twin keeps source pose')
     p.add_argument("--lift", type=float, default=.25)
     p.add_argument("--fixed-withdrawal", type=float, nargs=3, help="world displacement at fixed orientation, recorded on the safe twin")
     p.add_argument("--withdrawal-approach", type=float, nargs=3,
@@ -92,7 +93,7 @@ def main():
     if (root.exists() or root == repo or repo in root.parents or a.data_root.resolve() in root.parents
             or a.artifact_root.resolve() not in root.parents):
         p.error("output must be new, below external artifact root, and outside source data/Git")
-    if (not np.isfinite(a.translation).all() or not 0 < a.lift < .6 or a.common_neutral_steps < 0
+    if (not np.isfinite(a.translation).all() or not np.isfinite(a.yaw_degrees) or not 0 < a.lift < .6 or a.common_neutral_steps < 0
             or (a.fixed_withdrawal is not None and not np.isfinite(a.fixed_withdrawal).all())
             or (a.withdrawal_approach is not None and (a.fixed_withdrawal is None or not np.isfinite(a.withdrawal_approach).all()))):
         p.error("invalid construction parameters")

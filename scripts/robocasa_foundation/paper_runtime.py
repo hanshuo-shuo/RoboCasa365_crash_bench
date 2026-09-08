@@ -62,13 +62,15 @@ class Bindings:
         return (np.asarray(data.get_body_xpos(body)).copy(),
                 np.asarray(data.get_body_xquat(body)).copy())
 
-    def translate(self, name, delta):
-        """Start intervention only; caller must reconstruct before every branch."""
+    def translate(self, name, delta, *, yaw_rad=0.):
+        """Start pose intervention only; optional yaw rotates about world vertical."""
         import numpy as np
         env, obj = self.env, self.objects[name]
         change = np.asarray(delta, dtype=float)
         if change.shape != (3,) or not np.isfinite(change).all():
             raise ValueError("translation must be three finite world-space meters")
+        if isinstance(yaw_rad, bool) or not np.isfinite(yaw_rad):
+            raise ValueError('world yaw must be a finite angle')
         if len(obj.joints) != 1:
             raise ValueError("pose intervention requires one free joint")
         address = env.sim.model.get_joint_qpos_addr(obj.joints[0])
@@ -78,6 +80,11 @@ class Bindings:
         before_qvel = np.asarray(env.sim.data.qvel).copy()
         qpos = np.asarray(env.sim.data.get_joint_qpos(obj.joints[0])).copy()
         qpos[:3] += change
+        if yaw_rad:
+            w,x,y,z=qpos[3:7]
+            c,s=np.cos(yaw_rad/2),np.sin(yaw_rad/2)
+            qpos[3:7]=[c*w-s*z,c*x-s*y,c*y+s*x,c*z+s*w]
+            qpos[3:7]/=np.linalg.norm(qpos[3:7])
         env.sim.data.set_joint_qpos(obj.joints[0], qpos)
         env.sim.forward()
         difference = np.asarray(env.sim.data.qpos) - before_qpos
@@ -324,7 +331,8 @@ class PaperStart:
                 name = self.case["intervention_object"]
                 if env._check_grasp(rt.gripper_model(env), env.objects[name]):
                     raise ValueError("cannot pose-edit a held object")
-                bindings.translate(name, self.case["intervention"]["translation_world_m"])
+                bindings.translate(name, self.case["intervention"]["translation_world_m"],
+                                   yaw_rad=self.case['intervention'].get('yaw_world_rad',0.))
             return env, bindings
         except Exception:
             env.close()

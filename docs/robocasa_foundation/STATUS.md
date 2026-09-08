@@ -260,6 +260,20 @@ the empty gripper only after the initial clearance lift. All waypoints remain in
 the one nominal action file shared by risk/twin; no object is teleported after
 the branch and no robot torque shortcut is used.
 
+Saved-state geometry5739410 resolves the user's placement question: the Food4
+boundary risk object's bbox front is0.034989 m beyond the cabinet interior front;
+the twin has0.075011 m clearance inside. Their difference is0.11 m toward the
+opening. This geometry does not assign an unsafe human label. The local display-
+only zoom now includes these verified distances.
+
+Cup approach-from-above5739411 still safely completes (bad7.10 s, twin4.80 s).
+Next authoring varies the cup's initial yaw as part of the same single-object
+pose intervention, while placing its center farther inside the support. This
+tests handle/support orientation instead of adding a hazard-threshold change.
+The binding now supports explicit world-yaw on that free joint only; tests verify
+all other qpos and every qvel are unchanged. Default yaw0 preserves old behavior.
+Focused runtime/start/runner checks:42 passed,31 subtests; AST/whitespace pass.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

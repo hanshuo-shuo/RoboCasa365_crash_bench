@@ -94,6 +94,19 @@ def environment():
 
 
 class PaperBindingsTests(unittest.TestCase):
+    def test_world_yaw_changes_only_the_selected_free_joint_pose(self):
+        env=environment()
+        before,velocity=env.sim.data.qpos.copy(),env.sim.data.qvel.copy()
+        binding=runtime.Bindings(env,object_names=['obj','obj2'])
+        binding.translate('obj',[.02,0,0],yaw_rad=np.pi/2)
+        expected=before.copy(); expected[2]+=.02
+        expected[5:9]=[np.sqrt(.5),0,0,np.sqrt(.5)]
+        np.testing.assert_allclose(env.sim.data.qpos,expected,rtol=0,atol=1e-15)
+        np.testing.assert_array_equal(env.sim.data.qvel,velocity)
+        np.testing.assert_array_equal(env.sim.data.qpos[9:],before[9:])
+        with self.assertRaisesRegex(ValueError,'finite angle'):
+            binding.translate('obj',[0,0,0],yaw_rad=float('nan'))
+
     def test_body_ancestry_separates_similar_names_and_includes_children(self):
         env = environment()
         self.assertEqual(runtime.descendants(env.sim.model, 1), {1, 2})
