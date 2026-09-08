@@ -1,10 +1,28 @@
 # RoboCasa benchmark status
 
-**Last updated:** 2026-09-07
+**Last updated:** 2026-09-08
 **Protocol:** paper_v1 (development); curated_v0 and pi05_pilot_v1 (frozen)
 **Progress:** paper_v1 ready_items: 0/30; curated_v0 ready_items: 5/5
 **Frozen curated source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
+
+## Support-loss development (2026-09-08, in progress)
+
+- Local and Quest main were clean at `89b6cb5`; origin fetch found no divergence.
+  Existing `/tmp/quest.sock` reused. Old dependency-waiting jobs 3973984/85/86
+  are unrelated and untouched. No environment or source package was installed.
+- Read all required handoffs and saved source measurements from job `5701452`.
+  First candidate is DrawerToCounter episode 8 (measuring cup), frame 240,
+  ten common neutral controls, world translation `[0, -0.1, 0]` metres.
+  Existing source nominal withdrawal is shared by bad and safe twin; recovery
+  uses the existing Cartesian robot-action primitive for vertical clearance.
+- Added `try_paper_support.py` and its checked-in CPU wrapper. Every attempt
+  uses a new external `paper_v1_support_JOBID` directory and one replay per
+  branch. Scorer is unchanged, with predeclared development `min_drop_m=0.3`
+  plus actual ungrasped floor contact. Original success and start thresholds
+  are unchanged. No successful support-loss result is claimed yet.
+- Focused local verification: 41 tests, 38 subtests passed (0.43 s); Python
+  syntax, Slurm shell syntax and `git diff --check` passed.
 
 ## Current implementation checkpoint (2026-09-07)
 
