@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import html
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -25,7 +26,10 @@ def main():
     p.add_argument("--branches", nargs="+", choices=["bad","recovery","safe_twin"], help="explicit branches for failed-attempt visual diagnosis")
     p.add_argument("--comparison-time", type=float, help="saved-state time for diagnosis without a danger event")
     p.add_argument("--videos", action="store_true", help="write three-camera videos and a Chinese review page with blank labels")
+    p.add_argument("--ffmpeg", type=Path, help="existing encoder executable; no dependency installation")
     a = p.parse_args()
+    if a.videos and (a.ffmpeg is None or not a.ffmpeg.is_file()):
+        p.error("--videos requires an existing --ffmpeg executable")
     root, output = a.run_root.resolve(), a.output_root.resolve()
     repo = Path(__file__).resolve().parents[2]
     data_root = a.data_root.resolve()
@@ -84,16 +88,21 @@ def main():
             indices = sorted(set([0,10,20,40,round(danger_time*20)]))
             sheet("fall_timeline.jpg", [("bad", min(i,len(saved["bad"])-1)) for i in indices])
         if a.videos:
-            import imageio.v2 as imageio
             for branch in branches:
                 name = branch + ".mp4"
                 # Each encoded frame is one recorded 20-Hz simulator state.
                 # Include the exact terminal state, never extrapolate after success.
-                with imageio.get_writer(output/name, fps=20, codec="libx264", quality=8,
-                                        macro_block_size=1, pixelformat="yuv420p") as writer:
+                command = [str(a.ffmpeg), "-v", "error", "-n", "-f", "rawvideo",
+                           "-pix_fmt", "rgb24", "-s", "768x256", "-r", "20", "-i", "pipe:0",
+                           "-an", "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p",
+                           "-movflags", "+faststart", str(output/name)]
+                with subprocess.Popen(command, stdin=subprocess.PIPE) as writer:
                     for index in range(len(saved[branch])):
                         pictures = frame(branch, index, record_measurement=False)
-                        writer.append_data(np.concatenate([np.asarray(pic) for pic in pictures], axis=1))
+                        writer.stdin.write(np.concatenate([np.asarray(pic) for pic in pictures], axis=1).tobytes())
+                    writer.stdin.close()
+                    if writer.wait() != 0:
+                        raise RuntimeError("FFmpeg failed to encode saved-state video")
                 records.append({"file":name,"sha256":sha256_file(output/name),
                                 "state_count":len(saved[branch]),"fps":20,
                                 "terminal_sim_time_s":(len(saved[branch])-1)/20})

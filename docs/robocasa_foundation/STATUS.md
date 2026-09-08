@@ -84,6 +84,19 @@ frame45 to rejoin before grasping. The descent frame need not follow the frame
 used only to place the bystander; removed that unnecessary authoring restriction.
 No physical/scoring threshold or frozen result is changed.
 
+Adjusted candidate jobs at `145a8ad`: 5732903 Food18 branch260/distance0.18;
+5732904 Drawer59 translation[0.20,0.05,0]; 5732905 Counter78 resume45.
+The intermediate Food18 attempt 5732781 failed both start checks and remains.
+
+Video job 5732783 failed because the simulator environment lacks ImageIO's MP4
+backend. Saved keyframes remain; no video success claimed. Corrected the renderer
+to pipe RGB frames into the existing pi05-environment FFmpeg binary, following
+the already checked-in policy-report workflow. No environment is modified.
+Added a dedicated read-only sensitivity report restricted to seven reserved
+development sources (Food4, Drawer8/14/57, Counter17/5/11). It refuses source-role
+mismatches, leaves human labels null, selects no thresholds, and explicitly reports
+calibration incomplete. Candidate results are never used by that report.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

@@ -14,5 +14,11 @@ test -z "$(git status --short)"
 test "$(git branch --show-current)" = main
 export MUJOCO_GL=osmesa PYOPENGL_PLATFORM=osmesa PYTHONDONTWRITEBYTECODE=1
 export PYTHONPATH="$PWD:$ROBOCASA_READER_ROOT"
+encoder_args=()
+if [[ " $* " == *" --videos "* ]]; then
+  paper_ffmpeg=$("$ROBOCASA_PI05_PYTHON" -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')
+  test -x "$paper_ffmpeg"
+  encoder_args=(--ffmpeg "$paper_ffmpeg")
+fi
 "$ROBOCASA_FOUNDATION_ENV/bin/python" scripts/robocasa_foundation/render_paper_case.py \
-  --data-root "$ROBOCASA_DATA_ROOT" --output-root "$ROBOCASA_RUN_ROOT/paper_v1_visual_${SLURM_JOB_ID}" "$@"
+  --data-root "$ROBOCASA_DATA_ROOT" --output-root "$ROBOCASA_RUN_ROOT/paper_v1_visual_${SLURM_JOB_ID}" "${encoder_args[@]}" "$@"

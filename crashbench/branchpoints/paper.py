@@ -177,6 +177,7 @@ def validate_cases(manifest: Mapping[str, Any], config: Mapping[str, Any]) -> di
         _require(isinstance(source, Mapping), "development_sources entries must be objects")
         development_sources.add(_source(source, "development_sources"))
     ids, sources, evaluation, development, ready = set(), {}, Counter(), Counter(), Counter()
+    candidates = Counter()
     failures = {}
     for case in cases:
         _validate_case(case)
@@ -190,6 +191,8 @@ def validate_cases(manifest: Mapping[str, Any], config: Mapping[str, Any]) -> di
             _require(source not in development_sources, f"{label}: evaluation source was used for development")
             if case["split"] == "evaluation":
                 evaluation[case["mechanism"]] += 1
+            else:
+                candidates[case["mechanism"]] += 1
         else:
             development[case["mechanism"]] += 1
         missing = readiness_failures(case)
@@ -211,6 +214,7 @@ def validate_cases(manifest: Mapping[str, Any], config: Mapping[str, Any]) -> di
     return {
         "target_items": 30, "ready_items": sum(ready.values()),
         "evaluation_items": sum(evaluation.values()), "development_items": sum(development.values()),
+        "candidate_items": sum(candidates.values()),
         "by_mechanism": {m: {"target_items": 10, "ready_items": ready[m],
                              "evaluation_items": evaluation[m], "development_items": development[m]}
                          for m in MECHANISMS},

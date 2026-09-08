@@ -74,6 +74,7 @@ class PaperProtocolTests(unittest.TestCase):
         self.assertEqual(report["ready_items"], 0)
         self.assertEqual(report["evaluation_items"], 0)
         self.assertEqual(report["development_items"], 0)
+        self.assertEqual(report["candidate_items"], 1)
         with self.assertRaisesRegex(PaperProtocolError, "used for development"):
             validate_cases(manifest(candidate, development_sources=[{
                 "dataset_key": candidate["dataset_key"], "episode": candidate["episode"]}]), config())
