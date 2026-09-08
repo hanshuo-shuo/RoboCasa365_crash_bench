@@ -189,6 +189,29 @@ author now also saves structured errors for invalid nominal-authoring starts.
 Food4 controls5734081/82 (0.08/0.10 m) safely complete at13.2 s with zero contact;
 they do not yet supply the missing challenging light-contact negative.
 
+Corrected native contact check5735954 at `1e3d5d0` passed: all195×238 saved state
+values and executed actions equal original5732431; observed4850 actual physics
+steps. It detects short task-object/bystander contacts missed by 20-Hz endpoints,
+and correctly flags the overturned recovery at4.65 s (unsafe task success).
+Development17 check5736193 also preserves every old state for all three branches;
+outcomes stay bad catastrophe at3.6 s, recovery safe14.75 s, twin safe8.8 s.
+No observation-induced physical change was found in these actual checks.
+
+Additional source/attempts: Drawer43 source5735973 nominal success step189;
+candidate5736192 placed beyond the measured table front and failed support and
+penetration/stability checks. Adjusted5736527 uses translation[-0.13,0.08,0] and
+withdrawal[-0.15,0.4,0], branch177. Drawer66 adjusted5736075 has no initial
+penetration but risk stability still fails; safe twin succeeds0.9 s. Retain all.
+Food4 intermediate offset0.11 control5735955 has peak sampled force0.2523 N,
+event4.25 s and task completion13.2 s; its twin has zero contact. It is a marginal
+contact inspection case, not a human-labeled benign negative.
+
+To avoid treating the ambiguous non-target grasp in development11 as benign,
+the next additional calibration control uses already reserved Counter0 in its
+original bystander pose. A development-only zero-intervention flag records this
+explicitly; candidates cannot use that shortcut. No new evaluation source is
+consumed for calibration, and no model outcome is consulted.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

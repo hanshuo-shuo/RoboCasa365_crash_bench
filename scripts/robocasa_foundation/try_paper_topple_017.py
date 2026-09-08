@@ -127,6 +127,8 @@ def main():
     p.add_argument("--output-root", type=Path, required=True)
     p.add_argument("--episode", type=int, default=17)
     p.add_argument("--role", choices=["development", "candidate"], default="development")
+    p.add_argument("--zero-intervention-control", action="store_true",
+                   help="reserved development source only: retain the original bystander pose")
     p.add_argument("--branch-frame", type=int, default=40)
     p.add_argument("--query-frame", type=int, default=80)
     p.add_argument("--xy-offset", nargs=2, type=float, default=[-.01, -.05])
@@ -135,6 +137,8 @@ def main():
     p.add_argument("--post-grasp-detour", nargs=2, type=int, metavar=("GRASP_FRAME", "RESUME_FRAME"),
                    help="optional second raised transit after original grasp, preserving its gripper command")
     a = p.parse_args()
+    if a.zero_intervention_control and a.role != 'development':
+        p.error('zero-intervention controls are development evidence, not new candidates')
     root = a.output_root.resolve()
     repo = Path(__file__).resolve().parents[2]
     if root.exists() or repo == root or repo in root.parents or a.data_root.resolve() in root.parents:
@@ -150,6 +154,9 @@ def main():
     })
     case, rows = make_case(a.data_root, a.source_root, config, np.asarray(a.xy_offset), a.resume_frame,
                            episode=a.episode, branch_frame=a.branch_frame, query_frame=a.query_frame, role=a.role)
+    if a.zero_intervention_control:
+        case['intervention']['translation_world_m'] = [0.,0.,0.]
+        case['authoring']['zero_intervention_control'] = True
     if a.post_grasp_detour is not None:
         grasp_frame, end_frame = a.post_grasp_detour
         if not a.resume_frame < grasp_frame < end_frame < len(rows) or not rows[grasp_frame]["objects"]["obj"]["grasped"]:
