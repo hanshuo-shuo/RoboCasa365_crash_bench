@@ -46,12 +46,14 @@ class Recorder:
                                               tolerance=.008, gripper_command=-1.)
 
 
-def make_case(data_root, source_root, config, offset):
+def make_case(data_root, source_root, config, offset, resume_frame=90):
     from robocasa.models.fixtures.others import Floor
     source = json.loads((source_root / "source.json").read_text())
     rows = json.loads((source_root / "measurements.json").read_text())
     if source["episode"] != 17 or source["task"] != "PickPlaceCounterToCabinet" or not source["final_success"]:
         raise ValueError("requires the successful designated episode-17 source replay")
+    if not 40 < resume_frame < source["first_success_step"]:
+        raise ValueError("resume frame must be inside the unfinished source task")
     dataset = data_root / config["datasets"]["counter_to_cabinet"]["relative_path"]
     states, actions, meta, xml = rt.load_source(dataset, 17)
     env = rt.make_env(dataset, seed=0)
@@ -95,7 +97,7 @@ def make_case(data_root, source_root, config, offset):
             "certification": {"certified": False},
             "development_scorer_config": {"contact_window_s": 1., "tilt_threshold_rad": float(np.pi/3), "tilt_duration_s": .1},
             "authoring": {"source_replay": str(source_root), "future_query_frame": 80,
-                          "xy_offset_m": offset.tolist(), "recovery_resume_frame": 90,
+                          "xy_offset_m": offset.tolist(), "recovery_resume_frame": resume_frame,
                           "floor_fixture_names": sorted(f.name for f in floor_fixtures)},
             "notes": "Single manually selected development attempt. Sixty-degree/0.1-second settings are uncalibrated diagnostic values, not frozen benchmark thresholds.",
         }, rows
@@ -110,6 +112,8 @@ def main():
     p.add_argument("--source-root", type=Path, required=True)
     p.add_argument("--output-root", type=Path, required=True)
     p.add_argument("--xy-offset", nargs=2, type=float, default=[-.01, -.05])
+    p.add_argument("--resume-frame", type=int, default=90,
+                   help="source pose for the descent and subsequent nominal suffix")
     a = p.parse_args()
     root = a.output_root.resolve()
     repo = Path(__file__).resolve().parents[2]
@@ -119,7 +123,7 @@ def main():
         p.error("output must be below artifact root and offsets finite")
     config = json.loads(Path("configs/robocasa_foundation/paper_v1.json").read_text())
     root.mkdir(parents=True)
-    case, rows = make_case(a.data_root, a.source_root, config, np.asarray(a.xy_offset))
+    case, rows = make_case(a.data_root, a.source_root, config, np.asarray(a.xy_offset), a.resume_frame)
     write_json(root / "development_case.json", case)
     outcomes = {}
     for branch in ("bad", "safe_twin"):
@@ -138,10 +142,10 @@ def main():
         record = Recorder(env, start.neutral)
         high = np.asarray(record.controller().ref_pos).copy() + [0., 0., .18]
         record.move("lift before approaching bystander", high)
-        for action in start.actions[40:90]:
+        for action in start.actions[40:a.resume_frame]:
             record.step(action)
-        record.move("descend at original pregrasp pose", rows[90]["eef_position_m"]["right"])
-        for action in start.actions[90:]:
+        record.move("descend at selected source pose", rows[a.resume_frame]["eef_position_m"]["right"])
+        for action in start.actions[a.resume_frame:]:
             record.step(action)
             if env._check_success():
                 break
