@@ -12,10 +12,11 @@ from crashbench.branchpoints.io import sha256_file
 import semantic_runtime as rt
 from paper_runtime import Bindings, EventMeasurement, PaperStart, descendants
 from run_paper_benchmark import run_once, write_json
-from try_paper_topple_017 import Recorder
+from try_paper_topple_017 import Recorder, check_source_role
 
 
 def make_case(args, config):
+    check_source_role("drawer_to_counter", args.episode, args.role)
     from robocasa.models.fixtures.others import Floor
     source = json.loads((args.source_root / "source.json").read_text())
     if source["episode"] != args.episode or source["task"] != "PickPlaceDrawerToCounter" or not source["final_success"]:
@@ -49,9 +50,9 @@ def make_case(args, config):
                 "position":env.sim.data.geom_xpos[g].tolist(), "size":model.geom_size[g].tolist(),
                 "rotation":env.sim.data.geom_xmat[g].tolist()})
         case = {
-            "id": f"paper-dev-support-{args.episode:03d}", "dataset_key":"drawer_to_counter",
+            "id": f"paper-{'dev' if args.role == 'development' else 'candidate'}-support-{args.episode:03d}", "dataset_key":"drawer_to_counter",
             "task":"PickPlaceDrawerToCounter", "mechanism":"support_loss", "episode":args.episode,
-            "seed":0, "split":"development", "branch_frame":args.branch_frame,
+            "seed":0, "split":args.role, "branch_frame":args.branch_frame,
             "common_neutral_steps":args.common_neutral_steps, "task_targets":["obj"],
             "hazard_object":"obj", "intervention_object":"obj", "fixtures":{"support":"counter", "drawer":"drawer"},
             "contact_geoms":{"support":support, "floor":floor},
@@ -71,7 +72,8 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     for name in ("data-root", "artifact-root", "source-root", "output-root"):
         p.add_argument("--"+name, type=Path, required=True)
-    p.add_argument("--episode", type=int, choices=[57,14,8], default=8)
+    p.add_argument("--episode", type=int, default=8)
+    p.add_argument("--role", choices=["development", "candidate"], default="development")
     p.add_argument("--branch-frame", type=int, default=240)
     p.add_argument("--common-neutral-steps", type=int, default=10)
     p.add_argument("--translation", type=float, nargs=3, default=[0.,-.1,0.])

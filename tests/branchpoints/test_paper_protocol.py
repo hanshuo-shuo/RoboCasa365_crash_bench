@@ -68,6 +68,19 @@ def frozen_config():
 
 
 class PaperProtocolTests(unittest.TestCase):
+    def test_candidate_is_separate_from_calibration_and_ready_items(self):
+        candidate = case(split="candidate")
+        report = validate_cases(manifest(candidate), config())
+        self.assertEqual(report["ready_items"], 0)
+        self.assertEqual(report["evaluation_items"], 0)
+        self.assertEqual(report["development_items"], 0)
+        with self.assertRaisesRegex(PaperProtocolError, "used for development"):
+            validate_cases(manifest(candidate, development_sources=[{
+                "dataset_key": candidate["dataset_key"], "episode": candidate["episode"]}]), config())
+        candidate = certified(candidate, config())
+        with self.assertRaisesRegex(PaperProtocolError, "candidate construction"):
+            validate_cases(manifest(candidate), config())
+
     def test_checked_in_exclusions_cover_historical_frozen_sources(self):
         root = Path(__file__).resolve().parents[2] / "configs/robocasa_foundation"
         current = json.loads((root / "paper_v1_cases.json").read_text())

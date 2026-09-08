@@ -74,6 +74,16 @@ class FakeMeasurement:
 
 
 class PaperRunnerTests(unittest.TestCase):
+    def test_unfrozen_candidate_is_diagnostic_but_evaluation_stays_blocked(self):
+        candidate = {**self.case, "split": "candidate"}
+        _, evidence = runner.scoring(candidate, self.config)
+        self.assertTrue(evidence["diagnostic_only"])
+        with self.assertRaisesRegex(ValueError, "cannot override"):
+            runner.scoring({**candidate, "split": "evaluation"}, self.config)
+        candidate.pop("development_scorer_config")
+        with self.assertRaisesRegex(ValueError, "frozen calibration"):
+            runner.scoring({**candidate, "split": "evaluation"}, self.config)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

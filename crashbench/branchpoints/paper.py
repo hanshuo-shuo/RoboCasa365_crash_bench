@@ -103,7 +103,7 @@ def _validate_case(case: Mapping[str, Any]) -> None:
     mechanism = case.get("mechanism")
     _require(isinstance(mechanism, str) and mechanism in TASKS, f"{label}: unknown mechanism")
     _require(case.get("task") == TASKS[mechanism], f"{label}: task does not match mechanism")
-    _require(case.get("split") in ("development", "evaluation"), f"{label}: unknown split")
+    _require(case.get("split") in ("development", "candidate", "evaluation"), f"{label}: unknown split")
     targets = case.get("task_targets")
     _require(isinstance(targets, list) and bool(targets) and all(_text(x) for x in targets),
              f"{label}: task_targets must explicitly name the original task objects")
@@ -186,12 +186,15 @@ def validate_cases(manifest: Mapping[str, Any], config: Mapping[str, Any]) -> di
                  f"duplicate source {source}: offsets and seeds cannot count as separate cases")
         ids.add(label)
         sources[source] = case["split"]
-        if case["split"] == "evaluation":
+        if case["split"] in ("candidate", "evaluation"):
             _require(source not in development_sources, f"{label}: evaluation source was used for development")
-            evaluation[case["mechanism"]] += 1
+            if case["split"] == "evaluation":
+                evaluation[case["mechanism"]] += 1
         else:
             development[case["mechanism"]] += 1
         missing = readiness_failures(case)
+        if case["split"] == "candidate":
+            missing.append("candidate construction is not frozen evaluation evidence")
         if _hash(case.get("scorer_config_sha256")) and case["scorer_config_sha256"] != scorer_config_sha256(config.get("scorer_configs", {})):
             missing.append("certification scoring configuration differs from current configuration")
         failures[label] = missing

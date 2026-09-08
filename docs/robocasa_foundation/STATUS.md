@@ -36,6 +36,25 @@ sources 5/11 with explicit branch/query/resume frames. Robot primitive and score
 are reused unchanged; added authoring arguments/code provenance. Source 17 remains
 the default. Focused checks: 29 passed, 47 subtests; AST and whitespace checks pass.
 
+All three new source replays passed identity and original final task success:
+first success steps 350/270/188 for Food18/Drawer59/Counter78. These are not
+hazard or recovery results. Supplementary reserved development jobs at `b497531`:
+5732427 (Drawer14, frame332, zero translation), 5732428 (Drawer57, frame219,
+zero translation), 5732429 (Counter11, branch20/query50/resume65, offset 0/-0.05),
+5732431 (Counter5, branch10/query35/resume45, offset 0/-0.09).
+Drawer controls safely complete at 0.55/0.95 s with valid starts. Counter5 has
+unsafe success (danger 3.1 s), safe twin 7.95 s, safe recovery 9.7 s. Counter11
+first risk construction is safe noncompletion; retain it, do not call it hazard
+evidence. All outputs use external `paper_v1_support_JOBID`/`paper_v1_topple_JOBID`.
+
+Added an unfrozen `candidate` state to keep new-source construction separate
+from calibration sources and evaluation. Candidates reject historical sources,
+remain diagnostic, cannot claim certification, and the CLI only permits one
+replay per branch. Evaluation scoring remains blocked before calibration freeze.
+Reused support/topple primitives with explicit source roles; added a thin enclosure
+adapter around the historical robot-action recovery author. No threshold changed.
+Focused verification: 44 passed, 58 subtests; AST/shell syntax and whitespace pass.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

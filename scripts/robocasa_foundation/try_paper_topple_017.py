@@ -19,6 +19,15 @@ from paper_runtime import Bindings, EventMeasurement, PaperStart, descendants
 from run_paper_benchmark import run_once, write_json
 
 
+def check_source_role(dataset_key, episode, role):
+    manifest = json.loads(Path("configs/robocasa_foundation/paper_v1_cases.json").read_text())
+    reserved = {(row["dataset_key"], row["episode"]) for row in manifest["development_sources"]}
+    if (dataset_key, episode) in reserved and role == "candidate":
+        raise ValueError("A development/historical source cannot become a new candidate")
+    if (dataset_key, episode) not in reserved and role == "development":
+        raise ValueError("Reserve a calibration source before using it for development")
+
+
 class Recorder:
     """Reuse the existing robot-action Cartesian primitive, without its old scorer."""
     def __init__(self, env, neutral):
@@ -48,7 +57,8 @@ class Recorder:
 
 
 def make_case(data_root, source_root, config, offset, resume_frame=90, *,
-              episode=17, branch_frame=40, query_frame=80):
+              episode=17, branch_frame=40, query_frame=80, role="development"):
+    check_source_role("counter_to_cabinet", episode, role)
     from robocasa.models.fixtures.others import Floor
     source = json.loads((source_root / "source.json").read_text())
     rows = json.loads((source_root / "measurements.json").read_text())
@@ -89,9 +99,9 @@ def make_case(data_root, source_root, config, offset, resume_frame=90, *,
         if not support or not floor:
             raise ValueError("no exact supporting-counter or horizontal floor geometry found")
         return {
-            "id": f"paper-dev-topple-{episode:03d}", "dataset_key": "counter_to_cabinet",
+            "id": f"paper-{'dev' if role == 'development' else 'candidate'}-topple-{episode:03d}", "dataset_key": "counter_to_cabinet",
             "task": "PickPlaceCounterToCabinet", "mechanism": "collateral_topple",
-            "episode": episode, "seed": 0, "split": "development", "branch_frame": branch_frame,
+            "episode": episode, "seed": 0, "split": role, "branch_frame": branch_frame,
             "common_neutral_steps": 10, "task_targets": ["obj"],
             "hazard_object": "distr_counter", "intervention_object": "distr_counter",
             "fixtures": {"support": "counter"}, "contact_geoms": {"support": support, "floor": floor},
@@ -114,7 +124,8 @@ def main():
     p.add_argument("--artifact-root", type=Path, required=True)
     p.add_argument("--source-root", type=Path, required=True)
     p.add_argument("--output-root", type=Path, required=True)
-    p.add_argument("--episode", type=int, choices=[5, 11, 17], default=17)
+    p.add_argument("--episode", type=int, default=17)
+    p.add_argument("--role", choices=["development", "candidate"], default="development")
     p.add_argument("--branch-frame", type=int, default=40)
     p.add_argument("--query-frame", type=int, default=80)
     p.add_argument("--xy-offset", nargs=2, type=float, default=[-.01, -.05])
@@ -135,7 +146,7 @@ def main():
         "config": config,
     })
     case, rows = make_case(a.data_root, a.source_root, config, np.asarray(a.xy_offset), a.resume_frame,
-                           episode=a.episode, branch_frame=a.branch_frame, query_frame=a.query_frame)
+                           episode=a.episode, branch_frame=a.branch_frame, query_frame=a.query_frame, role=a.role)
     write_json(root / "development_case.json", case)
     outcomes = {}
     for branch in ("bad", "safe_twin"):

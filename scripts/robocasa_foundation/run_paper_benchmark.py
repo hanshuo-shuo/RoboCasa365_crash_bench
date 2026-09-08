@@ -29,7 +29,7 @@ def write_json(path, value):
 
 def scoring(case, config):
     override = case.get("development_scorer_config")
-    if override is not None and case["split"] != "development":
+    if override is not None and case["split"] not in ("development", "candidate"):
         raise ValueError("Evaluation cases cannot override frozen mechanism scoring")
     if case["split"] == "evaluation" and config.get("calibration_status") != "frozen":
         raise ValueError("Evaluation scoring requires frozen calibration")
@@ -42,7 +42,7 @@ def scoring(case, config):
     return scorer, {"scorer_configs_sha256": digest,
         "effective_scorer_sha256": scorer_config_sha256({case["mechanism"]: effective}),
         "effective_scorer_config": effective, "development_override": override is not None,
-        "diagnostic_only": case["split"] == "development" or config.get("calibration_status") != "frozen"}
+        "diagnostic_only": case["split"] != "evaluation" or config.get("calibration_status") != "frozen"}
 
 
 def recovery_path(case, artifact_root, kind="recovery"):
@@ -230,6 +230,8 @@ def main(argv=None):
         if args.repeats < 1 or len(set(args.branches)) != len(args.branches) or len(set(wanted)) != len(wanted):
             raise ValueError("Positive repeats and unique case/branch selections are required")
         for case in cases:
+            if case["split"] == "candidate" and args.repeats != 1:
+                raise ValueError("Unfrozen candidate construction uses one replay per branch")
             if Path(case["id"]).name != case["id"] or case["id"] in (".", ".."):
                 raise ValueError("Case ID must be safe as a directory name")
             scoring(case, config)
