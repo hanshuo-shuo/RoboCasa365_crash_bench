@@ -108,12 +108,13 @@
       "construction_evidence": {
         "job_id": "5744767",
         "replays_per_branch": 1,
-        "artifact_audit_passed": false,
-        "ready_for_repeat_validation": false,
+        "artifact_audit_passed": true,
+        "ready_for_repeat_validation": true,
         "ten_replays_complete": false,
         "prior_failed_same_source_jobs": [
           "5742903"
-        ]
+        ],
+        "artifact_audit": "paper_v1_audit_support_5744767/audit.json"
       }
     },
     {
@@ -208,7 +209,8 @@
         "artifact_audit_passed": true,
         "ten_replays_complete": false,
         "scoring_calibration_complete": false,
-        "ready_for_repeat_validation": true
+        "ready_for_repeat_validation": true,
+        "artifact_audit": "paper_v1_audit_topple_5733566_v2/audit.json"
       },
       "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23"
     },
@@ -288,7 +290,8 @@
         "artifact_audit_passed": true,
         "ten_replays_complete": false,
         "scoring_calibration_complete": false,
-        "ready_for_repeat_validation": true
+        "ready_for_repeat_validation": true,
+        "artifact_audit": "paper_v1_audit_enclosure_5733565_v2/audit.json"
       },
       "notes": "Locked source/pose/action candidate for ten fresh fixed-action replays. Human labels remain blank and formal ready status is false.",
       "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23"
