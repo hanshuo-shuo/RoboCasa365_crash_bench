@@ -55,6 +55,19 @@ Reused support/topple primitives with explicit source roles; added a thin enclos
 adapter around the historical robot-action recovery author. No threshold changed.
 Focused verification: 44 passed, 58 subtests; AST/shell syntax and whitespace pass.
 
+First diagnostic candidate submissions at `5f56a92`: enclosure 5732593
+(Food18, branch298, anchor180, outward0.12 m); support 5732595 (Drawer59,
+branch252, translation [0.20,-0.05,0], withdrawal [0.4,0,0]); topple 5732597
+(Counter78, branch5/query70/resume85, xy offset [-0.03,0]). All use seed0,
+one replay per branch, unchanged diagnostic scoring and 60-second budget.
+
+The saved-state renderer now optionally emits 20-Hz H.264 three-camera videos
+and a Chinese review page with pause/frame-step/slow-play controls. No scored
+actions are rerun or rendered; every restored state is checked for exact equality.
+Automatic outcome labels remain outside the human page, and human JSON/textareas
+start blank. Local review generation checked blank labels and escaped instruction
+text; AST and whitespace checks pass. Actual video rendering remains to be run.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
