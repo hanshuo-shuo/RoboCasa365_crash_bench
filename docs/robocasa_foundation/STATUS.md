@@ -36,6 +36,18 @@
   Focused checks: 42 passed, 38 subtests (0.32 s). Renderer can optionally include
   the safe twin in its saved-state comparison sheets; no scored sim is rendered.
 
+- `5728981`: fixed world withdrawal `[0, -0.4, 0]`, y shift -0.20 m:
+  bad safely completed at 1.95 s; twin at 0.95 s. No fall. Saved-state visual
+  diagnosis `5729044` shows the cup handle aligned with the open gripper;
+  all restored states matched exactly, with no action replay or rescoring.
+- `5729111`: added x shift +0.05 m (total `[0.05, -0.20, 0]`): bad now
+  triggers actual floor fall at 3.55 s and runs to 60 s without task success;
+  identical fixed nominal action twin safely completes at 0.95 s. Recovery
+  replay is pending at this checkpoint; no three-branch success claimed yet.
+- Full local branchpoint suite at `95e3177`: 169 passed, 1 native-only skip,
+  107 subtests (1.19 s). No frozen certification was rerun. Extended saved-state
+  visualization adds a fall timeline and restored contact/pose diagnostics.
+
 ## Current implementation checkpoint (2026-09-07)
 
 The current evidence and remaining paper work are summarized in

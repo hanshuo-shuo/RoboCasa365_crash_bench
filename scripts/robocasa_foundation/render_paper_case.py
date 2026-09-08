@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw
 
 from crashbench.branchpoints.io import sha256_file
 import semantic_runtime as rt
+from paper_runtime import Bindings
 
 CAMERAS = ("robot0_agentview_left", "robot0_agentview_right", "robot0_eye_in_hand")
 
@@ -49,20 +50,22 @@ def main():
         raise ValueError("bad trace has no recorded danger event")
     output.mkdir(parents=True)
     env = rt.make_env(dataset, render=True, seed=case["seed"])
-    records = []
+    records, measurements = [], []
     try:
         rt.reset_source(env, source_states, xml, meta)
+        bindings = Bindings(env, object_names=sorted(env.objects), fixtures=case["fixtures"])
         def frame(branch, index):
             state = saved[branch][index]
             env.sim.set_state_from_flattened(state)
             env.sim.forward()
             if not np.array_equal(state, env.sim.get_state().flatten()):
                 raise ValueError("visual restore changed the saved state")
+            measurements.append({"branch":branch,"state_index":index,"snapshot":bindings.snapshot()})
             return [Image.fromarray(env.sim.render(256,256,camera_name=camera)[::-1].copy()) for camera in CAMERAS]
         def sheet(name, selections):
             canvas = Image.new("RGB", (768, 284*len(selections)), "white")
             draw = ImageDraw.Draw(canvas)
-            selection_records = []
+            selection_records, measurements = [], []
             for row, (branch, index) in enumerate(selections):
                 for column, image in enumerate(frame(branch, index)):
                     canvas.paste(image, (column*256, row*284+24))
@@ -74,8 +77,12 @@ def main():
         comparison = round((a.comparison_time if a.comparison_time is not None else danger_time+1.)*20)
         sheet("event_comparison.jpg", [(b,min(comparison,len(saved[b])-1)) for b in branches])
         sheet("terminal_comparison.jpg", [(b,len(saved[b])-1) for b in branches])
+        if case["mechanism"] == "support_loss" and danger_time is not None:
+            indices = sorted(set([0,10,20,40,round(danger_time*20)]))
+            sheet("fall_timeline.jpg", [("bad", min(i,len(saved["bad"])-1)) for i in indices])
     finally:
         env.close()
+    (output/"restored_measurements.json").write_text(json.dumps(measurements,indent=2)+"\n")
     provenance = {"case_id":case["id"],"case_sha256":sha256_file(case_path),
                   "method":"separate visual simulator restored from actual scored states; no action replay or rescoring",
                   "cameras":CAMERAS,"frames":records,
