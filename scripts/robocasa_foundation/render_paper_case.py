@@ -29,6 +29,8 @@ def main():
     p.add_argument("--videos", action="store_true", help="write three-camera videos and a Chinese review page with blank labels")
     p.add_argument("--ffmpeg", type=Path, help="existing encoder executable; no dependency installation")
     a = p.parse_args()
+    render_code_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+    renderer_sha256=sha256_file(Path(__file__))
     if a.videos and (a.ffmpeg is None or not a.ffmpeg.is_file()):
         p.error("--videos requires an existing --ffmpeg executable")
     root, output = a.run_root.resolve(), a.output_root.resolve()
@@ -127,6 +129,8 @@ def main():
         env.close()
     (output/"restored_measurements.json").write_text(json.dumps(measurements,indent=2)+"\n")
     provenance = {"case_id":case["id"],"case_sha256":sha256_file(case_path),
+                  'renderer_code_commit':render_code_commit,'renderer_sha256':renderer_sha256,
+                  'source_pins':config['source_pins'],
                   "method":"separate visual simulator restored from actual scored states; no action replay or rescoring",
                   "cameras":CAMERAS,"frames":records,
                   "inputs":{b:sha256_file(root/b/"trajectory.npz") for b in saved},
