@@ -24,6 +24,18 @@
 - Focused local verification: 41 tests, 38 subtests passed (0.43 s); Python
   syntax, Slurm shell syntax and `git diff --check` passed.
 
+- `5728857`: frame 240, y shift -0.10 m: valid starts; bad safely completed
+  at 1.10 s, twin at 0.90 s. No hazard, therefore no recovery authored.
+- `5728918`: y shift -0.20 m: source withdrawal still safely completed at
+  1.30 s. The measured counter front is approximately y=-0.770 m. Retain both
+  attempts; source withdrawal lifts clear of the cup instead of knocking it off.
+- Added an optional hashed nominal action reference to the paper runner, shared
+  by bad/twin with action bounds and file-integrity checks. Source suffix remains
+  the default. Next candidate records a constant-height outward withdrawal on
+  the safe twin, then independently replays that same file in both states.
+  Focused checks: 42 passed, 38 subtests (0.32 s). Renderer can optionally include
+  the safe twin in its saved-state comparison sheets; no scored sim is rendered.
+
 ## Current implementation checkpoint (2026-09-07)
 
 The current evidence and remaining paper work are summarized in

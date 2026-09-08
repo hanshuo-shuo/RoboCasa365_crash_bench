@@ -76,12 +76,14 @@ def main():
     p.add_argument("--common-neutral-steps", type=int, default=10)
     p.add_argument("--translation", type=float, nargs=3, default=[0.,-.1,0.])
     p.add_argument("--lift", type=float, default=.25)
+    p.add_argument("--fixed-withdrawal", type=float, nargs=3, help="world displacement at fixed orientation, recorded on the safe twin")
     a = p.parse_args()
     root, repo = a.output_root.resolve(), Path(__file__).resolve().parents[2]
     if (root.exists() or root == repo or repo in root.parents or a.data_root.resolve() in root.parents
             or a.artifact_root.resolve() not in root.parents):
         p.error("output must be new, below external artifact root, and outside source data/Git")
-    if not np.isfinite(a.translation).all() or not 0 < a.lift < .6 or a.common_neutral_steps < 0:
+    if (not np.isfinite(a.translation).all() or not 0 < a.lift < .6 or a.common_neutral_steps < 0
+            or (a.fixed_withdrawal is not None and not np.isfinite(a.fixed_withdrawal).all())):
         p.error("invalid construction parameters")
     config = json.loads(Path("configs/robocasa_foundation/paper_v1.json").read_text())
     root.mkdir(parents=True)
@@ -90,6 +92,25 @@ def main():
     case, geometry = make_case(a, config)
     write_json(root/"development_case.json",case)
     write_json(root/"geometry.json",geometry)
+    if a.fixed_withdrawal is not None:
+        start = PaperStart(a.data_root,case,config)
+        env,_,_ = start.audited("safe_twin")
+        record = Recorder(env,start.neutral)
+        try:
+            record.move("fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.fixed_withdrawal)
+            record.move("clear after withdrawal",np.asarray(record.controller().ref_pos).copy()+[0.,0.,a.lift])
+            path = root/"nominal_actions.npz"
+            np.savez_compressed(path,actions=record.actions,states=record.states)
+            write_json(root/"nominal_primitives.json",record.primitives)
+            case["witnesses"]={"nominal":{"actions":str(path.relative_to(a.artifact_root.resolve())),"actions_sha256":sha256_file(path)}}
+            case["authoring"]["fixed_withdrawal_world_m"]=a.fixed_withdrawal
+            write_json(root/"development_case.json",case)
+        except Exception:
+            np.savez_compressed(root/"failed_nominal_authoring.npz",actions=record.actions,states=record.states)
+            write_json(root/"attempt.json", {"authoring_error":traceback.format_exc(),"new_certified_items":0})
+            return 1
+        finally:
+            env.close()
     report = {"new_certified_items":0,"development_three_branch_pass":False,"outcomes":{},"authoring_error":None}
     for branch in ("bad","safe_twin"):
         result = run_once(a.data_root,a.artifact_root,case,config,branch,0,root/branch,
@@ -114,7 +135,7 @@ def main():
         path = author/"recovery_actions.npz"
         np.savez_compressed(path,actions=record.actions,states=record.states)
         write_json(author/"primitives.json",record.primitives)
-        case["witnesses"]={"recovery":{"actions":str(path.relative_to(a.artifact_root.resolve())),"actions_sha256":sha256_file(path)}}
+        case.setdefault("witnesses",{})["recovery"]={"actions":str(path.relative_to(a.artifact_root.resolve())),"actions_sha256":sha256_file(path)}
         write_json(root/"development_case.json",case)
     except Exception:
         report["authoring_error"]=traceback.format_exc()

@@ -19,6 +19,7 @@ def main():
     p.add_argument("--data-root", type=Path, required=True)
     p.add_argument("--run-root", type=Path, required=True)
     p.add_argument("--output-root", type=Path, required=True)
+    p.add_argument("--include-safe-twin", action="store_true", help="include the matched control in every comparison")
     a = p.parse_args()
     root, output = a.run_root.resolve(), a.output_root.resolve()
     repo = Path(__file__).resolve().parents[2]
@@ -32,7 +33,8 @@ def main():
     dataset = a.data_root / config["datasets"][case["dataset_key"]]["relative_path"]
     source_states, _, meta, xml = rt.load_source(dataset, case["episode"])
     saved, results = {}, {}
-    for branch in ("bad", "recovery"):
+    branches = ("bad", "recovery", "safe_twin") if a.include_safe_twin else ("bad", "recovery")
+    for branch in branches:
         results[branch] = json.loads((root/branch/"result.json").read_text())
         with np.load(root/branch/"trajectory.npz", allow_pickle=False) as data:
             saved[branch] = np.asarray(data["states"]).copy()
@@ -66,10 +68,10 @@ def main():
                 selection_records.append({"branch":branch,"state_index":index,"sim_time_s":index/20})
             canvas.save(output/name, quality=92)
             records.append({"file":name,"frames":selection_records,"sha256":sha256_file(output/name)})
-        sheet("start.jpg", [("bad",0)])
+        sheet("start.jpg", [(b,0) for b in (("bad","safe_twin") if a.include_safe_twin else ("bad",))])
         comparison = round((danger_time+1.)*20)
-        sheet("event_comparison.jpg", [(b,min(comparison,len(saved[b])-1)) for b in ("bad","recovery")])
-        sheet("terminal_comparison.jpg", [(b,len(saved[b])-1) for b in ("bad","recovery")])
+        sheet("event_comparison.jpg", [(b,min(comparison,len(saved[b])-1)) for b in branches])
+        sheet("terminal_comparison.jpg", [(b,len(saved[b])-1) for b in branches])
     finally:
         env.close()
     provenance = {"case_id":case["id"],"case_sha256":sha256_file(case_path),

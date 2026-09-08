@@ -45,8 +45,8 @@ def scoring(case, config):
         "diagnostic_only": case["split"] == "development" or config.get("calibration_status") != "frozen"}
 
 
-def recovery_path(case, artifact_root):
-    reference = case.get("witnesses", {}).get("recovery", {})
+def recovery_path(case, artifact_root, kind="recovery"):
+    reference = case.get("witnesses", {}).get(kind, {})
     relative = Path(reference.get("actions", ""))
     if not relative.parts or relative.is_absolute() or ".." in relative.parts:
         raise ValueError("Recovery actions must be an explicit relative external artifact reference")
@@ -116,8 +116,17 @@ def run_once(data_root, artifact_root, case, config, branch, repeat, output, *, 
         elif branch == "hold":
             sequence = np.repeat(padding[None], count, axis=0)
         elif branch in ("bad", "safe_twin"):
-            nominal = start.nominal_actions
-            sequence = valid_actions(nominal() if callable(nominal) else nominal, low, high)
+            if "nominal" in case.get("witnesses", {}):
+                path, expected = recovery_path(case, artifact_root, "nominal")
+                digest = sha256_file(path)
+                if digest != expected:
+                    raise ValueError("Nominal action artifact hash mismatch")
+                with np.load(path, allow_pickle=False) as archive:
+                    sequence = valid_actions(archive["actions"], low, high)
+                result.update(nominal_actions_path=str(path), nominal_actions_sha256=digest)
+            else:
+                nominal = start.nominal_actions
+                sequence = valid_actions(nominal() if callable(nominal) else nominal, low, high)
         else:
             raise ValueError(f"Unknown branch: {branch}")
         result.update(action_sequence_sha256=action_hash(sequence), source_action_count=len(sequence),
@@ -180,8 +189,9 @@ def check_output(output, data_root, artifact_root, cases, input_files):
     if output.exists() or output == repository or repository in output.parents:
         raise ValueError("Output must be a new directory outside Git")
     protected = [data_root.resolve()]
-    protected.extend(recovery_path(case, artifact_root)[0].parent for case in cases
-                     if case.get("witnesses", {}).get("recovery", {}).get("actions"))
+    protected.extend(recovery_path(case, artifact_root, kind)[0].parent for case in cases
+                     for kind in ("recovery", "nominal")
+                     if case.get("witnesses", {}).get(kind, {}).get("actions"))
     if any(output == root or root in output.parents or output in root.parents for root in protected):
         raise ValueError("Output cannot overlap source or recovery input directories")
     if any(output == path.resolve() or output in path.resolve().parents for path in input_files):

@@ -130,6 +130,25 @@ class PaperRunnerTests(unittest.TestCase):
         self.assertNotEqual(bad["executed_actions_sha256"], twin["executed_actions_sha256"])
         self.assertEqual(twin["outcome"], "recovery_success")
 
+    def test_authored_nominal_is_identical_for_both_states_and_hash_checked(self):
+        actions = np.full((8,12), 0.2)
+        self.recovery(actions)
+        self.case["witnesses"]["nominal"] = self.case["witnesses"].pop("recovery")
+        self.case["success_steps"] = {"bad":3, "safe_twin":2}
+        bad, path = self.run_case("bad")
+        twin, _ = self.run_case("safe_twin")
+        self.assertEqual(bad["action_sequence_sha256"], twin["action_sequence_sha256"])
+        self.assertEqual(bad["action_sequence_sha256"], runner.action_hash(actions))
+        with np.load(path/"trajectory.npz") as archive:
+            np.testing.assert_array_equal(archive["actions"], actions[:3])
+        self.case["witnesses"]["nominal"]["actions_sha256"] = "0"*64
+        result, _ = self.run_case(name="bad-nominal-hash")
+        self.assertEqual(result["outcome"], "invalid")
+        self.assertEqual(result["action_count"], 0)
+        self.assertIn("hash mismatch", result["execution_error"])
+        with self.assertRaises(ValueError):
+            runner.check_output(self.artifacts/"witness"/"new", self.data, self.artifacts, [self.case], [])
+
     def test_noncompletion_uses_full_horizon_and_preserves_common_neutral(self):
         result, output = self.run_case("safe_twin")
         self.assertEqual(result["outcome"], "safe_noncompletion")
