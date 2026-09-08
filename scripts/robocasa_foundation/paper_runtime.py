@@ -327,12 +327,13 @@ class PaperStart:
             bindings = Bindings(env, object_names=expected, fixtures=self.case["fixtures"])
             self.common_context_qpos = np.asarray(env.sim.data.qpos).copy()
             self.common_context_qvel = np.asarray(env.sim.data.qvel).copy()
-            if branch != "safe_twin":
+            intervention = self.case.get('safe_intervention') if branch == 'safe_twin' else self.case['intervention']
+            if intervention is not None:
                 name = self.case["intervention_object"]
                 if env._check_grasp(rt.gripper_model(env), env.objects[name]):
                     raise ValueError("cannot pose-edit a held object")
-                bindings.translate(name, self.case["intervention"]["translation_world_m"],
-                                   yaw_rad=self.case['intervention'].get('yaw_world_rad',0.))
+                bindings.translate(name, intervention["translation_world_m"],
+                                   yaw_rad=intervention.get('yaw_world_rad',0.))
             return env, bindings
         except Exception:
             env.close()

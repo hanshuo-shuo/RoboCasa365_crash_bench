@@ -78,6 +78,10 @@ def main():
     p.add_argument("--common-neutral-steps", type=int, default=10)
     p.add_argument("--translation", type=float, nargs=3, default=[0.,-.1,0.])
     p.add_argument("--yaw-degrees", type=float, default=0.,help='initial hazard-object yaw only; safe twin keeps source pose')
+    p.add_argument('--safe-translation',type=float,nargs=3,
+                   help='explicit safe-twin pose construction for the same object; original robot/task context is retained')
+    p.add_argument('--nominal-reference',type=Path,
+                   help='reuse an existing full nominal NPZ relative to artifact-root instead of reauthoring it')
     p.add_argument("--lift", type=float, default=.25)
     p.add_argument("--fixed-withdrawal", type=float, nargs=3, help="world displacement at fixed orientation, recorded on the safe twin")
     p.add_argument("--withdrawal-approach", type=float, nargs=3,
@@ -94,6 +98,7 @@ def main():
             or a.artifact_root.resolve() not in root.parents):
         p.error("output must be new, below external artifact root, and outside source data/Git")
     if (not np.isfinite(a.translation).all() or not np.isfinite(a.yaw_degrees) or not 0 < a.lift < .6 or a.common_neutral_steps < 0
+            or (a.safe_translation is not None and not np.isfinite(a.safe_translation).all())
             or (a.fixed_withdrawal is not None and not np.isfinite(a.fixed_withdrawal).all())
             or (a.withdrawal_approach is not None and (a.fixed_withdrawal is None or not np.isfinite(a.withdrawal_approach).all()))):
         p.error("invalid construction parameters")
@@ -106,9 +111,18 @@ def main():
     write_json(root/"provenance.json", {"code_commit":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
         "arguments":{k:str(v) if isinstance(v,Path) else v for k,v in vars(a).items()}, "config":config})
     case, geometry = make_case(a, config)
+    if a.safe_translation is not None:
+        case['safe_intervention']={'translation_world_m':a.safe_translation,'yaw_world_rad':0.}
+        case['notes']='Both matched poses are explicitly curated from one common source prefix. Only the same object pose differs; neither scoring nor original task success is changed.'
+    if a.nominal_reference is not None:
+        ref=(a.artifact_root/a.nominal_reference).resolve()
+        if a.nominal_reference.is_absolute() or '..' in a.nominal_reference.parts or a.artifact_root.resolve() not in ref.parents:
+            p.error('nominal reference must remain under external artifact root')
+        case['witnesses']={'nominal':{'actions':str(a.nominal_reference),'actions_sha256':sha256_file(ref)}}
+        case['authoring']['reused_nominal_reference']=str(a.nominal_reference)
     write_json(root/"development_case.json",case)
     write_json(root/"geometry.json",geometry)
-    if a.fixed_withdrawal is not None:
+    if a.fixed_withdrawal is not None and a.nominal_reference is None:
         start = PaperStart(a.data_root,case,config)
         env, record = None, None
         try:

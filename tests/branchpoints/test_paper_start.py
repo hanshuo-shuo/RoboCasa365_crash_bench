@@ -138,6 +138,30 @@ class EventMeasurementTests(unittest.TestCase):
 
 
 class PaperStartTests(unittest.TestCase):
+    def test_curated_safe_pose_uses_the_same_object_and_rejects_held_edits(self):
+        for held in (False,True):
+            with tempfile.TemporaryDirectory() as directory:
+                root=Path(directory)
+                case,config,rt=self._constructor_inputs(root)
+                case['safe_intervention']={'translation_world_m':[.2,0,0]}
+                env,_,_=fixture()
+                env.objects={'target':object(),'victim':object()}
+                env.get_ep_meta=lambda:{'lang':'original task'}
+                env._check_grasp=lambda *_:held
+                rt.make_env.return_value=env
+                with mock.patch.dict(sys.modules,{'semantic_runtime':rt}), \
+                     mock.patch.object(runtime,'source_hashes',return_value=case['hashes']), \
+                     mock.patch.object(runtime,'task_predicate_hash',return_value='a'*64), \
+                     mock.patch.object(runtime,'Bindings') as bindings:
+                    start=runtime.PaperStart(root,case,config)
+                    if held:
+                        with self.assertRaisesRegex(ValueError,'held object'):
+                            start.build('safe_twin')
+                        bindings.return_value.translate.assert_not_called()
+                    else:
+                        start.build('safe_twin')
+                        bindings.return_value.translate.assert_called_once_with(case['intervention_object'],[.2,0,0],yaw_rad=0.)
+
     def _constructor_inputs(self, root):
         extra = root / "source/extras"
         extra.mkdir(parents=True)

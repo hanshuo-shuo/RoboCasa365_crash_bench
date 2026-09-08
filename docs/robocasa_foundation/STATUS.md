@@ -318,6 +318,22 @@ pose/type/size from cached simulator data, without querying controllers or chang
 physics. This will verify receiving-surface clearance in fresh source replays.
 Focused source/runtime tests:14 passed,8 subtests; whitespace passes.
 
+Source-screen5742130: Drawer23 fresh replay succeeds at310; Drawer98 does not
+complete (no execution error). Actual source23 robot-foot box is centered near
+[1.136,-1.894,0.192] with half-sizes[0.35,0.25,0.19]. Static source XML confirms
+the island's left edge x=1.5 m. First source23 construction5742903 (frame292,
+risk translation[-0.17,-0.10,0], fixed withdrawal[-0.4,0,0]) produces actual floor
+catastrophes in both risk and original-pose control. This is a failed matched
+candidate, retained. Backup source34 screen5742906 also does not complete.
+
+Next source23 pair explicitly curates the safe object's pose farther inward,
+while retaining the same common source prefix, same robot/fixture context, same
+original task and the exact already recorded nominal file. This is allowed
+single-object pose construction, not a change to the task predicate or event.
+The safe twin is now declared rather than implied to be the unmodified source
+pose. Default cases keep their original behavior. Held-object edit checks apply
+to either curated pose. Runtime/start/runner checks:43 passed,31 subtests.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
