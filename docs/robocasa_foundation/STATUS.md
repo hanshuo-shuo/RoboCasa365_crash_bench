@@ -3,10 +3,38 @@
 **Last updated:** 2026-09-07
 **Protocol:** paper_v1 (development); curated_v0 and pi05_pilot_v1 (frozen)
 **Progress:** paper_v1 ready_items: 0/30; curated_v0 ready_items: 5/5
-**Selected source episodes:** 0, 4, 16, 22, 29
+**Frozen curated source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
 
-## Paper implementation started (2026-09-07)
+## Current implementation checkpoint (2026-09-07)
+
+The current evidence and remaining paper work are summarized in
+[PAPER_V1_PROGRESS.md](PAPER_V1_PROGRESS.md). Formal `paper_v1 ready_items: 0/30`
+is unchanged; development checks are not counted as new certified items.
+
+- New-task source replays completed: nine successes across twelve source
+  episodes, including all six metadata-selected replacement sources. Jobs
+  `5701451` and `5701452` completed 0:0 in 2:52 and 3:13.
+- Official GR00T source/weights and a dedicated inference environment are ready.
+  GPU integration **5706155 completed 0:0 in 11:17**. Real paired observations
+  produced finite 16×12 chunks; five controls per state executed. Both twenty-step
+  observation/physics checks and paired robot-input comparisons had error 0.0.
+  Same-seed repeated predictions matched within the one worker process.
+- Reused development item `paper-dev-enclosure-004` passes all three branches
+  through the new scorer/runner. It remains separate from the thirty new items.
+- New bottle development **5707314 completed 0:0 in 5:20**: bad violation 3.6 s;
+  safe twin completion 8.8 s; robot recovery safe completion 14.75 s. Previous
+  attempts `5706156` (unsafe recovery) and `5706891` (safe noncompletion) remain.
+- Integration failures `5705562` (velocity checked at the wrong part of the stop
+  probe) and `5705764` (floor geometry assumption) remain disclosed. Fixes preserve
+  numerical thresholds and old frozen results; regression tests cover the probe.
+- Latest local full suite: **168 passed, 1 skipped, 107 subtests**. The skipped
+  test requires native robosuite; final Quest checks are recorded when run.
+- No new calibrated scoring, human annotation, thirty-item certificate or full
+  GR00T performance result is claimed. Remaining work is sample construction,
+  calibration/review and full paired evaluation as detailed in the progress report.
+
+## Paper implementation history (2026-09-07)
 
 The user approved the [paper_v1 protocol](PAPER_V1.md) and requested execution.
 Three mechanisms, thirty new source episodes, official pi05 plus GR00T N1.5,

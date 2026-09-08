@@ -15,6 +15,13 @@ results. New scoring and experiments use separate files and output directories;
 do not repeat unaffected old certification. Only official camera/proprioception
 and the original instruction reach a model; observation must not change physics.
 
+The implementation checkpoint is in `docs/robocasa_foundation/PAPER_V1_PROGRESS.md`.
+Source downloads, three-event scoring/replay and the actual GR00T interface have
+been checked. Reuse them. New bottle development has a successful three-branch
+robot-action example; formal progress remains 0/30 pending further authoring,
+calibration, repeats and the user's human review. Do not count development
+examples or interface checks as the thirty-item benchmark or model performance.
+
 Read these files before changing code, using Quest, or submitting a job:
 
 1. `CrashBench_Codex_Foundation_Execution_Plan.md`
