@@ -20,6 +20,8 @@ def main():
     p.add_argument("--run-root", type=Path, required=True)
     p.add_argument("--output-root", type=Path, required=True)
     p.add_argument("--include-safe-twin", action="store_true", help="include the matched control in every comparison")
+    p.add_argument("--branches", nargs="+", choices=["bad","recovery","safe_twin"], help="explicit branches for failed-attempt visual diagnosis")
+    p.add_argument("--comparison-time", type=float, help="saved-state time for diagnosis without a danger event")
     a = p.parse_args()
     root, output = a.run_root.resolve(), a.output_root.resolve()
     repo = Path(__file__).resolve().parents[2]
@@ -33,17 +35,17 @@ def main():
     dataset = a.data_root / config["datasets"][case["dataset_key"]]["relative_path"]
     source_states, _, meta, xml = rt.load_source(dataset, case["episode"])
     saved, results = {}, {}
-    branches = ("bad", "recovery", "safe_twin") if a.include_safe_twin else ("bad", "recovery")
+    branches = tuple(a.branches) if a.branches else (("bad", "recovery", "safe_twin") if a.include_safe_twin else ("bad", "recovery"))
     for branch in branches:
         results[branch] = json.loads((root/branch/"result.json").read_text())
         with np.load(root/branch/"trajectory.npz", allow_pickle=False) as data:
             saved[branch] = np.asarray(data["states"]).copy()
         if len(saved[branch]) != results[branch]["action_count"] + 1 or results[branch]["outcome"] == "invalid":
             raise ValueError("cannot visualize incomplete or invalid scored state records")
-    if not np.allclose(saved["bad"][0], saved["recovery"][0], rtol=0, atol=1e-10):
+    if "recovery" in saved and not np.allclose(saved["bad"][0], saved["recovery"][0], rtol=0, atol=1e-10):
         raise ValueError("bad and recovery starts do not match")
     danger_time = results["bad"]["time_to_violation_s"]
-    if danger_time is None:
+    if danger_time is None and a.comparison_time is None:
         raise ValueError("bad trace has no recorded danger event")
     output.mkdir(parents=True)
     env = rt.make_env(dataset, render=True, seed=case["seed"])
@@ -68,8 +70,8 @@ def main():
                 selection_records.append({"branch":branch,"state_index":index,"sim_time_s":index/20})
             canvas.save(output/name, quality=92)
             records.append({"file":name,"frames":selection_records,"sha256":sha256_file(output/name)})
-        sheet("start.jpg", [(b,0) for b in (("bad","safe_twin") if a.include_safe_twin else ("bad",))])
-        comparison = round((danger_time+1.)*20)
+        sheet("start.jpg", [(b,0) for b in (("bad","safe_twin") if "safe_twin" in branches else ("bad",))])
+        comparison = round((a.comparison_time if a.comparison_time is not None else danger_time+1.)*20)
         sheet("event_comparison.jpg", [(b,min(comparison,len(saved[b])-1)) for b in branches])
         sheet("terminal_comparison.jpg", [(b,len(saved[b])-1) for b in branches])
     finally:
