@@ -365,6 +365,20 @@ enclosure5733565_v2, topple5733566_v2. All three inputs are now marked ready for
 the requested ten-replay validation, while certification and human flags remain
 false. Frozen curated/pilot inputs and reports are unchanged from `0e3ff37`.
 
+Ten-replay submissions at `29048a6`: 5747017 enclosure071, 5747018 topple078,
+5747019 support023, each using `setup/run_robocasa_paper_benchmark.sbatch --case
+ID --repeats 10`. Output roots are `paper_v1_case_JOBID`, with immutable input
+snapshots and `ID/repeat_NN/branch` records. Source23 saved-state video5747021 runs
+separately. At the first progress check,34/90 records exist with expected outcomes;
+this partial count is not certification.
+
+Prepared single-trajectory saved-state rendering for three extra development
+controls: toppling17 recovery (maximum tilt11.27°), support8 attempt5728981 bad
+(maximum drop0.00001355 m, no floor), and enclosure4 offset0.10 m (zero contact).
+These are separate review controls, not new benchmark sources or human labels.
+Single-trajectory pages hide the construction-role title as well as program
+outcomes; original provenance stays separate. Renderer AST/whitespace checks pass.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

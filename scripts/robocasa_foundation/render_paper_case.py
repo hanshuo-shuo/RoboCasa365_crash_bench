@@ -50,9 +50,9 @@ def main():
             saved[branch] = np.asarray(data["states"]).copy()
         if len(saved[branch]) != results[branch]["action_count"] + 1 or results[branch]["outcome"] == "invalid":
             raise ValueError("cannot visualize incomplete or invalid scored state records")
-    if "recovery" in saved and not np.allclose(saved["bad"][0], saved["recovery"][0], rtol=0, atol=1e-10):
+    if "bad" in saved and "recovery" in saved and not np.allclose(saved["bad"][0], saved["recovery"][0], rtol=0, atol=1e-10):
         raise ValueError("bad and recovery starts do not match")
-    danger_time = results["bad"]["time_to_violation_s"]
+    danger_time = results.get("bad", {}).get("time_to_violation_s")
     if danger_time is None and a.comparison_time is None:
         raise ValueError("bad trace has no recorded danger event")
     output.mkdir(parents=True)
@@ -88,11 +88,13 @@ def main():
             for row, (branch, index) in enumerate(selections):
                 for column, image in enumerate(frame(branch, index)):
                     canvas.paste(image, (column*256, row*284+24))
-                draw.text((8,row*284+4), f"{branch}; actual scored time {index/20:.2f} s", fill="black")
+                shown_branch='trajectory' if len(branches)==1 else branch
+                draw.text((8,row*284+4), f"{shown_branch}; actual scored time {index/20:.2f} s", fill="black")
                 selection_records.append({"branch":branch,"state_index":index,"sim_time_s":index/20})
             canvas.save(output/name, quality=92)
             records.append({"file":name,"frames":selection_records,"sha256":sha256_file(output/name)})
-        sheet("start.jpg", [(b,0) for b in (("bad","safe_twin") if "safe_twin" in branches else ("bad",))])
+        start_branches=[b for b in branches if b!='recovery' or 'bad' not in branches]
+        sheet("start.jpg", [(b,0) for b in start_branches])
         if danger_time is not None:
             onset=round(danger_time*20)
             sheet('first_event.jpg',[(b,min(onset,len(saved[b])-1)) for b in branches])
@@ -146,6 +148,7 @@ def write_review(output, case, meta, branches, saved):
         return html.escape(translations.get(category,category)+'（'+name+'）')
     roles={'bad':'A：风险摆放＋固定续执行','recovery':'B：相同风险起点＋机器人恢复',
            'safe_twin':'C：安全摆放＋与 A 完全相同的固定动作'}
+    if len(branches)==1:roles={branches[0]:'待核查轨迹'}
     sections=[]
     for branch in branches:
         sections.append(f'<section><h2>{roles[branch]}</h2><p>记录至 {(len(saved[branch])-1)/20:.2f} 秒。'
@@ -158,7 +161,7 @@ def write_review(output, case, meta, branches, saved):
             '<option value="1" selected>1×</option></select></p>'
             f'<label>你的判断与依据（初始为空）<textarea data-branch="{branch}"></textarea></label></section>')
     images=''.join(f'<figure><figcaption>{title}</figcaption><img src="{file}"></figure>' for file,title in
-        [('start.jpg','起点：A/B 共用风险起点；C 为安全摆放'),('first_event.jpg','过程关键帧 1（时间标在图内）'),
+        [('start.jpg','该轨迹实际起点' if len(branches)==1 else '起点：A/B 共用风险起点；C 为安全摆放'),('first_event.jpg','过程关键帧 1（时间标在图内）'),
          ('event_comparison.jpg','过程关键帧 2（时间标在图内）'),
          ('terminal_comparison.jpg','各分支实际记录终点')] if (output/file).exists())
     page='''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>CrashBench 人工核查</title>
