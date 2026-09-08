@@ -185,11 +185,14 @@ class EventMeasurement:
         targets = set(self.case['task_targets'])
         names = [model.geom_id2name(g) for g in range(model.ngeom)]
         bodies = [int(model.geom_bodyid[g]) for g in range(model.ngeom)]
-        self._original_sim_step = self.env.sim.step
+        self._sim_step_method = 'step2' if getattr(self.env, 'lite_physics', False) else 'step'
+        self._original_sim_step = getattr(self.env.sim, self._sim_step_method)
         self._substep_contacts = []
+        self._observed_substep_count = 0
 
         def observed_step(*args, **kwargs):
             result = self._original_sim_step(*args, **kwargs)
+            self._observed_substep_count += 1
             data = self.env.sim.data
             for index in range(data.ncon):
                 contact = data.contact[index]
@@ -208,11 +211,11 @@ class EventMeasurement:
                             'support':support,'floor':floor})
             return result
 
-        self.env.sim.step = observed_step
+        setattr(self.env.sim, self._sim_step_method, observed_step)
 
     def stop_observing(self):
         if self._original_sim_step is not None:
-            self.env.sim.step = self._original_sim_step
+            setattr(self.env.sim, self._sim_step_method, self._original_sim_step)
             self._original_sim_step = None
 
     def bottom_z(self):
@@ -257,7 +260,11 @@ class EventMeasurement:
     def snapshot(self, step, frequency):
         result = self.normalize(self.bindings.snapshot(), step, frequency)
         if self._substep_contacts is not None:
+            if step > 0 and self._observed_substep_count == 0:
+                raise RuntimeError('contact observer received no actual physics steps')
             contacts, self._substep_contacts = self._substep_contacts, []
+            result['observed_physics_steps'] = self._observed_substep_count
+            self._observed_substep_count = 0
             result['physics_substep_contacts'] = contacts
             result['contact_sampling'] = 'physics_substeps_and_control_endpoint'
             result['undesired_contact'] |= any(c['actor'] for c in contacts)

@@ -167,6 +167,28 @@ contact, despite author exit1 and diagnostic grasp/terminal warnings. Bad peaks
 at1.756 N and violates at2.35 s; twin completes at4.0 s with zero enclosure contact.
 This is one construction check, not repeated certification or human review.
 
+Registered Food71 and Counter78 as `candidate`, with exact source/action references
+and blank human labels. Current manifest: 2 candidates, 4 development examples,
+0 evaluation entries, 0 ready. Their read-only audits at `3de7b4a` pass (external
+`paper_v1_audit_enclosure_5733565` and `paper_v1_audit_topple_5733566`).
+
+Initial substep check5735524 replayed the original Counter5 recovery: all195 saved
+states (238 values each) equal the original bit-for-bit, but the observer recorded
+no substeps. The pinned robosuite `lite_physics` path calls `step1`/`step2`, not
+`step`. Corrected the observer to wrap the actual final physics-step method and
+to fail closed when zero physics steps are observed. The zero-observation run is
+retained and is not a successful contact-sampling validation. Unit tests cover
+both methods, original step counts, transient capture and the zero-step error;
+59 focused tests / 66 subtests pass.
+
+Drawer66 initial candidate5733892 failed the safe-twin object stability probe
+before nominal authoring; its full traceback and construction are retained.
+Second attempt5735608 uses100 common neutral controls and x translation0.10 m,
+based on the actual island front x≈2.154 m. No threshold loosened. The support
+author now also saves structured errors for invalid nominal-authoring starts.
+Food4 controls5734081/82 (0.08/0.10 m) safely complete at13.2 s with zero contact;
+they do not yet supply the missing challenging light-contact negative.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

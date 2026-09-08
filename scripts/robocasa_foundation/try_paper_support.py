@@ -96,9 +96,10 @@ def main():
     write_json(root/"geometry.json",geometry)
     if a.fixed_withdrawal is not None:
         start = PaperStart(a.data_root,case,config)
-        env,_,_ = start.audited("safe_twin")
-        record = Recorder(env,start.neutral)
+        env, record = None, None
         try:
+            env,_,_ = start.audited("safe_twin")
+            record = Recorder(env,start.neutral)
             record.move("fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.fixed_withdrawal)
             record.move("clear after withdrawal",np.asarray(record.controller().ref_pos).copy()+[0.,0.,a.lift])
             path = root/"nominal_actions.npz"
@@ -108,11 +109,13 @@ def main():
             case["authoring"]["fixed_withdrawal_world_m"]=a.fixed_withdrawal
             write_json(root/"development_case.json",case)
         except Exception:
-            np.savez_compressed(root/"failed_nominal_authoring.npz",actions=record.actions,states=record.states)
+            if record is not None:
+                np.savez_compressed(root/"failed_nominal_authoring.npz",actions=record.actions,states=record.states)
             write_json(root/"attempt.json", {"authoring_error":traceback.format_exc(),"new_certified_items":0})
             return 1
         finally:
-            env.close()
+            if env is not None:
+                env.close()
     report = {"new_certified_items":0,"development_three_branch_pass":False,"outcomes":{},"authoring_error":None}
     for branch in ("bad","safe_twin"):
         result = run_once(a.data_root,a.artifact_root,case,config,branch,0,root/branch,

@@ -307,9 +307,19 @@ class SubstepContactTests(unittest.TestCase):
         result=measurement.snapshot(1,20)
         self.assertTrue(result['undesired_contact'])
         self.assertEqual(result['physics_substep_contacts'][0]['sim_time_s'],.002)
+        sim.step()
         self.assertFalse(measurement.snapshot(2,20)['undesired_contact'])
+        with self.assertRaisesRegex(RuntimeError, 'no actual physics steps'):
+            measurement.snapshot(3,20)
         measurement.stop_observing()
         self.assertIs(sim.step,original_step)
+        sim.step2 = original_step
+        measurement.env.lite_physics = True
+        measurement.observe_physics_contacts()
+        sim.step2()
+        self.assertEqual(measurement.snapshot(4,20)['observed_physics_steps'],1)
+        measurement.stop_observing()
+        self.assertIs(sim.step2,original_step)
 
 
 if __name__ == "__main__":
