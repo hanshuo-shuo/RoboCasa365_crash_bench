@@ -48,6 +48,18 @@
   107 subtests (1.19 s). No frozen certification was rerun. Extended saved-state
   visualization adds a fall timeline and restored contact/pose diagnostics.
 
+- `5729111` independent recovery safely completed at **0.80 s** (16 controls).
+  Three-branch development pass: bad floor fall at 3.55 s / 60 s noncompletion;
+  recovery 0.80 s safe success; twin 0.95 s safe success. Actual run code
+  `95e3177`. Same risk start, common contexts, source/predicate/action hashes,
+  action bounds and sixty-second budgets passed the read-only artifact audit.
+  Registered `paper-dev-support-008` as development only; formal 0/30 unchanged.
+- The first review exporter passed its integrity audit but plotting failed with
+  `ModuleNotFoundError: matplotlib` on Quest. The partial audit remains at
+  `paper_v1_support_review_5729111/audit.json`. No package installed. Added
+  an audit-only JSON export and local plotting mode to use existing local
+  Matplotlib 3.11.1. Camera review job `5729385` submitted independently.
+
 ## Current implementation checkpoint (2026-09-07)
 
 The current evidence and remaining paper work are summarized in

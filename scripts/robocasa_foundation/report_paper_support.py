@@ -13,10 +13,24 @@ from run_paper_benchmark import action_hash, write_json
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--run-root',type=Path,required=True)
-    p.add_argument('--artifact-root',type=Path,required=True)
+    p.add_argument('--run-root',type=Path)
+    p.add_argument('--artifact-root',type=Path)
+    p.add_argument('--audit-only',action='store_true',help='export verified plot inputs without plotting dependencies')
+    p.add_argument('--plot-input',type=Path,help='render a previously audited plot-data JSON locally')
     p.add_argument('--output-root',type=Path,required=True)
     a=p.parse_args()
+    if a.plot_input:
+        payload=json.loads(a.plot_input.read_text())
+        out=a.output_root.resolve()
+        repo=Path(__file__).resolve().parents[2]
+        if out.exists() or out==repo or repo in out.parents:
+            p.error('plot output must be new and outside Git')
+        out.mkdir(parents=True)
+        write_json(out/'audit.json',payload['audit'])
+        render(out,Path(payload['source_run']),payload['results'],payload['traces'])
+        return
+    if a.run_root is None or a.artifact_root is None:
+        p.error('audit requires run-root and artifact-root')
     root,out=a.run_root.resolve(),a.output_root.resolve()
     repo=Path(__file__).resolve().parents[2]
     if out.exists() or out==repo or repo in out.parents or root in out.parents or out in root.parents:
@@ -61,6 +75,15 @@ def main():
     write_json(out/'audit.json',audit)
     if not audit['passed']:
         raise ValueError(f'failed artifact checks: {checks}')
+    write_json(out/'plot_data.json',{'source_run':str(root),'audit':audit,'results':results,
+        'traces':{b:[{'input':row['input']} for row in trace] for b,trace in traces.items()}})
+    if not a.audit_only:
+        render(out,root,results,traces)
+    print(json.dumps({'output':str(out),'audit_passed':True,'new_certified_items':0}))
+
+
+def render(out,root,results,traces):
+    """Use an existing plotting runtime; never install it in the simulator env."""
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt

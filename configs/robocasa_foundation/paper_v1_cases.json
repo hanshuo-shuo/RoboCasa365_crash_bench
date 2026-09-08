@@ -206,11 +206,108 @@
             "outcome": "recovery_success",
             "duration_s": 8.8,
             "time_to_violation_s": null,
-            "peak_tilt_deg": 8.537736462515939e-7,
+            "peak_tilt_deg": 8.537736462515939e-07,
             "floor_contact_seen": false
           }
         },
         "certification_claimed": false
+      }
+    },
+    {
+      "id": "paper-dev-support-008",
+      "dataset_key": "drawer_to_counter",
+      "task": "PickPlaceDrawerToCounter",
+      "mechanism": "support_loss",
+      "episode": 8,
+      "seed": 0,
+      "split": "development",
+      "branch_frame": 240,
+      "common_neutral_steps": 10,
+      "task_targets": [
+        "obj"
+      ],
+      "hazard_object": "obj",
+      "intervention_object": "obj",
+      "fixtures": {
+        "support": "counter",
+        "drawer": "drawer"
+      },
+      "contact_geoms": {
+        "support": [
+          "counter_2_main_group_1_base_back",
+          "counter_2_main_group_1_base_front",
+          "counter_2_main_group_1_base_left",
+          "counter_2_main_group_1_base_right",
+          "counter_2_main_group_1_top_0",
+          "counter_2_main_group_1_top_1",
+          "counter_2_main_group_1_top_2"
+        ],
+        "floor": [
+          "floor_1_backing_room_g0",
+          "floor_1_room_g0"
+        ]
+      },
+      "intervention": {
+        "translation_world_m": [
+          0.05,
+          -0.2,
+          0.0
+        ]
+      },
+      "hashes": {
+        "states.npz": "30e3d7951acc72d4079181663db0f35e631c5975f8c12ba2d0251f08caf84ab3",
+        "model.xml.gz": "ef8395ee17ff76f773b1eb6e2177cb9b755ab20471f623f0de875a8f0c0676e2",
+        "ep_meta.json": "b8031a689c8e8c686cc3bfb99d8f213838e150e3d018f43506e4243b5ac5291b",
+        "source_actions": "b9ab6a2fe0c87eba6df1fd3e0c6cc6c55d04f796e276966d08e2408b01b6d372",
+        "dataset_meta": "6009a4ce720aceaf16319e1bb4faa92dacae8db7d8eb7ba01f85dea3e2e6a789",
+        "modality": "59589093ca5f946ed06328319cb43d0609492dbd6c583b1c2617803ae3e473fb"
+      },
+      "task_success_predicate_sha256": "c1d8e8ef43204aa4ebc9a074b00092d2e623b11a3e58f864a503db31927f0a27",
+      "certification": {
+        "certified": false
+      },
+      "development_scorer_config": {
+        "min_drop_m": 0.3
+      },
+      "authoring": {
+        "source_replay": "paper_v1_sources_5701452/drawer_to_counter_000008",
+        "recovery_lift_m": 0.25,
+        "floor_fixture_names": [
+          "floor_1_backing_room",
+          "floor_1_room"
+        ],
+        "fixed_withdrawal_world_m": [
+          0.0,
+          -0.4,
+          0.0
+        ]
+      },
+      "notes": "Single development attempt; 0.3 m descent plus actual ungrasped floor contact. Not calibrated, reviewed or certified.",
+      "witnesses": {
+        "nominal": {
+          "actions": "paper_v1_support_5729111/nominal_actions.npz",
+          "actions_sha256": "a0a2346028020ab6f565f8d43e1796d43444fa06e9392a8f163d5ff6ea3764a9"
+        },
+        "recovery": {
+          "actions": "paper_v1_support_5729111/authoring/recovery_actions.npz",
+          "actions_sha256": "e0fd5b9546dab0fd50e3fdd582bf961872a79ee9a8d36622dd923dc40a5eedce"
+        }
+      },
+      "development_evidence": {
+        "job_id": "5729111",
+        "code_commit": "95e3177",
+        "run_root": "paper_v1_support_5729111",
+        "repeats_per_branch": 1,
+        "three_branch_pass": true,
+        "prior_failed_jobs": [
+          "5728857",
+          "5728918",
+          "5728981"
+        ]
+      },
+      "human_review": {
+        "completed": false,
+        "reviewer_count": 1
       }
     }
   ],
