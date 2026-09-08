@@ -28,8 +28,17 @@ is unchanged; development checks are not counted as new certified items.
 - Integration failures `5705562` (velocity checked at the wrong part of the stop
   probe) and `5705764` (floor geometry assumption) remain disclosed. Fixes preserve
   numerical thresholds and old frozen results; regression tests cover the probe.
-- Latest local full suite: **168 passed, 1 skipped, 107 subtests**. The skipped
-  test requires native robosuite; final Quest checks are recorded when run.
+- Final Quest full suite at `4241c67`: **169 passed, 107 subtests**, 32.95 s,
+  including native robosuite. Local full suite: **168 passed, 1 skipped**;
+  the only local skip is the same native-controller comparison passed on Quest.
+- A read-only artifact audit of the new bottle case passed source/witness
+  hashes, action bounds, trajectory lengths, paired contexts and nominal-action
+  identity. Bad peaked at 91.6 degrees of tilt and recovery at 11.3 degrees;
+  neither touched the floor. Both runnable examples are explicitly development.
+- Saved-state visual QA generated three comparison images and hashed provenance
+  under `/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_visual_5708093`.
+  The same-time comparison shows the bad bottle down and recovery bottle upright.
+  No scored rollout was rerun for those images; human review remains pending.
 - No new calibrated scoring, human annotation, thirty-item certificate or full
   GR00T performance result is claimed. Remaining work is sample construction,
   calibration/review and full paired evaluation as detailed in the progress report.

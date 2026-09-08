@@ -22,7 +22,9 @@ def main():
     a = p.parse_args()
     root, output = a.run_root.resolve(), a.output_root.resolve()
     repo = Path(__file__).resolve().parents[2]
-    if output.exists() or output == repo or repo in output.parents or root in output.parents or output in root.parents:
+    data_root = a.data_root.resolve()
+    if (output.exists() or output == repo or repo in output.parents or root in output.parents
+            or output in root.parents or output == data_root or data_root in output.parents):
         p.error("output must be new and outside the source run and repository")
     case_path = root / "development_case.json"
     case = json.loads(case_path.read_text())

@@ -18,6 +18,14 @@ paired common contexts, nominal action identity and recovery file hash all
 passed a read-only artifact check. The single successful development attempt
 does not replace calibration, human review or ten-run certification.
 
+Saved-state visual QA is under `paper_v1_visual_5708093` in the external run
+root: `start.jpg`, `event_comparison.jpg`, `terminal_comparison.jpg` and hashed
+`visualization.json`. At the same scored time (4.6 s), the bad branch shows the
+bottle lying on the counter while the recovery branch keeps it upright. These
+images restore actual recorded states in a separate visual simulator; no action
+trajectory is replayed or rescored, and restored states are checked for equality.
+This assistant inspection does not mark the human-review fields complete.
+
 ## Available code and data
 
 - Explicit object/fixture binding, three mechanical-event scorers, stable-start
@@ -136,7 +144,7 @@ new evaluation sources even though its three branches now work.
 
 ## What remains for the paper
 
-1. Obtain valid bad/recovery/safe-twin branches for the two new mechanisms,
+1. Expand the working bottle example and obtain a valid support-loss example,
    with model-visible risk and robot-action recovery within sixty seconds.
 2. Calibrate on development evidence; construct and certify thirty new source
    items (ten per mechanism), with the agreed single-person review.
@@ -149,3 +157,8 @@ new evaluation sources even though its three branches now work.
 No human labels, calibration, new certificates or full GR00T policy performance
 are implied by a passing unit test, a downloaded checkpoint or a nominal replay.
 See [the approved protocol](PAPER_V1.md) and [project status](STATUS.md).
+
+Final code validation at 4241c67: **169/169 Quest tests passed**, including the
+native simulator-controller comparison (107 subtests, 32.95 s). Local validation
+passed 168 tests with that one native-only comparison skipped. Frozen manifests,
+score settings and historical reports match the pre-expansion commit byte-for-byte.
