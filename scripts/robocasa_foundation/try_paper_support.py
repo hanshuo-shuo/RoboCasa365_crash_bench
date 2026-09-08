@@ -83,6 +83,10 @@ def main():
                    help="optional common nominal alignment displacement before the fixed withdrawal")
     p.add_argument("--withdrawal-gripper", type=float, choices=[-1.,1.], default=-1.,
                    help="fixed nominal gripper command; close empty gripper before transit when +1")
+    p.add_argument("--withdrawal-clearance", type=float, default=0.,
+                   help="lift before nominal alignment, then return to the same withdrawal height")
+    p.add_argument("--withdrawal-windup", type=float, default=0.,
+                   help="move opposite the withdrawal direction before the fixed stroke")
     a = p.parse_args()
     root, repo = a.output_root.resolve(), Path(__file__).resolve().parents[2]
     if (root.exists() or root == repo or repo in root.parents or a.data_root.resolve() in root.parents
@@ -92,6 +96,10 @@ def main():
             or (a.fixed_withdrawal is not None and not np.isfinite(a.fixed_withdrawal).all())
             or (a.withdrawal_approach is not None and (a.fixed_withdrawal is None or not np.isfinite(a.withdrawal_approach).all()))):
         p.error("invalid construction parameters")
+    if not 0 <= a.withdrawal_clearance <= .2 or not 0 <= a.withdrawal_windup <= .2:
+        p.error('clearance and windup must be finite and within 0 to 0.2 metres')
+    if a.fixed_withdrawal is None and (a.withdrawal_clearance or a.withdrawal_windup or a.withdrawal_gripper==1.):
+        p.error('nominal grip, clearance and windup options require --fixed-withdrawal')
     config = json.loads(Path("configs/robocasa_foundation/paper_v1.json").read_text())
     root.mkdir(parents=True)
     write_json(root/"provenance.json", {"code_commit":subprocess.check_output(["git","rev-parse","HEAD"],text=True).strip(),
@@ -105,11 +113,21 @@ def main():
         try:
             env,_,_ = start.audited("safe_twin")
             record = Recorder(env,start.neutral)
+            if a.withdrawal_clearance:
+                record.move('clear before nominal alignment',np.asarray(record.controller().ref_pos).copy()+[0.,0.,a.withdrawal_clearance])
             if a.withdrawal_gripper == 1.:
                 for _ in range(10):
                     action=record.neutral(); action[6]=1.; record.step(action)
             if a.withdrawal_approach is not None:
                 record.move("align before fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.withdrawal_approach,
+                            gripper_command=a.withdrawal_gripper)
+            if a.withdrawal_windup:
+                direction=np.asarray(a.fixed_withdrawal,dtype=float)
+                if np.linalg.norm(direction)==0: raise ValueError('windup requires a nonzero withdrawal')
+                record.move('move behind withdrawal stroke',np.asarray(record.controller().ref_pos).copy()
+                            -a.withdrawal_windup*direction/np.linalg.norm(direction),gripper_command=a.withdrawal_gripper)
+            if a.withdrawal_clearance:
+                record.move('return to withdrawal height',np.asarray(record.controller().ref_pos).copy()-[0.,0.,a.withdrawal_clearance],
                             gripper_command=a.withdrawal_gripper)
             record.move("fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.fixed_withdrawal,
                         gripper_command=a.withdrawal_gripper)
@@ -122,6 +140,8 @@ def main():
             case["authoring"]["fixed_withdrawal_world_m"]=a.fixed_withdrawal
             case["authoring"]["withdrawal_gripper_command"]=a.withdrawal_gripper
             case["authoring"]["empty_gripper_close_steps"]=10 if a.withdrawal_gripper==1. else 0
+            case['authoring']['withdrawal_clearance_m']=a.withdrawal_clearance
+            case['authoring']['withdrawal_windup_m']=a.withdrawal_windup
             if a.withdrawal_approach is not None:
                 case["authoring"]["withdrawal_approach_world_m"]=a.withdrawal_approach
             write_json(root/"development_case.json",case)

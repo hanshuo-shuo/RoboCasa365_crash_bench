@@ -252,6 +252,14 @@ The contact-observation equality report is now saved at
 `paper_v1_contact_observation_check_5735954/audit.json`, with hashes of both
 identical trajectory files and the new trace/result. No human/ready count changes.
 
+The next cup nominal keeps the same validated risk pose and approaches above the
+cup before moving behind its bowl and returning to withdrawal height. This avoids
+nudging it sideways during alignment, which the saved positions show in prior
+attempts. It reuses the existing Cartesian primitive for all movements and closes
+the empty gripper only after the initial clearance lift. All waypoints remain in
+the one nominal action file shared by risk/twin; no object is teleported after
+the branch and no robot torque shortcut is used.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
