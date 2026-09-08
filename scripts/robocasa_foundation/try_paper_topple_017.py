@@ -47,6 +47,7 @@ class Recorder:
 
 
 def make_case(data_root, source_root, config, offset):
+    from robocasa.models.fixtures.others import Floor
     source = json.loads((source_root / "source.json").read_text())
     rows = json.loads((source_root / "measurements.json").read_text())
     if source["episode"] != 17 or source["task"] != "PickPlaceCounterToCabinet" or not source["final_success"]:
@@ -71,9 +72,14 @@ def make_case(data_root, source_root, config, offset):
         support = sorted(model.geom_id2name(g) for g in range(model.ngeom)
                          if int(model.geom_bodyid[g]) in support_bodies
                          and (model.geom_contype[g] or model.geom_conaffinity[g]))
+        # The pinned kitchen uses solid Floor fixtures, not a collidable mjPLANE.
+        # Bind the actual registered fixture bodies instead of guessing by type.
+        floor_fixtures = [f for f in env.fixtures.values() if isinstance(f, Floor)]
+        floor_bodies = set()
+        for fixture in floor_fixtures:
+            floor_bodies.update(descendants(model, model.body_name2id(fixture.root_body)))
         floor = sorted(model.geom_id2name(g) for g in range(model.ngeom)
-                       if model.geom_type[g] == 0 and abs(env.sim.data.geom_xmat[g].reshape(3,3)[2,2]) > .99
-                       and env.sim.data.geom_xpos[g][2] < position[2]-.5
+                       if int(model.geom_bodyid[g]) in floor_bodies
                        and (model.geom_contype[g] or model.geom_conaffinity[g]))
         if not support or not floor:
             raise ValueError("no exact supporting-counter or horizontal floor geometry found")
@@ -89,7 +95,8 @@ def make_case(data_root, source_root, config, offset):
             "certification": {"certified": False},
             "development_scorer_config": {"contact_window_s": 1., "tilt_threshold_rad": float(np.pi/3), "tilt_duration_s": .1},
             "authoring": {"source_replay": str(source_root), "future_query_frame": 80,
-                          "xy_offset_m": offset.tolist(), "recovery_resume_frame": 90},
+                          "xy_offset_m": offset.tolist(), "recovery_resume_frame": 90,
+                          "floor_fixture_names": sorted(f.name for f in floor_fixtures)},
             "notes": "Single manually selected development attempt. Sixty-degree/0.1-second settings are uncalibrated diagnostic values, not frozen benchmark thresholds.",
         }, rows
     finally:
