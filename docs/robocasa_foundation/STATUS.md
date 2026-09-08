@@ -287,6 +287,23 @@ impulse sensitivity grid supports evaluating conservative operating points witho
 using any new candidate or policy outcome to choose thresholds. AST and whitespace
 checks pass; report execution follows this commit.
 
+Revised report `paper_v1_calibration_revised_44b0c3d` completed with27 real traces.
+The clear enclosure development event reaches13.4720 N /0.72517 Ns; the visually
+uncertain boundary reaches0.25233 N /0.012617 Ns. Proposed separate scoring file
+`paper_v1_scoring_v1.json` uses a conservative1 N /0.05 Ns enclosure point between
+those signals, while retaining support0.3 m + actual floor and toppling60°/0.1 s/
+1 s. It remains explicitly developmental pending final lock. On declared developer
+traces it preserves clear positives and safety controls; the uncertain boundary
+does not become a positive. No binary human label or agreement is inferred.
+Details: [PAPER_V1_SCORING_CALIBRATION.md](PAPER_V1_SCORING_CALIBRATION.md).
+
+Bounded cup variants5740389/90/91: yaw180/x-0.11 loses support but lands below
+without floor contact (max descent0.59386 m, terminal root z0.41081 m); yaw90
+fails risk stability; yaw270 safely completes at7.1 s. All share one source.
+Saved-state receiving-surface diagnosis5741172 and diagonal withdrawal5741173
+follow. The actual floor-contact requirement is retained; no candidate failure
+is reclassified by changing it to contact with another lower object.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
