@@ -274,6 +274,19 @@ The binding now supports explicit world-yaw on that free joint only; tests verif
 all other qpos and every qvel are unchanged. Default yaw0 preserves old behavior.
 Focused runtime/start/runner checks:42 passed,31 subtests; AST/whitespace pass.
 
+Yaw180 cup attempt5740065 has valid starts but no fall (bad6.60 s, twin4.80 s).
+The next bounded checks vary only the same source43 pose: yaw180/x-0.11 m,
+yaw90/x-0.13 m, yaw270/x-0.13 m; all retain y+0.15 m and the same recorded
+nominal recipe. They remain one source episode, not three new sample units.
+
+The revised development report now includes the actual active-substep runs
+(Counter5:5735954/5739619; Counter17:5736193), the Counter0 original-pose control,
+and three Food4 boundary attempts. It verifies trace/source hashes, preserves
+unknown human labels, and treats Counter11 as inspection-only. Its wider force/
+impulse sensitivity grid supports evaluating conservative operating points without
+using any new candidate or policy outcome to choose thresholds. AST and whitespace
+checks pass; report execution follows this commit.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
