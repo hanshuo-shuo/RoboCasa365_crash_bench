@@ -68,6 +68,22 @@ Automatic outcome labels remain outside the human page, and human JSON/textareas
 start blank. Local review generation checked blank labels and escaped instruction
 text; AST and whitespace checks pass. Actual video rendering remains to be run.
 
+First candidate failures retained: 5732593 Food18 has no hazard at 0.12 m;
+its twin fails object stability in the unchanged probe. 5732595 Drawer59 has
+valid starts but both branches safely complete (2.20/1.05 s), with maximum
+recorded descent about 0.005 mm; no recovery authored. 5732597 Counter78 has
+valid starts and danger at 1.90 s, twin safe completion 9.55 s, but the first
+detour safely fails to finish in 60 s. This is not a complete candidate witness.
+Additional Food18 distance0.18 attempt 5732781 and development Counter5 video
+job 5732783 were submitted at `6b7584d`; outputs remain separate.
+
+Next geometry-based adjustments: Drawer59 lateral shift +0.05 instead of -0.05
+with unchanged outward +x withdrawal (table front x≈2.387 m); Food18 earlier
+branch260 to stop before door-contact transients; Counter78 earlier descent at
+frame45 to rejoin before grasping. The descent frame need not follow the frame
+used only to place the bystander; removed that unnecessary authoring restriction.
+No physical/scoring threshold or frozen result is changed.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

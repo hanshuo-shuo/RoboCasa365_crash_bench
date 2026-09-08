@@ -64,7 +64,8 @@ def make_case(data_root, source_root, config, offset, resume_frame=90, *,
     rows = json.loads((source_root / "measurements.json").read_text())
     if source["episode"] != episode or source["task"] != "PickPlaceCounterToCabinet" or not source["final_success"]:
         raise ValueError("requires the successful designated source replay")
-    if not 0 < branch_frame < query_frame <= resume_frame < source["first_success_step"]:
+    if not (0 < branch_frame < query_frame < source["first_success_step"]
+            and branch_frame < resume_frame < source["first_success_step"]):
         raise ValueError("resume frame must be inside the unfinished source task")
     dataset = data_root / config["datasets"]["counter_to_cabinet"]["relative_path"]
     states, actions, meta, xml = rt.load_source(dataset, episode)
