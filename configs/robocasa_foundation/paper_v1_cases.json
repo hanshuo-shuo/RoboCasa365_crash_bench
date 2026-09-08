@@ -580,6 +580,11 @@
       }
     }
   ],
+  "excluded_sources": [
+    {"dataset_key": "foodcleanup", "episode": 18, "reason": "Repeated object-stability failure in the safe twin; attempts 5732593, 5732781, 5732903 retained."},
+    {"dataset_key": "drawer_to_counter", "episode": 59, "reason": "Withdrawals miss the cup or drop it into the drawer; corner placement invalid. Attempts 5732595, 5732904, 5733235, 5733624 retained."},
+    {"dataset_key": "drawer_to_counter", "episode": 66, "reason": "Original pose needs long settling; edge interventions penetrate the hand or fail stability. Attempts 5733892, 5735608, 5736075 retained."}
+  ],
   "development_sources": [
     {
       "dataset_key": "foodcleanup",
@@ -690,5 +695,5 @@
       "episode": 8
     }
   ],
-  "notes": "Twelve prior FoodCleanup attempts excluded. New-task 0/1/2 screened first; Drawer targets missed grasp and Counter distractors lack upright geometry. Next replay: Counter17/11/5 bottles and Drawer57/14/8 (two rolling-pin assets and a measuring cup), chosen from metadata before replay. Drawer49/50 remain reserved, unrun backups."
+  "notes": "All historical FoodCleanup sources are excluded, including episode 9. Development sources remain separate from new candidates. First-batch retired candidates are recorded in excluded_sources and cannot reenter evaluation or calibration. See PAPER_V1_BATCH01.md and STATUS.md for actual attempts; no model outcomes are used for selection."
 }

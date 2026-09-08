@@ -68,6 +68,13 @@ def frozen_config():
 
 
 class PaperProtocolTests(unittest.TestCase):
+    def test_retired_candidate_sources_cannot_reenter_the_batch(self):
+        candidate=case(split='candidate')
+        value=manifest(candidate)
+        value['excluded_sources']=[{'dataset_key':candidate['dataset_key'],'episode':candidate['episode']}]
+        with self.assertRaisesRegex(PaperProtocolError, 'previously excluded'):
+            validate_cases(value,config())
+
     def test_candidate_is_separate_from_calibration_and_ready_items(self):
         candidate = case(split="candidate")
         report = validate_cases(manifest(candidate), config())

@@ -212,6 +212,19 @@ original bystander pose. A development-only zero-intervention flag records this
 explicitly; candidates cannot use that shortcut. No new evaluation source is
 consumed for calibration, and no model outcome is consulted.
 
+Counter0 original-pose control5736747 safely completes (9.80/9.75 s) under active
+substep contact sampling. Counter11 remains an ambiguous non-target grasp/fall
+inspection source, not a benign label. Drawer43 third construction5736921 has
+valid starts, but bad safely completes at6.95 s (maximum descent9.14 mm) and twin
+at0.75 s; no floor fall. Keep the validated pose and next try a lateral alignment
+followed by outward withdrawal, recording one shared nominal robot-action file.
+
+Food18 and Drawer59/66 are now explicitly retired sources, separate from dedicated
+calibration sources. Both manifest validation and the authoring CLI reject their
+reuse as new candidates; they are not silently repurposed for calibration.
+The batch report is rewritten around actual current results and all retained
+failures. No ten-run verification or formal human-ready release has occurred.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

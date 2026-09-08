@@ -22,6 +22,9 @@ from run_paper_benchmark import run_once, write_json
 def check_source_role(dataset_key, episode, role):
     manifest = json.loads(Path("configs/robocasa_foundation/paper_v1_cases.json").read_text())
     reserved = {(row["dataset_key"], row["episode"]) for row in manifest["development_sources"]}
+    excluded = {(row['dataset_key'], row['episode']) for row in manifest.get('excluded_sources', [])}
+    if (dataset_key, episode) in excluded:
+        raise ValueError('This source was excluded; preserve its historical attempts')
     if (dataset_key, episode) in reserved and role == "candidate":
         raise ValueError("A development/historical source cannot become a new candidate")
     if (dataset_key, episode) not in reserved and role == "development":

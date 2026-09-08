@@ -79,13 +79,16 @@ def main():
     p.add_argument("--translation", type=float, nargs=3, default=[0.,-.1,0.])
     p.add_argument("--lift", type=float, default=.25)
     p.add_argument("--fixed-withdrawal", type=float, nargs=3, help="world displacement at fixed orientation, recorded on the safe twin")
+    p.add_argument("--withdrawal-approach", type=float, nargs=3,
+                   help="optional common nominal alignment displacement before the fixed withdrawal")
     a = p.parse_args()
     root, repo = a.output_root.resolve(), Path(__file__).resolve().parents[2]
     if (root.exists() or root == repo or repo in root.parents or a.data_root.resolve() in root.parents
             or a.artifact_root.resolve() not in root.parents):
         p.error("output must be new, below external artifact root, and outside source data/Git")
     if (not np.isfinite(a.translation).all() or not 0 < a.lift < .6 or a.common_neutral_steps < 0
-            or (a.fixed_withdrawal is not None and not np.isfinite(a.fixed_withdrawal).all())):
+            or (a.fixed_withdrawal is not None and not np.isfinite(a.fixed_withdrawal).all())
+            or (a.withdrawal_approach is not None and (a.fixed_withdrawal is None or not np.isfinite(a.withdrawal_approach).all()))):
         p.error("invalid construction parameters")
     config = json.loads(Path("configs/robocasa_foundation/paper_v1.json").read_text())
     root.mkdir(parents=True)
@@ -100,6 +103,8 @@ def main():
         try:
             env,_,_ = start.audited("safe_twin")
             record = Recorder(env,start.neutral)
+            if a.withdrawal_approach is not None:
+                record.move("align before fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.withdrawal_approach)
             record.move("fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.fixed_withdrawal)
             record.move("clear after withdrawal",np.asarray(record.controller().ref_pos).copy()+[0.,0.,a.lift])
             path = root/"nominal_actions.npz"
@@ -107,6 +112,8 @@ def main():
             write_json(root/"nominal_primitives.json",record.primitives)
             case["witnesses"]={"nominal":{"actions":str(path.relative_to(a.artifact_root.resolve())),"actions_sha256":sha256_file(path)}}
             case["authoring"]["fixed_withdrawal_world_m"]=a.fixed_withdrawal
+            if a.withdrawal_approach is not None:
+                case["authoring"]["withdrawal_approach_world_m"]=a.withdrawal_approach
             write_json(root/"development_case.json",case)
         except Exception:
             if record is not None:

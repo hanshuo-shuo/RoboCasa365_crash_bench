@@ -176,6 +176,12 @@ def validate_cases(manifest: Mapping[str, Any], config: Mapping[str, Any]) -> di
     for source in exclusions:
         _require(isinstance(source, Mapping), "development_sources entries must be objects")
         development_sources.add(_source(source, "development_sources"))
+    retired = manifest.get('excluded_sources', [])
+    _require(isinstance(retired, list), 'excluded_sources must be a list')
+    excluded_sources = set()
+    for source in retired:
+        _require(isinstance(source, Mapping), 'excluded_sources entries must be objects')
+        excluded_sources.add(_source(source, 'excluded_sources'))
     ids, sources, evaluation, development, ready = set(), {}, Counter(), Counter(), Counter()
     candidates = Counter()
     failures = {}
@@ -189,6 +195,7 @@ def validate_cases(manifest: Mapping[str, Any], config: Mapping[str, Any]) -> di
         sources[source] = case["split"]
         if case["split"] in ("candidate", "evaluation"):
             _require(source not in development_sources, f"{label}: evaluation source was used for development")
+            _require(source not in excluded_sources, f"{label}: source was previously excluded")
             if case["split"] == "evaluation":
                 evaluation[case["mechanism"]] += 1
             else:
