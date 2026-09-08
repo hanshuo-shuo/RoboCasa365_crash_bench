@@ -379,6 +379,20 @@ These are separate review controls, not new benchmark sources or human labels.
 Single-trajectory pages hide the construction-role title as well as program
 outcomes; original provenance stays separate. Renderer AST/whitespace checks pass.
 
+Topple repeat job5747018 completed0:0 in17:47. Offline audit
+`paper_v1_repeat_audit_5747018` passes all source/action/padding/state/score checks;
+bad/recovery/twin each have10/10 expected outcomes, all starts and identities valid.
+This is repeated validation passed, not human admission. The other two repeat jobs
+continue. Extra-control render jobs are5747564 (topple17 recovery),5747566
+(support8 earlier non-fall),5747568 (enclosure4 offset0.10).
+
+Human-review exports now include a unique review ID as well as case ID, preventing
+different developer variants of one episode from being confused. Manual outcome,
+start-state and visible-cue choices all default to blank; free-text notes remain
+blank too. The page explains the unchanged task goal without displaying program
+scores. Static generation checks confirm empty fields and escaped source text;
+browser interaction remains unverified because local file URLs were blocked.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
