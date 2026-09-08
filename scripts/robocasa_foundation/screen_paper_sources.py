@@ -39,8 +39,26 @@ def run(dataset, episode, output, mode, seed, expected_task):
                 raise ValueError("restored task identity mismatch")
             fixtures = {key: key for key in getattr(env, "fixture_refs", {})}
             bindings = Bindings(env, object_names=names, fixtures=fixtures)
+            # Diagnostic only: read the receiving surface implicated in the cup
+            # failures. Never query/update a controller or alter physics here.
+            foot_id = None
+            model = getattr(env.sim, 'model', None)
+            if model is not None and hasattr(model, 'geom_name2id'):
+                try:
+                    foot_id = model.geom_name2id('mobilebase0_pedestal_feet_col')
+                    if foot_id < 0:
+                        foot_id = None
+                except ValueError:
+                    pass
             for step in range(len(actions) + 1):
                 row = bindings.snapshot()
+                if foot_id is not None:
+                    row['robot_foot_geometry'] = {
+                        'name':'mobilebase0_pedestal_feet_col', 'type':int(model.geom_type[foot_id]),
+                        'position_m':np.asarray(env.sim.data.geom_xpos[foot_id]).tolist(),
+                        'rotation':np.asarray(env.sim.data.geom_xmat[foot_id]).tolist(),
+                        'size':np.asarray(model.geom_size[foot_id]).tolist(),
+                    }
                 row["step"] = step
                 rows.append(row)
                 actual_states.append(np.asarray(env.sim.get_state().flatten()).copy())

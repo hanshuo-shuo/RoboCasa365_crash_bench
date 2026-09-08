@@ -304,6 +304,20 @@ Saved-state receiving-surface diagnosis5741172 and diagonal withdrawal5741173
 follow. The actual floor-contact requirement is retained; no candidate failure
 is reclassified by changing it to contact with another lower object.
 
+Saved-state diagnosis5741172 confirms the receiving surface is the robot's
+`mobilebase0_pedestal_feet_col`. Diagonal withdrawal5741173 also ends off the
+counter without floor contact. To avoid further blind tuning, metadata screening
+now considers the original demo's target position relative to recorded initial
+base pose, with XML joint indexing checked against complete state dimensions.
+This is only original-demo metadata, not fresh-replay proof. New eligible cups
+23 (layout24) and98 (layout31) have large lateral separation estimates (0.86 and
+0.459 m); actual base motion must still be checked. No policy outcomes were read.
+
+The existing source-screen runner now records the exact known robot-foot geometry
+pose/type/size from cached simulator data, without querying controllers or changing
+physics. This will verify receiving-surface clearance in fresh source replays.
+Focused source/runtime tests:14 passed,8 subtests; whitespace passes.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
