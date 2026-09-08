@@ -6,6 +6,49 @@
 **Frozen curated source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
 
+## First paper batch delivered for human review (2026-09-08)
+
+**Construction passed: 3/3; fresh-repeat validation passed: 3/3; pending human: 3;
+formal paper_v1 ready_items: 0/30.** All 90 branch replays have expected outcomes,
+valid stable/nonviolating/unfinished starts, and valid source identities. No model
+inference was run. Frozen curated_v0 remains 5/5.
+
+Actual runs at `29048a62b12b6841651f161a5b1925b03f86c9f5`:
+5747017 Food71 COMPLETED0:0 43:18;5747018 Counter78 COMPLETED0:0 17:47;
+5747019 Drawer23 COMPLETED0:0 55:38. Each used the checked-in
+`run_robocasa_paper_benchmark.sbatch --case ID --repeats 10`, seed0 and60-second
+maximum budget. Three actual offline audits in `paper_v1_repeat_audit_JOBID`
+passed. Final first-danger times are2.40/1.20/1.80s; recovery completion times
+30.85/15.90/0.35s; safe-twin times4.00/9.55/0.45s. Historical development timing
+below is retained as history, not the final frozen-scoring result.
+
+Manifest certification now records only mechanical repeated validation;
+human_review remains incomplete. Validator reports exactly the missing single
+reviewer evidence for all three, and ready_items0. The calibration operating point
+and four pinned implementation files remain unchanged during these repetitions.
+
+The external `paper_v1_batch01_human/index.html` package contains3 primary pages
+(9 certified representative videos) and3 additional development trajectories.
+All source metadata, frozen inputs, audit result indexes and media hashes checked;
+all nine reused video inputs are byte-identical to certified repeat00 trajectories.
+Final keyframe render jobs5748659/5748661/5749150 completed0:0. Video render5747021
+and supplemental5747564/66/68 completed0:0. Full FFmpeg decoding of12 videos passes.
+All human outcome/start/visibility fields are blank, with unique export IDs.
+Browser playback interaction remains unverified because the browser rejected local
+file URLs; no bypass was attempted. Program provenance is outside the human folder.
+
+Final delivery checks:16 protocol tests and32 subtests pass; all7 HTML local-link
+checks and6 blank-form checks pass; Python AST and git whitespace checks pass.
+Seven frozen curated/pilot inputs and reports remain byte-identical to0e3ff37;
+all four scoring implementation files remain byte-identical to29048a6.
+The earlier full Quest suite passed183 tests/113 subtests; no new simulator run
+was needed for final documentation, manifest evidence and review packaging.
+
+See [true results, actions and failures](PAPER_V1_BATCH01.md),
+[development calibration](PAPER_V1_SCORING_CALIBRATION.md), and
+[next-batch handoff](PAPER_V1_BATCH01_HANDOFF.md). The following chronological
+entries preserve earlier partial checks and failures; this section is current.
+
 ## First paper batch in progress (2026-09-08)
 
 See [batch evidence and handoff](PAPER_V1_BATCH01.md). Both checkouts initially

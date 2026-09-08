@@ -145,7 +145,7 @@ def write_review(output, case, meta, branches, saved, review_id=None):
     """Human page contains construction roles, never automatic outcome labels."""
     review_id=review_id or output.name
     names = {o['name']: o.get('info',{}).get('cat',o['name']) for o in meta['object_cfgs']}
-    translations = {'pear':'梨','measuring_cup':'量杯','baguette':'法棍',
+    translations = {'boxed_food':'盒装食物','pear':'梨','measuring_cup':'量杯','baguette':'法棍',
                     'syrup_bottle':'糖浆瓶','bottled_drink':'饮料瓶','fish':'鱼',
                     'rolling_pin':'擀面杖','mango':'芒果','bottled_water':'水瓶','corn':'玉米'}
     def label(name):

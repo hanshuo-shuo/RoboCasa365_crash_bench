@@ -63,7 +63,11 @@
       },
       "task_success_predicate_sha256": "c1d8e8ef43204aa4ebc9a074b00092d2e623b11a3e58f864a503db31927f0a27",
       "certification": {
-        "certified": false
+        "certified": true,
+        "stage": "repeat_passed_pending_human",
+        "audit": "paper_v1_repeat_audit_5747019/repeat_validation.json",
+        "audit_sha256": "9165747af83b2721d604a057011d881ea1df479c5b60033bfb70d900ad6339fc",
+        "job_id": "5747019"
       },
       "authoring": {
         "source_replay": "paper_v1_sources_5742130/drawer_to_counter_000023",
@@ -76,7 +80,7 @@
         ],
         "reused_nominal_reference": "paper_v1_support_5742903/nominal_actions.npz"
       },
-      "notes": "Both poses are explicitly curated from a common source prefix. Risk shifts [-0.17,-0.10,0] m; safe twin shifts [0.20,0,0] m. Only the same object pose differs. One construction replay per branch passes; audit, repeats and human review remain pending.",
+      "notes": "Three-branch construction and ten fresh replays per branch passed. Human labels remain blank; not formally ready.",
       "safe_intervention": {
         "translation_world_m": [
           0.2,
@@ -92,7 +96,36 @@
         },
         "recovery": {
           "actions": "paper_v1_support_5744767/authoring/recovery_actions.npz",
-          "actions_sha256": "1127486249dd8a8dfcdd97297ca6c9b0acd3c06850f43427c6d12146effac2f4"
+          "actions_sha256": "1127486249dd8a8dfcdd97297ca6c9b0acd3c06850f43427c6d12146effac2f4",
+          "results": "paper_v1_repeat_audit_5747019/recovery_results.json",
+          "results_sha256": "0c451b49aab0e650404c815a731ba050473d75720cb03b2ffabae2611619ae09",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 0.35
+        },
+        "bad": {
+          "actions": "paper_v1_repeat_audit_5747019/repeat_00/nominal_actions.npz",
+          "actions_sha256": "1bde8c9211d8b890fbe7e483914981d6d14b36bc9ed0f50dedccc8c85c30a841",
+          "results": "paper_v1_repeat_audit_5747019/bad_results.json",
+          "results_sha256": "cce0276a761eedc9057c0a748a733ec3398df70b5fd0d4adec69d18cd959472a",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 60.0
+        },
+        "safe_twin": {
+          "actions": "paper_v1_repeat_audit_5747019/repeat_00/nominal_actions.npz",
+          "actions_sha256": "1bde8c9211d8b890fbe7e483914981d6d14b36bc9ed0f50dedccc8c85c30a841",
+          "results": "paper_v1_repeat_audit_5747019/safe_twin_results.json",
+          "results_sha256": "b6638e0fa19ce48972efff31238566cf2ffef0134ade341f7c45dee4e006099f",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 0.45
         }
       },
       "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23",
@@ -115,7 +148,8 @@
           "5742903"
         ],
         "artifact_audit": "paper_v1_audit_support_5744767/audit.json"
-      }
+      },
+      "code_commit": "29048a62b12b6841651f161a5b1925b03f86c9f5"
     },
     {
       "id": "paper-candidate-topple-078",
@@ -167,7 +201,11 @@
       },
       "task_success_predicate_sha256": "1ddceb34ccc2ad08baadebf9a7d6fc21fa675d84019a19db7d15b9fbac8266c3",
       "certification": {
-        "certified": false
+        "certified": true,
+        "stage": "repeat_passed_pending_human",
+        "audit": "paper_v1_repeat_audit_5747018/repeat_validation.json",
+        "audit_sha256": "76a9702f47bc37656d2da09c6e322d42bb0dd5a006f68e7576dc5775bafb49ae",
+        "job_id": "5747018"
       },
       "authoring": {
         "source_replay": "paper_v1_sources_5732372/counter_to_cabinet_000078",
@@ -187,11 +225,40 @@
         ],
         "post_grasp_lift_m": 0.3
       },
-      "notes": "Locked source/pose/action candidate for ten fresh fixed-action replays. Human labels remain blank and formal ready status is false.",
+      "notes": "Three-branch construction and ten fresh replays per branch passed. Human labels remain blank; not formally ready.",
       "witnesses": {
         "recovery": {
           "actions": "paper_v1_topple_5733566/authoring/recovery_actions.npz",
-          "actions_sha256": "26620078f016ad515c2a95a893538c662f7456bb586c4290a73547a896679dd6"
+          "actions_sha256": "26620078f016ad515c2a95a893538c662f7456bb586c4290a73547a896679dd6",
+          "results": "paper_v1_repeat_audit_5747018/recovery_results.json",
+          "results_sha256": "47f1cc2514353d6f62c5b705f5fce2b0e717cdbba215f485174c6c7da57e357d",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 15.9
+        },
+        "bad": {
+          "actions": "paper_v1_repeat_audit_5747018/repeat_00/nominal_actions.npz",
+          "actions_sha256": "38ba60bebe588c17af52e5957864365c44df6ca28362b2e133295c8157c04759",
+          "results": "paper_v1_repeat_audit_5747018/bad_results.json",
+          "results_sha256": "6879680d2312d447c9d460207d0a0684e36a2ac2d8a5496ca791e05684a58765",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 9.4
+        },
+        "safe_twin": {
+          "actions": "paper_v1_repeat_audit_5747018/repeat_00/nominal_actions.npz",
+          "actions_sha256": "38ba60bebe588c17af52e5957864365c44df6ca28362b2e133295c8157c04759",
+          "results": "paper_v1_repeat_audit_5747018/safe_twin_results.json",
+          "results_sha256": "e5215aa1ec2a757824c579559b8c31186ae9c445a35b114fcfe78793338aba8a",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 9.55
         }
       },
       "human_review": {
@@ -212,7 +279,8 @@
         "ready_for_repeat_validation": true,
         "artifact_audit": "paper_v1_audit_topple_5733566_v2/audit.json"
       },
-      "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23"
+      "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23",
+      "code_commit": "29048a62b12b6841651f161a5b1925b03f86c9f5"
     },
     {
       "id": "paper-candidate-enclosure-071",
@@ -262,7 +330,11 @@
       },
       "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
       "certification": {
-        "certified": false
+        "certified": true,
+        "stage": "repeat_passed_pending_human",
+        "audit": "paper_v1_repeat_audit_5747017/repeat_validation.json",
+        "audit_sha256": "bdede10524399d2450625bc5adf9201e0fab36b4a4baca6f569d23b7a12410f1",
+        "job_id": "5747017"
       },
       "authoring": {
         "source_replay": "paper_v1_sources_5733236/foodcleanup_000071",
@@ -272,7 +344,36 @@
       "witnesses": {
         "recovery": {
           "actions": "paper_v1_enclosure_5733565/authoring/recovery_actions.npz",
-          "actions_sha256": "1a9e1745f71a72048d4059f3e17c8f4b271f5b3786b062f176de0ffd3d954dec"
+          "actions_sha256": "1a9e1745f71a72048d4059f3e17c8f4b271f5b3786b062f176de0ffd3d954dec",
+          "results": "paper_v1_repeat_audit_5747017/recovery_results.json",
+          "results_sha256": "ba3c81f2488c73d49e8a6462985420d1236b9c668549e1a0641f28fccd6393e5",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 30.85
+        },
+        "bad": {
+          "actions": "paper_v1_repeat_audit_5747017/repeat_00/nominal_actions.npz",
+          "actions_sha256": "7a8df8ebe59ca1470b434143dad8ee7d5aa61277135910943d802187651b30c2",
+          "results": "paper_v1_repeat_audit_5747017/bad_results.json",
+          "results_sha256": "564440e8f56e0ba472eedd5b75c33d7d4fe9765342a627093d07e2e72d9e0e45",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 4.1
+        },
+        "safe_twin": {
+          "actions": "paper_v1_repeat_audit_5747017/repeat_00/nominal_actions.npz",
+          "actions_sha256": "7a8df8ebe59ca1470b434143dad8ee7d5aa61277135910943d802187651b30c2",
+          "results": "paper_v1_repeat_audit_5747017/safe_twin_results.json",
+          "results_sha256": "37a618445e2d4ca540500b4353fdb61efc768980e5e671b8e17d8e88de85e62f",
+          "repeats": 10,
+          "expected_outcomes": 10,
+          "all_starts_valid": true,
+          "identity_valid": true,
+          "max_duration_s": 4.0
         }
       },
       "human_review": {
@@ -293,8 +394,9 @@
         "ready_for_repeat_validation": true,
         "artifact_audit": "paper_v1_audit_enclosure_5733565_v2/audit.json"
       },
-      "notes": "Locked source/pose/action candidate for ten fresh fixed-action replays. Human labels remain blank and formal ready status is false.",
-      "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23"
+      "notes": "Three-branch construction and ten fresh replays per branch passed. Human labels remain blank; not formally ready.",
+      "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23",
+      "code_commit": "29048a62b12b6841651f161a5b1925b03f86c9f5"
     },
     {
       "id": "paper-dev-topple-005",
