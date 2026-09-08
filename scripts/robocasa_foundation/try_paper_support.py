@@ -81,6 +81,8 @@ def main():
     p.add_argument("--fixed-withdrawal", type=float, nargs=3, help="world displacement at fixed orientation, recorded on the safe twin")
     p.add_argument("--withdrawal-approach", type=float, nargs=3,
                    help="optional common nominal alignment displacement before the fixed withdrawal")
+    p.add_argument("--withdrawal-gripper", type=float, choices=[-1.,1.], default=-1.,
+                   help="fixed nominal gripper command; close empty gripper before transit when +1")
     a = p.parse_args()
     root, repo = a.output_root.resolve(), Path(__file__).resolve().parents[2]
     if (root.exists() or root == repo or repo in root.parents or a.data_root.resolve() in root.parents
@@ -103,15 +105,23 @@ def main():
         try:
             env,_,_ = start.audited("safe_twin")
             record = Recorder(env,start.neutral)
+            if a.withdrawal_gripper == 1.:
+                for _ in range(10):
+                    action=record.neutral(); action[6]=1.; record.step(action)
             if a.withdrawal_approach is not None:
-                record.move("align before fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.withdrawal_approach)
-            record.move("fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.fixed_withdrawal)
-            record.move("clear after withdrawal",np.asarray(record.controller().ref_pos).copy()+[0.,0.,a.lift])
+                record.move("align before fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.withdrawal_approach,
+                            gripper_command=a.withdrawal_gripper)
+            record.move("fixed withdrawal",np.asarray(record.controller().ref_pos).copy()+a.fixed_withdrawal,
+                        gripper_command=a.withdrawal_gripper)
+            record.move("clear after withdrawal",np.asarray(record.controller().ref_pos).copy()+[0.,0.,a.lift],
+                        gripper_command=a.withdrawal_gripper)
             path = root/"nominal_actions.npz"
             np.savez_compressed(path,actions=record.actions,states=record.states)
             write_json(root/"nominal_primitives.json",record.primitives)
             case["witnesses"]={"nominal":{"actions":str(path.relative_to(a.artifact_root.resolve())),"actions_sha256":sha256_file(path)}}
             case["authoring"]["fixed_withdrawal_world_m"]=a.fixed_withdrawal
+            case["authoring"]["withdrawal_gripper_command"]=a.withdrawal_gripper
+            case["authoring"]["empty_gripper_close_steps"]=10 if a.withdrawal_gripper==1. else 0
             if a.withdrawal_approach is not None:
                 case["authoring"]["withdrawal_approach_world_m"]=a.withdrawal_approach
             write_json(root/"development_case.json",case)

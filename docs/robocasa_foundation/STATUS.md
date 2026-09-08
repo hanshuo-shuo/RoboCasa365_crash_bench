@@ -225,6 +225,17 @@ reuse as new candidates; they are not silently repurposed for calibration.
 The batch report is rewritten around actual current results and all retained
 failures. No ten-run verification or formal human-ready release has occurred.
 
+At `2be33c9`, full local suite:176 passed, one native-only skip,113 subtests;
+Quest suite:177 passed,113 subtests (23.00 s), including native controller checks.
+Drawer43 two-part open-gripper withdrawal5738422 still safely completes the risk
+branch (4.45 s). Unique position matching in saved states shows the cup is nudged
+back onto the counter, not falling after an unobserved termination. Next concrete
+attempt closes the empty gripper for10 controls, then uses the same existing
+Cartesian moves with that fixed grip command; all actions are recorded and shared
+by risk/twin. Recovery still starts from the original matched open-gripper state.
+Boundary-contact developer video5738423 is being produced for independent human
+judgment; no human labels are filled from program results.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
