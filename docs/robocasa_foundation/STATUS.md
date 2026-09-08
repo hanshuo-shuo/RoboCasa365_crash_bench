@@ -6,7 +6,13 @@
 **Frozen curated source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
 
-## Support-loss development (2026-09-08, in progress)
+## Support-loss development complete (2026-09-08)
+
+**One complete development example:** `paper-dev-support-008`, job 5729111.
+Bad falls at 3.55 s; robot recovery safely finishes at 0.80 s; matched twin
+safely finishes at 0.95 s. Formal paper_v1 remains 0/30. Full evidence,
+action hashes, failed attempts and commands: [SUPPORT_LOSS_DEV_RESULT.md](SUPPORT_LOSS_DEV_RESULT.md).
+The chronological notes below retain intermediate failures and pending states.
 
 - Local and Quest main were clean at `89b6cb5`; origin fetch found no divergence.
   Existing `/tmp/quest.sock` reused. Old dependency-waiting jobs 3973984/85/86
@@ -59,6 +65,27 @@
   `paper_v1_support_review_5729111/audit.json`. No package installed. Added
   an audit-only JSON export and local plotting mode to use existing local
   Matplotlib 3.11.1. Camera review job `5729385` submitted independently.
+
+- Final saved-state visual job `5729385`: completed 0:0, 1:11; four sheets
+  plus restored contact/pose diagnostics and hashes. Hand/cup contact at 0.50 s,
+  drawer-side contact at 1–2 s, floor contact at 3.55 s. Risk cue is small in
+  agent views and largely absent from the initial wrist view; human adequacy
+  review remains pending. No rendered simulator was used for scored actions.
+- Final offline audit export: `paper_v1_support_review_5729111_v2`, all 31
+  checks pass. Nominal file has 58 controls; recovery file has 22; executed
+  lengths 1200/16/19 (bad/recovery/twin), with original-success termination.
+  Risk/recovery probe drift 0.00263 mm; maximum linear speed 0.000462 m/s.
+  All unchanged start thresholds pass. Actual floor-event bbox descent 0.939826 m.
+- Local existing Matplotlib 3.11.1 generated the saved-data height plot and HTML
+  review pack; blank human notes, all four camera sheets, image hashes and HTML
+  links checked. The initial missing-Matplotlib report failure remains retained;
+  no installs, new environment, source downloads or scored reruns were needed.
+- Final Quest branchpoint suite at `25308db`: **170 passed, 107 subtests**, 13.54 s,
+  including native controller comparison. Local suite: 169 passed / 1 native-only
+  skip, 107 subtests. Later report-only edits passed AST, actual local plotting,
+  whitespace and local-link checks. Frozen manifests, score settings and reports
+  are byte-identical to `89b6cb5`; only new paper artifacts and current status
+  documents changed. All result binaries remain outside Git.
 
 ## Current implementation checkpoint (2026-09-07)
 

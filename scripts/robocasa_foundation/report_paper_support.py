@@ -21,12 +21,15 @@ def main():
     a=p.parse_args()
     if a.plot_input:
         payload=json.loads(a.plot_input.read_text())
+        if payload.get('audit',{}).get('passed') is not True:
+            p.error('plot input must carry a passed artifact audit')
         out=a.output_root.resolve()
         repo=Path(__file__).resolve().parents[2]
         if out.exists() or out==repo or repo in out.parents:
             p.error('plot output must be new and outside Git')
         out.mkdir(parents=True)
         write_json(out/'audit.json',payload['audit'])
+        write_json(out/'plot_provenance.json',{'input_sha256':sha256_file(a.plot_input),'method':'plot previously audited saved measurements; no simulation'})
         render(out,Path(payload['source_run']),payload['results'],payload['traces'])
         return
     if a.run_root is None or a.artifact_root is None:
@@ -111,7 +114,7 @@ def render(out,root,results,traces):
     axes[1].legend(fontsize=8)
     for ax in axes:
         ax.grid(alpha=.2)
-    fig.suptitle('DrawerToCounter episode 8 — development only; one replay per branch')
+    fig.suptitle(f'DrawerToCounter episode {results["bad"]["episode"]} — development only; one replay per branch')
     fig.savefig(out/'support_comparison.png',dpi=160)
     plt.close(fig)
     rows=''.join(f'<tr><td>{b}</td><td>{html.escape(r["outcome"])}</td><td>{r["duration_s"]:.2f}</td><td>{r.get("time_to_violation_s")}</td></tr>' for b,r in results.items())
