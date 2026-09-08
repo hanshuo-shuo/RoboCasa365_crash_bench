@@ -25,6 +25,17 @@ First metadata-selected new sources are FoodCleanup 18, DrawerToCounter 59 and
 CounterToCabinet 78. No model outcomes were used. Development calibration remains
 incomplete; three new candidates have not yet passed any branch or certification.
 
+At `f3a0c6e`, submitted existing `setup/screen_robocasa_paper_sources.sbatch`
+with `--dataset-keys foodcleanup --episodes 18` (5732370),
+`--dataset-keys drawer_to_counter --episodes 59` (5732371), and
+`--dataset-keys counter_to_cabinet --episodes 78` (5732372).
+Outputs: external `paper_v1_sources_JOBID`; one nominal replay per source.
+
+Extended the existing bottle authoring CLI to the already reserved development
+sources 5/11 with explicit branch/query/resume frames. Robot primitive and scorer
+are reused unchanged; added authoring arguments/code provenance. Source 17 remains
+the default. Focused checks: 29 passed, 47 subtests; AST and whitespace checks pass.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
