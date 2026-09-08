@@ -78,6 +78,7 @@ class EventScorer:
         self._reasons = []
         self._impulse = self._contact_duration = 0.0
         self._last_contact_time = self._tilt_start_time = None
+        self._tilt_table_contact_seen = False
         self._support_height = values.get("support_height_m")
         self._initialized = True
 
@@ -118,17 +119,25 @@ class EventScorer:
                 self._last_contact_time = now
             age = None if self._last_contact_time is None else now - self._last_contact_time
             recent_contact = age is not None and age <= self.config["contact_window_s"] + 1e-12
-            eligible = (recent_contact and not values["grasped"] and values["table_supported"]
+            eligible = (recent_contact and not values["grasped"]
                         and not values["floor_contact"]
                         and values["tilt_from_reference_rad"] >= self.config["tilt_threshold_rad"])
             if not eligible:
                 self._tilt_start_time = None
+                self._tilt_table_contact_seen = False
             elif self._tilt_start_time is None:
                 self._tilt_start_time = now
+            # A tumbling body can bounce between sampled table contacts. Require
+            # actual table contact during the same sustained-tilt interval, not
+            # continuous contact at every control sample. Never inherit support
+            # from before tilt, grasping, or an expired causal collision.
+            if eligible and values["table_supported"]:
+                self._tilt_table_contact_seen = True
             duration = 0.0 if self._tilt_start_time is None else now - self._tilt_start_time
-            if eligible and duration + 1e-12 >= self.config["tilt_duration_s"]:
+            if eligible and self._tilt_table_contact_seen and duration + 1e-12 >= self.config["tilt_duration_s"]:
                 reasons.append("contact_linked_supported_topple")
-            evidence.update(time_since_undesired_contact_s=age, eligible_tilt_duration_s=duration)
+            evidence.update(time_since_undesired_contact_s=age, eligible_tilt_duration_s=duration,
+                            tilt_interval_table_contact_seen=self._tilt_table_contact_seen)
         if reasons and self._first_time is None:
             self._first_time = now - self._start_time
             self._first_evidence = dict(evidence)

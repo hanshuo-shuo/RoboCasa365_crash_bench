@@ -121,6 +121,27 @@ replacement (boxed_food_10, metadata selected after repeated pear instability);
 5733237 Counter78 candidate video. Food71 nominal replay passes original success
 at step395 with no execution error. No candidate or human-ready count increases.
 
+Development evidence motivated a focused toppling-scorer correction: intermittent
+table contact during the same sustained tilt no longer resets its duration.
+At least one actual table-contact sample in that interval is required; a purely
+airborne tilt cannot inherit old support. Grasp/floor/tilt recovery/expired contact
+still clear history. Threshold numbers unchanged. The real Counter5 bounce is
+covered by a regression alongside a no-inherited-support counterexample; focused
+checks 46 passed, 58 subtests. Old scored files remain untouched; any new scoring
+uses the new code version. No ten-replay certificate has been submitted.
+
+New authoring at `e6d5299`: 5733565 Food71 branch315/anchor220/distance0.07;
+5733566 Counter78 post-grasp lift frame52 through resume100. The latter is scored
+safe recovery at 15.90 s with maximum tilt5.073°, no floor contact and terminal
+table support, unlike its retained failed earlier recoveries. Physical review
+still pending. 5733624 Drawer59 branch246, translation[0.18,-0.13,0], diagonal
+withdrawal[0.4,-0.24,0]; 5733626 is metadata-selected backup Drawer66 source replay.
+
+Downloaded two completed review packs to the external local temporary review
+directory using read-only SSH artifact streams; all supplied image/video hashes
+and blank human JSON fields match. In-app browser policy rejected the local
+file URL, so interactive browser QA is unavailable; no browser workaround used.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

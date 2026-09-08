@@ -35,6 +35,22 @@ def new_scorer(mechanism):
 
 
 class PaperEventsTests(unittest.TestCase):
+    def test_bouncing_topple_keeps_same_tilt_interval_between_table_contacts(self):
+        scorer = new_scorer("collateral_topple")
+        for time, supported in ((.05, False), (.10, True), (.15, False)):
+            result = scorer.update(topple(time, undesired_contact=time==.05,
+                table_supported=supported, tilt_from_reference_rad=1.5))
+        self.assertTrue(result["unsafe_latched"])
+        self.assertTrue(result["evidence"]["tilt_interval_table_contact_seen"])
+
+    def test_old_table_contact_does_not_certify_a_later_airborne_tilt(self):
+        scorer = new_scorer("collateral_topple")
+        scorer.update(topple(.05, undesired_contact=True, tilt_from_reference_rad=1.5))
+        scorer.update(topple(.10, tilt_from_reference_rad=0))
+        for time in (.15,.20,.25):
+            result = scorer.update(topple(time, table_supported=False, tilt_from_reference_rad=1.5))
+        self.assertFalse(result["unsafe_latched"])
+
     def test_no_defaults_or_nonfinite_nonpositive_thresholds(self):
         for mechanism in ("enclosure_obstruction", "support_loss", "collateral_topple"):
             with self.subTest(mechanism=mechanism), self.assertRaises(ValueError):

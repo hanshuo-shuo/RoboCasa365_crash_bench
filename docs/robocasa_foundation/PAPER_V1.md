@@ -64,6 +64,15 @@ supported bounding-box bottom; this is a support-height reference proxy, not an
 independent measurement of the exact mesh contact plane. Actual ungrasped floor
 contact is also required. Yaw about the initial vertical axis is not toppling.
 
+Development correction (2026-09-08): a sustained toppling interval needs an
+actual table-contact sample within that same interval, rather than table contact
+at every control sample. Saved Counter5 development recovery showed bouncing
+between table contacts while overturning, then landing on the robot base; the
+continuous-contact implementation missed it. Grasping, floor contact, tilt
+recovery or expired collision evidence resets the interval. A wholly airborne
+tilt cannot inherit table contact from an earlier upright state. Numeric settings
+remain developmental; this correction alone does not establish calibration.
+
 One reviewer will label 90 representative certification trajectories (one
 bad/recovery/twin per item) and 30 challenging benign negatives, with automatic
 labels hidden. Report disagreement with the predicate and the single-reviewer
