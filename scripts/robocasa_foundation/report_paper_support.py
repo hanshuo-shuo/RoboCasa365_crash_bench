@@ -15,6 +15,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--run-root',type=Path)
     p.add_argument('--artifact-root',type=Path)
+    p.add_argument('--data-root',type=Path,help='verify original source files and source-suffix nominal actions without simulation')
     p.add_argument('--audit-only',action='store_true',help='export verified plot inputs without plotting dependencies')
     p.add_argument('--plot-input',type=Path,help='render a previously audited plot-data JSON locally')
     p.add_argument('--output-root',type=Path,required=True)
@@ -39,8 +40,16 @@ def main():
     if out.exists() or out==repo or repo in out.parents or root in out.parents or out in root.parents:
         p.error('output must be new and outside Git and the scored run')
     case=json.loads((root/'development_case.json').read_text())
+    if case['mechanism']!='support_loss' and not a.audit_only:
+        p.error('other mechanisms use --audit-only; support height plots do not apply')
     results,traces,states={}, {}, {}
     checks={}
+    source_start=None
+    if a.data_root is not None:
+        from paper_runtime import PaperStart
+        config=json.loads((repo/'configs/robocasa_foundation/paper_v1.json').read_text())
+        source_start=PaperStart(a.data_root,case,config)
+        checks['source_files_current']=source_start.hashes==case['hashes']
     for branch in ('bad','recovery','safe_twin'):
         r=json.loads((root/branch/'result.json').read_text())
         trace=json.loads((root/branch/'trace.json').read_text())
@@ -54,14 +63,20 @@ def main():
         checks[branch+'_budget']=r['horizon_s']==60 and r['duration_s']<=60
         checks[branch+'_predicate']=r['task_success_predicate_sha256']==case['task_success_predicate_sha256']
         kind='recovery' if branch=='recovery' else 'nominal'
-        ref=case['witnesses'][kind]
-        path=a.artifact_root/ref['actions']
-        checks[branch+'_file_hash']=sha256_file(path)==ref['actions_sha256']
-        with np.load(path,allow_pickle=False) as data:
-            sequence=data['actions']
-            checks[branch+'_full_hash']=action_hash(sequence)==r['action_sequence_sha256']
-            count=min(len(sequence),len(actions))
-            checks[branch+'_fixed_prefix']=np.array_equal(actions[:count],sequence[:count])
+        ref=case.get('witnesses',{}).get(kind)
+        if ref is not None:
+            path=a.artifact_root/ref['actions']
+            checks[branch+'_file_hash']=sha256_file(path)==ref['actions_sha256']
+            with np.load(path,allow_pickle=False) as data:
+                sequence=np.asarray(data['actions']).copy()
+        elif kind=='nominal' and source_start is not None:
+            sequence=source_start.nominal_actions
+            checks[branch+'_file_hash']=source_start.hashes==case['hashes']
+        else:
+            p.error('source nominal actions require --data-root; recovery requires a pinned file')
+        checks[branch+'_full_hash']=action_hash(sequence)==r['action_sequence_sha256']
+        count=min(len(sequence),len(actions))
+        checks[branch+'_fixed_prefix']=np.array_equal(actions[:count],sequence[:count])
         results[branch],traces[branch]=r,trace
     checks['same_risk_start']=np.array_equal(states['bad'][0],states['recovery'][0])
     checks['same_nominal']=results['bad']['action_sequence_sha256']==results['safe_twin']['action_sequence_sha256']

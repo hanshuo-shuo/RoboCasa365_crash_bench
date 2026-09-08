@@ -276,5 +276,41 @@ class PaperScreenTests(unittest.TestCase):
             self.assertEqual(before["model.xml.gz"], after["model.xml.gz"])
 
 
+class SubstepContactTests(unittest.TestCase):
+    def test_transient_contact_is_retained_without_extra_physics_steps(self):
+        model=SimpleNamespace(ngeom=3, geom_bodyid=[1,2,3],
+            body_name2id=lambda name: {'robot':2}[name],
+            geom_id2name=lambda g: ['victim','robot_geom','table'][g])
+        data=SimpleNamespace(time=0.,ncon=0,contact=[])
+        calls=[]
+        def original_step():
+            calls.append(1); data.time += .002
+            data.contact=[SimpleNamespace(geom1=0,geom2=1,frame=[0,0,1])] if len(calls)==1 else []
+            data.ncon=len(data.contact)
+        sim=SimpleNamespace(model=model,data=data,step=original_step)
+        measurement=runtime.EventMeasurement.__new__(runtime.EventMeasurement)
+        measurement.env=SimpleNamespace(sim=sim)
+        measurement.mechanism='collateral_topple'
+        measurement.case={'task_targets':['target']}
+        measurement.actor_bodies={'robot'}
+        measurement.victim='victim'
+        measurement.bindings=SimpleNamespace(body_entities={1:'victim'},snapshot=lambda: {})
+        measurement.geoms={'support':{'table'},'floor':set()}
+        measurement._original_sim_step=None
+        measurement._substep_contacts=None
+        measurement.normalize=lambda raw,step,frequency: dict(undesired_contact=False,table_supported=False,floor_contact=False)
+        measurement.observe_physics_contacts()
+        sim.step();sim.step()
+        self.assertEqual(len(calls),2)
+        self.assertAlmostEqual(data.time,.004)
+        self.assertEqual(data.ncon,0)
+        result=measurement.snapshot(1,20)
+        self.assertTrue(result['undesired_contact'])
+        self.assertEqual(result['physics_substep_contacts'][0]['sim_time_s'],.002)
+        self.assertFalse(measurement.snapshot(2,20)['undesired_contact'])
+        measurement.stop_observing()
+        self.assertIs(sim.step,original_step)
+
+
 if __name__ == "__main__":
     unittest.main()

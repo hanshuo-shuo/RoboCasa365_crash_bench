@@ -142,6 +142,31 @@ directory using read-only SSH artifact streams; all supplied image/video hashes
 and blank human JSON fields match. In-app browser policy rejected the local
 file URL, so interactive browser QA is unavailable; no browser workaround used.
 
+The bounce-only correction is insufficient for Counter5 recovery: 20-Hz endpoint
+traces record no actor contact until 4.95 s, after the overturn has begun. New
+read-only contact sampling therefore wraps existing simulator physics steps for
+collateral cases, recording exact actor/task-object/table/floor geom pairs without
+adding `step` or `forward` calls. Numeric thresholds remain unchanged. A transient
+contact test verifies the impact survives a later contact-free endpoint with
+exactly the original step count. Native physics equality is still required before
+claiming the new measurement is verified. Registered the original Counter5
+development action file for that single replay; it is not a recovery success.
+
+Extended the existing support audit in audit-only mode to source-suffix nominal
+actions for other mechanisms; `--data-root` verifies current source hashes without
+constructing a simulator. Focused tests for measurement/scoring/runner/protocol:
+59 passed, 66 subtests; AST and whitespace pass. Five downloaded videos decode
+fully at 768×256, 20 Hz, with frame counts matching saved-state provenance.
+
+Pending/actual job references: source4 control replay5733893 succeeds;
+Drawer66 first candidate5733892; upright Counter78 review5733894;
+Counter5 saved-state collision diagnostic5733952; Food4 small-translation controls
+5734081/5734082 (0.08/0.10 m, branch298, anchor180); Food71 review5734084.
+Food71 independent recovery5733565 safely completes at30.85 s with zero enclosure
+contact, despite author exit1 and diagnostic grasp/terminal warnings. Bad peaks
+at1.756 N and violates at2.35 s; twin completes at4.0 s with zero enclosure contact.
+This is one construction check, not repeated certification or human review.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.

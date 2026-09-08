@@ -76,6 +76,7 @@ def run_once(data_root, artifact_root, case, config, branch, repeat, output, *, 
         "split": case["split"], "branch": branch, "repeat": repeat, "outcome": "invalid",
         "certification_claimed": False, "execution_error": None, "padding_convention": PADDING}
     env = None
+    measurement = None
     actions, states, trace = [], [], []
     frequency = float(config["control_frequency_hz"])
     success = unsafe = False
@@ -134,6 +135,8 @@ def run_once(data_root, artifact_root, case, config, branch, repeat, output, *, 
         measurement = measurement_class(env, bindings, case)
         initial = measurement.snapshot(0, frequency)
         scorer.reset(initial)
+        if hasattr(measurement, 'observe_physics_contacts'):
+            measurement.observe_physics_contacts()
         json.dumps(initial, allow_nan=False)
         result["initial_event_snapshot"] = initial
         states.append(np.asarray(env.sim.get_state().flatten()).copy())
@@ -169,6 +172,8 @@ def run_once(data_root, artifact_root, case, config, branch, repeat, output, *, 
         if pending is not None:
             result["failed_action"] = pending.tolist()
     finally:
+        if measurement is not None and hasattr(measurement, 'stop_observing'):
+            measurement.stop_observing()
         if env is not None:
             try:
                 env.close()

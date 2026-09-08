@@ -169,6 +169,51 @@ class EventMeasurement:
         _, q = bindings.object_pose(self.victim)
         self.reference_up_body = rotation_matrix(q).T @ np.array([0., 0., 1.])
         self.support_height = self.bottom_z()
+        self._original_sim_step = None
+        self._substep_contacts = None
+
+    def observe_physics_contacts(self):
+        """Read contact identities after existing physics steps; never add a step/forward.
+
+        A 20-Hz endpoint can miss a brief impact entirely. Only contact identity
+        flags are accumulated here; force thresholds remain their declared proxies.
+        """
+        if self.mechanism != "collateral_topple" or self._original_sim_step is not None:
+            return
+        model = self.env.sim.model
+        actors = {model.body_name2id(name) for name in self.actor_bodies}
+        targets = set(self.case['task_targets'])
+        names = [model.geom_id2name(g) for g in range(model.ngeom)]
+        bodies = [int(model.geom_bodyid[g]) for g in range(model.ngeom)]
+        self._original_sim_step = self.env.sim.step
+        self._substep_contacts = []
+
+        def observed_step(*args, **kwargs):
+            result = self._original_sim_step(*args, **kwargs)
+            data = self.env.sim.data
+            for index in range(data.ncon):
+                contact = data.contact[index]
+                pair = (int(contact.geom1), int(contact.geom2))
+                for side, geom in enumerate(pair):
+                    if self.bindings.body_entities.get(bodies[geom]) != self.victim:
+                        continue
+                    other = pair[1-side]
+                    entity = self.bindings.body_entities.get(bodies[other])
+                    actor = bodies[other] in actors or entity in targets
+                    support = names[other] in self.geoms['support'] and abs(float(contact.frame[2])) > .5
+                    floor = names[other] in self.geoms['floor']
+                    if actor or support or floor:
+                        self._substep_contacts.append({'sim_time_s':float(data.time),
+                            'geoms':[names[geom],names[other]], 'actor':actor,
+                            'support':support,'floor':floor})
+            return result
+
+        self.env.sim.step = observed_step
+
+    def stop_observing(self):
+        if self._original_sim_step is not None:
+            self.env.sim.step = self._original_sim_step
+            self._original_sim_step = None
 
     def bottom_z(self):
         import numpy as np
@@ -210,7 +255,15 @@ class EventMeasurement:
         return result
 
     def snapshot(self, step, frequency):
-        return self.normalize(self.bindings.snapshot(), step, frequency)
+        result = self.normalize(self.bindings.snapshot(), step, frequency)
+        if self._substep_contacts is not None:
+            contacts, self._substep_contacts = self._substep_contacts, []
+            result['physics_substep_contacts'] = contacts
+            result['contact_sampling'] = 'physics_substeps_and_control_endpoint'
+            result['undesired_contact'] |= any(c['actor'] for c in contacts)
+            result['table_supported'] |= any(c['support'] for c in contacts)
+            result['floor_contact'] |= any(c['floor'] for c in contacts)
+        return result
 
 
 class PaperStart:
