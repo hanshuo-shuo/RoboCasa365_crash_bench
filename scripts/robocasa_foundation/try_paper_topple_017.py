@@ -51,9 +51,9 @@ class Recorder:
         self.actions.append(action.copy())
         self.states.append(np.asarray(self.env.sim.get_state().flatten()).copy())
 
-    def move(self, label, target):
+    def move(self, label, target, gripper_command=-1.):
         return rt.ActionRunner.move_eef_world(self, label, target, max_steps=120,
-                                              tolerance=.008, gripper_command=-1.)
+                                              tolerance=.008, gripper_command=gripper_command)
 
 
 def make_case(data_root, source_root, config, offset, resume_frame=90, *,
@@ -132,6 +132,8 @@ def main():
     p.add_argument("--xy-offset", nargs=2, type=float, default=[-.01, -.05])
     p.add_argument("--resume-frame", type=int, default=90,
                    help="source pose for the descent and subsequent nominal suffix")
+    p.add_argument("--post-grasp-detour", nargs=2, type=int, metavar=("GRASP_FRAME", "RESUME_FRAME"),
+                   help="optional second raised transit after original grasp, preserving its gripper command")
     a = p.parse_args()
     root = a.output_root.resolve()
     repo = Path(__file__).resolve().parents[2]
@@ -148,6 +150,12 @@ def main():
     })
     case, rows = make_case(a.data_root, a.source_root, config, np.asarray(a.xy_offset), a.resume_frame,
                            episode=a.episode, branch_frame=a.branch_frame, query_frame=a.query_frame, role=a.role)
+    if a.post_grasp_detour is not None:
+        grasp_frame, end_frame = a.post_grasp_detour
+        if not a.resume_frame < grasp_frame < end_frame < len(rows) or not rows[grasp_frame]["objects"]["obj"]["grasped"]:
+            p.error("post-grasp detour needs ordered frames and actual source grasp evidence")
+        case["authoring"]["post_grasp_detour"] = a.post_grasp_detour
+        case["authoring"]["post_grasp_lift_m"] = .30
     write_json(root / "development_case.json", case)
     outcomes = {}
     for branch in ("bad", "safe_twin"):
@@ -169,7 +177,20 @@ def main():
         for action in start.actions[a.branch_frame:a.resume_frame]:
             record.step(action)
         record.move("descend at selected source pose", rows[a.resume_frame]["eef_position_m"]["right"])
-        for action in start.actions[a.resume_frame:]:
+        suffix_frame = a.resume_frame
+        if a.post_grasp_detour is not None:
+            grasp_frame, end_frame = a.post_grasp_detour
+            for action in start.actions[suffix_frame:grasp_frame]:
+                record.step(action)
+            grip = float(start.actions[grasp_frame-1, 6])
+            record.move("lift held task object before bystander transit",
+                        np.asarray(record.controller().ref_pos).copy()+[0.,0.,.30], gripper_command=grip)
+            for action in start.actions[grasp_frame:end_frame]:
+                record.step(action)
+            record.move("return to high source transit pose", rows[end_frame]["eef_position_m"]["right"],
+                        gripper_command=float(start.actions[end_frame-1,6]))
+            suffix_frame = end_frame
+        for action in start.actions[suffix_frame:]:
             record.step(action)
             if env._check_success():
                 break

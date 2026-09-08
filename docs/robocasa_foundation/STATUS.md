@@ -97,6 +97,30 @@ development sources (Food4, Drawer8/14/57, Counter17/5/11). It refuses source-ro
 mismatches, leaves human labels null, selects no thresholds, and explicitly reports
 calibration incomplete. Candidate results are never used by that report.
 
+Actual sensitivity report `paper_v1_calibration_6fa4d46` contains 18 recorded
+development traces. It exposed an important coverage gap: Counter5 recovery
+peaks at 176.71° but receives no event under any of the 27 sensitivity settings;
+Counter11 bad peaks at 91.57° and triggers only 3/27 settings. No calibration
+freeze is justified. Saved-state Counter5 diagnosis confirms its recovery bottle
+ends at z=0.407 m on `mobilebase0_pedestal_feet_col`, after falling from the
+counter. The mechanism-specific scorer's safe label is insufficient recovery
+evidence. Retract any physical-safe interpretation of the apparent three-branch
+passes; preserve original output labels and report this separately.
+
+Counter78 candidate 5732905 likewise has a scorer-safe recovery at 11.75 s but
+peak tilt174.38°; it remains physically unverified, not a passed recovery witness.
+Next authoring reuses the same Cartesian primitive for a second lift after the
+source grasp (frame52) and before transit, preserving the closed gripper command.
+No scorer threshold is changed to obtain a passing candidate.
+
+Corrected Counter5 videos 5733025 completed 0:0 (4:23); Drawer59 diagnostic video
+5733026 completed 0:0 (1:38). Official-camera saved-state restoration checks pass;
+human labels are blank. First MP4 backend failure 5732783 remains. Additional jobs:
+5733235 Drawer59 earlier branch246/translation[0.20,0,0]; 5733236 Food71 source
+replacement (boxed_food_10, metadata selected after repeated pear instability);
+5733237 Counter78 candidate video. Food71 nominal replay passes original success
+at step395 with no execution error. No candidate or human-ready count increases.
+
 ## Support-loss development complete (2026-09-08)
 
 **One complete development example:** `paper-dev-support-008`, job 5729111.
