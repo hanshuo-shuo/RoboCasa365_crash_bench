@@ -1,5 +1,8 @@
 # paper_v1 implementation checkpoint
 
+**2026-09-09 人审更新：正式 ready_items 1/30（Counter78）。Food71 有违规定义/可见性异议；Drawer23 证据不足。开发与重复通过仍各3/3。**
+详见 [已保存的人审反馈与下一步](PAPER_V1_HUMAN_REVIEW_20260909.md)。下文的0/30及空白人审状态为9月8日交付时的历史记录。
+
 **Updated: 2026-09-08. Formal ready_items: 0/30.**
 The earlier curated_v0 benchmark remains 5/5 and frozen. This report separates
 implemented evaluation tools from actual new benchmark and policy results.

@@ -1,10 +1,27 @@
 # RoboCasa benchmark status
 
-**Last updated:** 2026-09-08
+**Last updated:** 2026-09-09
 **Protocol:** paper_v1 (development); curated_v0 and pi05_pilot_v1 (frozen)
-**Progress:** paper_v1 ready_items: 0/30; curated_v0 ready_items: 5/5
+**Progress:** paper_v1 ready_items: 1/30; curated_v0 ready_items: 5/5
 **Frozen curated source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
+
+## Human feedback recorded (2026-09-09)
+
+User supplied six review comments in conversation after reporting possible browser
+save failure. Verbatim evidence is preserved in the local artifact directory and
+Quest external run root as `paper_v1_human_feedback_20260909/human_feedback.json`,
+SHA-256 `4acc68e7d39834a480fa5622336a77391b9c6ab33eda29678cebe5c3e45cc3ae`.
+Only Counter78 is accepted and ready. Food71 is disputed (visible difference and
+whether ordinary door contact is a violation); Drawer23 lacks sufficient visual
+review evidence. Supplementary observations do not imply task-completion labels.
+No unmentioned annotation fields were fabricated. Validator reports ready1/30.
+
+Added visible JSON export fallback to the existing review form and delivered HTML;
+original HTML is backed up outside Git. Download failure cause remains unknown;
+actual browser download interaction is not claimed repaired. Current feedback is
+already saved and does not require resubmission. No new simulation, model eval,
+score change or frozen-results edit. See [review receipt and next steps](PAPER_V1_HUMAN_REVIEW_20260909.md).
 
 ## First paper batch delivered for human review (2026-09-08)
 

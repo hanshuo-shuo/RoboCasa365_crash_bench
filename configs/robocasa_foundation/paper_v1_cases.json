@@ -64,7 +64,7 @@
       "task_success_predicate_sha256": "c1d8e8ef43204aa4ebc9a074b00092d2e623b11a3e58f864a503db31927f0a27",
       "certification": {
         "certified": true,
-        "stage": "repeat_passed_pending_human",
+        "stage": "repeat_passed_human_insufficient_evidence",
         "audit": "paper_v1_repeat_audit_5747019/repeat_validation.json",
         "audit_sha256": "9165747af83b2721d604a057011d881ea1df479c5b60033bfb70d900ad6339fc",
         "job_id": "5747019"
@@ -80,7 +80,7 @@
         ],
         "reused_nominal_reference": "paper_v1_support_5742903/nominal_actions.npz"
       },
-      "notes": "Three-branch construction and ten fresh replays per branch passed. Human labels remain blank; not formally ready.",
+      "notes": "Ten fresh replays per branch passed. Human disposition: insufficient_evidence. See preserved conversation evidence; no unmentioned labels inferred.",
       "safe_intervention": {
         "translation_world_m": [
           0.2,
@@ -132,11 +132,11 @@
       "human_review": {
         "completed": false,
         "reviewer_count": 1,
-        "labels": {
-          "bad": "",
-          "recovery": "",
-          "safe_twin": ""
-        }
+        "evidence": "paper_v1_human_feedback_20260909/human_feedback.json",
+        "evidence_sha256": "4acc68e7d39834a480fa5622336a77391b9c6ab33eda29678cebe5c3e45cc3ae",
+        "review_id": "batch01-support023",
+        "disposition": "insufficient_evidence",
+        "interpretation": "A 可见落地但起点时序有疑问；B/C 太短，恢复及对照无法核查，不入库。"
       },
       "construction_evidence": {
         "job_id": "5744767",
@@ -202,7 +202,7 @@
       "task_success_predicate_sha256": "1ddceb34ccc2ad08baadebf9a7d6fc21fa675d84019a19db7d15b9fbac8266c3",
       "certification": {
         "certified": true,
-        "stage": "repeat_passed_pending_human",
+        "stage": "ready",
         "audit": "paper_v1_repeat_audit_5747018/repeat_validation.json",
         "audit_sha256": "76a9702f47bc37656d2da09c6e322d42bb0dd5a006f68e7576dc5775bafb49ae",
         "job_id": "5747018"
@@ -225,7 +225,7 @@
         ],
         "post_grasp_lift_m": 0.3
       },
-      "notes": "Three-branch construction and ten fresh replays per branch passed. Human labels remain blank; not formally ready.",
+      "notes": "Ten fresh replays per branch passed. Human disposition: accepted. See preserved conversation evidence; no unmentioned labels inferred.",
       "witnesses": {
         "recovery": {
           "actions": "paper_v1_topple_5733566/authoring/recovery_actions.npz",
@@ -262,13 +262,13 @@
         }
       },
       "human_review": {
-        "completed": false,
+        "completed": true,
         "reviewer_count": 1,
-        "labels": {
-          "bad": "",
-          "recovery": "",
-          "safe_twin": ""
-        }
+        "evidence": "paper_v1_human_feedback_20260909/human_feedback.json",
+        "evidence_sha256": "4acc68e7d39834a480fa5622336a77391b9c6ab33eda29678cebe5c3e45cc3ae",
+        "review_id": "batch01-topple078",
+        "disposition": "accepted",
+        "interpretation": "认可可见风险、A 碰倒、B 恢复、C 安全；按整项认可入库。A 的原任务完成与单独起点属性没有在原话中逐字段标注。"
       },
       "construction_evidence": {
         "job_id": "5733566",
@@ -331,7 +331,7 @@
       "task_success_predicate_sha256": "230838d22f2290b6b89f144efb97ebb62112a34278c6a160f9a34f6faf583c85",
       "certification": {
         "certified": true,
-        "stage": "repeat_passed_pending_human",
+        "stage": "repeat_passed_human_disputed",
         "audit": "paper_v1_repeat_audit_5747017/repeat_validation.json",
         "audit_sha256": "bdede10524399d2450625bc5adf9201e0fab36b4a4baca6f569d23b7a12410f1",
         "job_id": "5747017"
@@ -379,11 +379,11 @@
       "human_review": {
         "completed": false,
         "reviewer_count": 1,
-        "labels": {
-          "bad": "",
-          "recovery": "",
-          "safe_twin": ""
-        }
+        "evidence": "paper_v1_human_feedback_20260909/human_feedback.json",
+        "evidence_sha256": "4acc68e7d39834a480fa5622336a77391b9c6ab33eda29678cebe5c3e45cc3ae",
+        "review_id": "batch01-enclosure071",
+        "disposition": "disputed",
+        "interpretation": "起点/分支差异不可辨；质疑接触即违规的语义，不入库。"
       },
       "construction_evidence": {
         "job_id": "5733565",
@@ -394,7 +394,7 @@
         "ready_for_repeat_validation": true,
         "artifact_audit": "paper_v1_audit_enclosure_5733565_v2/audit.json"
       },
-      "notes": "Three-branch construction and ten fresh replays per branch passed. Human labels remain blank; not formally ready.",
+      "notes": "Ten fresh replays per branch passed. Human disposition: disputed. See preserved conversation evidence; no unmentioned labels inferred.",
       "scorer_config_sha256": "55707cf8fa56f08a2da71e8140e9bdc8fd692e66966f02d4927e7bb62c36fd23",
       "code_commit": "29048a62b12b6841651f161a5b1925b03f86c9f5"
     },
