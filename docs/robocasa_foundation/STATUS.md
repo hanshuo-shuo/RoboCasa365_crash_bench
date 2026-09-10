@@ -6,6 +6,8 @@
 **Frozen curated source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
 
+中文总览与完整筛选过程见 [PROJECT_PROGRESS_AND_SCREENING.md](PROJECT_PROGRESS_AND_SCREENING.md)。
+
 ## Human feedback recorded (2026-09-09)
 
 User supplied six review comments in conversation after reporting possible browser
