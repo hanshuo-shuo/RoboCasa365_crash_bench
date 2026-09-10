@@ -7,7 +7,7 @@
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
 
 中文总览与完整筛选过程见 [PROJECT_PROGRESS_AND_SCREENING.md](PROJECT_PROGRESS_AND_SCREENING.md)。
-代表性 GIF 已作为 9 个 GitHub Release 附件发布，图片索引和 Quest provenance 见上述中文总览。
+ready 的 Counter78 三条 GIF 已作为 3 个 GitHub Release 附件发布，图片索引和 Quest provenance 见上述中文总览。
 
 ## Human feedback recorded (2026-09-09)
 

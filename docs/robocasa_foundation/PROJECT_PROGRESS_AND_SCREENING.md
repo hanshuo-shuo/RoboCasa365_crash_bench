@@ -368,55 +368,26 @@ ssh -S /tmp/quest.sock quest.northwestern.edu \
 
 ## 9. 代表性 GIF
 
-下面这些是放在本文末尾的代表性动画。它们仍保存在 Quest 外部运行目录，
-这里只引用，不把视频二进制提交进 Git。若当前 Markdown 阅读器没有挂载
-`/projects`，图片可能不直接显示，但下面的绝对路径可以在 Quest 上打开。
-
-### `curated_v0` 最终条目：episode 0
-
-这些 GIF 已作为 [GitHub Release 附件](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/tag/representative-gifs-20260910) 上传；下方图片引用使用 GitHub URL，因此 GitHub 网页可以直接显示。Quest 原始路径仍保留用于 provenance。
+现在只展示正式 ready 的 `paper-candidate-topple-078`（CounterToCabinet episode 78）。
+这三条 GIF 来自该案例真实保存的 bad / recovery / safe twin MP4，已作为
+[GitHub Release 附件](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/tag/representative-gifs-20260910) 上传；下方图片引用使用 GitHub URL，GitHub 网页可以直接显示。Quest 原始路径仍保留用于 provenance。
 
 | 危险分支 | 机器人恢复 | 安全 twin |
 | --- | --- | --- |
-| ![curated-000 bad](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-000_bad.gif) | ![curated-000 recovery](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-000_recovery.gif) | ![curated-000 safe twin](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-000_safe-twin.gif) |
+| ![Counter78 bad](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/counter78_bad.gif) | ![Counter78 recovery](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/counter78_recovery.gif) | ![Counter78 safe twin](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/counter78_safe_twin.gif) |
 
-路径：
+源 MP4：
 
 ```text
-/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5589647/bad_0.gif
-/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5589647/recovery_0.gif
-/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5589647/safe_twin_0.gif
+/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_visual_5733894/bad.mp4
+/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_visual_5733894/recovery.mp4
+/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_visual_5733894/safe_twin.mp4
 ```
 
-### `curated_v0` 最终条目：episode 29
-
-| 危险分支 | 机器人恢复 | 安全 twin |
-| --- | --- | --- |
-| ![curated-029 bad](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-029_bad.gif) | ![curated-029 recovery](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-029_recovery.gif) | ![curated-029 safe twin](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-029_safe-twin.gif) |
-
-路径：
+生成的 GIF：
 
 ```text
-/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5601419/bad_0.gif
-/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5601419/recovery_0.gif
-/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5601419/safe_twin_0.gif
-```
-
-### 早期构造过程
-
-这组三条用于展示从 authoring 到完整机器人恢复 witness 的开发过程，属于历史
-开发证据，不是额外 benchmark item：
-
-| 阶段 | GIF |
-| --- | --- |
-| 初始危险候选 | ![initial bad candidate](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/development_initial_bad.gif) |
-| 初始安全对照 | ![initial safe twin](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/development_initial_safe-twin.gif) |
-| 机器人恢复 witness | ![recovery witness](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/development_recovery_witness.gif) |
-
-对应路径：
-
-```text
-/projects/p33100/siosio/robocasa_foundation_runs/f5_author_5242790/authoring/bad_first_candidate.gif
-/projects/p33100/siosio/robocasa_foundation_runs/f5_author_5242790/authoring/safe_twin_nominal.gif
-/projects/p33100/siosio/robocasa_foundation_runs/f5_recovery_5244908/recovery/recovery_witness.gif
+/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_ready_counter78_gifs_20260910/counter78_bad.gif
+/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_ready_counter78_gifs_20260910/counter78_recovery.gif
+/projects/p33100/siosio/robocasa_foundation_runs/paper_v1_ready_counter78_gifs_20260910/counter78_safe_twin.gif
 ```
