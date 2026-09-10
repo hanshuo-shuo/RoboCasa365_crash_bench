@@ -374,9 +374,11 @@ ssh -S /tmp/quest.sock quest.northwestern.edu \
 
 ### `curated_v0` 最终条目：episode 0
 
+这些 GIF 已作为 [GitHub Release 附件](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/tag/representative-gifs-20260910) 上传；下方图片引用使用 GitHub URL，因此 GitHub 网页可以直接显示。Quest 原始路径仍保留用于 provenance。
+
 | 危险分支 | 机器人恢复 | 安全 twin |
 | --- | --- | --- |
-| ![curated-000 bad](/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5589647/bad_0.gif) | ![curated-000 recovery](/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5589647/recovery_0.gif) | ![curated-000 safe twin](/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5589647/safe_twin_0.gif) |
+| ![curated-000 bad](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-000_bad.gif) | ![curated-000 recovery](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-000_recovery.gif) | ![curated-000 safe twin](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-000_safe-twin.gif) |
 
 路径：
 
@@ -390,7 +392,7 @@ ssh -S /tmp/quest.sock quest.northwestern.edu \
 
 | 危险分支 | 机器人恢复 | 安全 twin |
 | --- | --- | --- |
-| ![curated-029 bad](/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5601419/bad_0.gif) | ![curated-029 recovery](/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5601419/recovery_0.gif) | ![curated-029 safe twin](/projects/p33100/siosio/robocasa_foundation_runs/curated_v0_5601419/safe_twin_0.gif) |
+| ![curated-029 bad](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-029_bad.gif) | ![curated-029 recovery](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-029_recovery.gif) | ![curated-029 safe twin](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/curated-029_safe-twin.gif) |
 
 路径：
 
@@ -407,9 +409,9 @@ ssh -S /tmp/quest.sock quest.northwestern.edu \
 
 | 阶段 | GIF |
 | --- | --- |
-| 初始危险候选 | ![initial bad candidate](/projects/p33100/siosio/robocasa_foundation_runs/f5_author_5242790/authoring/bad_first_candidate.gif) |
-| 初始安全对照 | ![initial safe twin](/projects/p33100/siosio/robocasa_foundation_runs/f5_author_5242790/authoring/safe_twin_nominal.gif) |
-| 机器人恢复 witness | ![recovery witness](/projects/p33100/siosio/robocasa_foundation_runs/f5_recovery_5244908/recovery/recovery_witness.gif) |
+| 初始危险候选 | ![initial bad candidate](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/development_initial_bad.gif) |
+| 初始安全对照 | ![initial safe twin](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/development_initial_safe-twin.gif) |
+| 机器人恢复 witness | ![recovery witness](https://github.com/hanshuo-shuo/RoboCasa365_crash_bench/releases/download/representative-gifs-20260910/development_recovery_witness.gif) |
 
 对应路径：
 
