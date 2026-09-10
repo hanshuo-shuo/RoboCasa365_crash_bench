@@ -1,12 +1,13 @@
 # RoboCasa benchmark status
 
-**Last updated:** 2026-09-09
+**Last updated:** 2026-09-10
 **Protocol:** paper_v1 (development); curated_v0 and pi05_pilot_v1 (frozen)
 **Progress:** paper_v1 ready_items: 1/30; curated_v0 ready_items: 5/5
 **Frozen curated source episodes:** 0, 4, 16, 22, 29
 **Historical frozen cohort:** unchanged, 0/5, NO-GO
 
 中文总览与完整筛选过程见 [PROJECT_PROGRESS_AND_SCREENING.md](PROJECT_PROGRESS_AND_SCREENING.md)。
+代表性 GIF 已作为 9 个 GitHub Release 附件发布，图片索引和 Quest provenance 见上述中文总览。
 
 ## Human feedback recorded (2026-09-09)
 
